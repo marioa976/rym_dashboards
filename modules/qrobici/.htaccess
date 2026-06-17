@@ -1,0 +1,11 @@
+AddDefaultCharset UTF-8
+# --- Blindaje del portal: bloquear archivos de datos e includes ---
+<FilesMatch "\.(sql|csv|xlsx|xls|zip|lock)$">
+  Require all denied
+</FilesMatch>
+<FilesMatch "^(config|db|import_lib|_nav|_portalbar)\.php$">
+  Require all denied
+</FilesMatch>
+<FilesMatch "^lib_.*\.php$">
+  Require all denied
+</FilesMatch>

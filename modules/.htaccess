@@ -1,0 +1,3 @@
+<FilesMatch "^_portalbar\.php$">
+  Require all denied
+</FilesMatch>

@@ -1,0 +1,13 @@
+# No copiar al contenedor: secretos, git, basura local
+.env
+.env.local
+.git
+.gitignore
+*.log
+.DS_Store
+/vendor/
+/node_modules/
+.vscode/
+.idea/
+DESPLIEGUE.md
+README*.md

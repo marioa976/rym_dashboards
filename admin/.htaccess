@@ -1,0 +1,4 @@
+# Bloquear acceso web directo a los includes del panel
+<FilesMatch "^_(boot|head|foot)\.php$">
+  Require all denied
+</FilesMatch>

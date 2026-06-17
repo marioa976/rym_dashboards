@@ -1,0 +1,19 @@
+{
+    "name": "dif/padron-importer",
+    "description": "Importador y geocodificador del Padrón DIF (XLSX → MariaDB + Google Maps).",
+    "type": "project",
+    "require": {
+        "php": ">=8.2",
+        "ext-pdo": "*",
+        "ext-mbstring": "*",
+        "ext-json": "*",
+        "ext-curl": "*",
+        "openspout/openspout": "^4.24"
+    },
+    "config": {
+        "platform": {
+            "php": "8.2.0"
+        },
+        "sort-packages": true
+    }
+}

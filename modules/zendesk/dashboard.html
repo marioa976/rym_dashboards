@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Dashboard Reportes de Servicio</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#fafafa;
+    --surface:#ffffff;
+    --border:#ececec;
+    --border-strong:#e0e0e0;
+    --text:#1a1a1a;
+    --text-muted:#6b7280;
+    --text-faint:#9ca3af;
+    --accent:#2563eb;
+    --positive:#059669;
+    --warning:#d97706;
+    --negative:#dc2626;
+    --neutral:#6366f1;
+  }
+  *{box-sizing:border-box;-webkit-font-smoothing:antialiased}
+  body{
+    margin:0;
+    font-family:'Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    font-size:14px;
+    line-height:1.5;
+  }
+  .container{max-width:1400px;margin:0 auto;padding:48px 32px 80px}
+
+  /* Header */
+  header{margin-bottom:48px}
+  header h1{
+    font-size:24px;
+    font-weight:600;
+    letter-spacing:-0.02em;
+    margin:0 0 6px;
+    color:var(--text);
+  }
+  header .meta{
+    color:var(--text-muted);
+    font-size:13px;
+  }
+  header .meta b{color:var(--text);font-weight:500}
+
+  /* Section titles */
+  .section{margin-top:56px}
+  .section:first-child{margin-top:0}
+  .section-title{
+    font-size:11px;
+    font-weight:600;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    color:var(--text-faint);
+    margin:0 0 16px;
+  }
+
+  /* Grid */
+  .grid{display:grid;gap:16px}
+  .kpi-grid{grid-template-columns:repeat(4,1fr)}
+  .row-2{grid-template-columns:1fr 1fr}
+  .row-3{grid-template-columns:repeat(3,1fr)}
+  @media (max-width:1100px){
+    .kpi-grid{grid-template-columns:repeat(2,1fr)}
+    .row-3{grid-template-columns:1fr 1fr}
+  }
+  @media (max-width:720px){
+    .kpi-grid,.row-2,.row-3{grid-template-columns:1fr}
+    .container{padding:32px 20px}
+  }
+
+  /* Card */
+  .card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:20px;
+  }
+  .card-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    margin-bottom:16px;
+  }
+  .card-title{
+    font-size:13px;
+    font-weight:600;
+    color:var(--text);
+    margin:0;
+  }
+  .card-sub{
+    font-size:12px;
+    color:var(--text-faint);
+  }
+
+  /* KPI */
+  .kpi .label{
+    font-size:12px;
+    color:var(--text-muted);
+    font-weight:500;
+    margin-bottom:8px;
+  }
+  .kpi .value{
+    font-size:30px;
+    font-weight:600;
+    letter-spacing:-0.02em;
+    line-height:1;
+    color:var(--text);
+  }
+  .kpi .value .unit{
+    font-size:14px;
+    font-weight:500;
+    color:var(--text-muted);
+    margin-left:4px;
+  }
+  .kpi .meta{
+    font-size:12px;
+    color:var(--text-muted);
+    margin-top:10px;
+    line-height:1.4;
+  }
+  .kpi .meta b{color:var(--text);font-weight:500}
+  .kpi.accent .value{color:var(--accent)}
+  .kpi.positive .value{color:var(--positive)}
+  .kpi.warning .value{color:var(--warning)}
+  .kpi.negative .value{color:var(--negative)}
+
+  /* Insight */
+  .insight{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-left:3px solid var(--accent);
+    border-radius:6px;
+    padding:14px 18px;
+    font-size:13px;
+    color:var(--text);
+    line-height:1.6;
+    margin-top:16px;
+  }
+  .insight.warning{border-left-color:var(--warning)}
+  .insight.negative{border-left-color:var(--negative)}
+  .insight.positive{border-left-color:var(--positive)}
+  .insight b{font-weight:600}
+
+  /* Charts */
+  .chart-wrap{position:relative;height:280px}
+  .chart-wrap.tall{height:360px}
+  .chart-wrap.xtall{height:440px}
+
+  /* Tables */
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  thead th{
+    text-align:left;
+    font-weight:500;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+    color:var(--text-faint);
+    padding:10px 12px;
+    border-bottom:1px solid var(--border-strong);
+  }
+  tbody td{
+    padding:12px;
+    border-bottom:1px solid var(--border);
+    color:var(--text);
+  }
+  tbody tr:last-child td{border-bottom:none}
+  td.num{text-align:right;font-variant-numeric:tabular-nums}
+  .progress{
+    height:4px;
+    background:#f3f4f6;
+    border-radius:2px;
+    overflow:hidden;
+    margin-top:2px;
+  }
+  .progress > span{
+    display:block;
+    height:100%;
+    border-radius:2px;
+    background:var(--accent);
+  }
+
+  /* Heatmap */
+  .heatmap{
+    display:grid;
+    gap:3px;
+    font-size:11px;
+  }
+  .heatmap .cell{
+    padding:10px 6px;
+    text-align:center;
+    border-radius:4px;
+    font-weight:500;
+    color:var(--text);
+  }
+  .heatmap .label{
+    color:var(--text-muted);
+    font-size:12px;
+    display:flex;
+    align-items:center;
+    padding:6px 0;
+  }
+  .heatmap .label.col{
+    justify-content:center;
+    text-align:center;
+    font-size:10px;
+    line-height:1.3;
+    color:var(--text-faint);
+    padding:6px 4px;
+  }
+
+  /* Badge */
+  .pill{
+    display:inline-block;
+    font-size:11px;
+    padding:2px 8px;
+    border-radius:999px;
+    background:#f3f4f6;
+    color:var(--text-muted);
+    font-weight:500;
+  }
+  .pill.positive{background:#ecfdf5;color:#047857}
+  .pill.warning{background:#fffbeb;color:#b45309}
+  .pill.negative{background:#fef2f2;color:#b91c1c}
+
+  /* Summary */
+  .summary{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:24px 28px;
+    line-height:1.7;
+  }
+  .summary p:first-child{margin-top:0}
+  .summary p:last-child{margin-bottom:0}
+  .summary ol{padding-left:20px}
+  .summary li{margin-bottom:6px}
+
+  footer{
+    margin-top:48px;
+    padding-top:24px;
+    border-top:1px solid var(--border);
+    font-size:12px;
+    color:var(--text-faint);
+    text-align:left;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>Reportes de Servicio · Municipio de Querétaro</h1>
+  <div class="meta">Sistema Zendesk · <b>20 abr — 20 may 2026</b> · <b>6,617</b> tickets · <b>7</b> delegaciones</div>
+</header>
+
+<!-- ====================== KPIs ====================== -->
+<section class="section">
+  <div class="section-title">Indicadores principales</div>
+  <div class="grid kpi-grid">
+    <div class="card kpi">
+      <div class="label">Total de reportes</div>
+      <div class="value">6,617</div>
+      <div class="meta">Promedio diario <b>213.5</b> · Pico <b>387</b></div>
+    </div>
+    <div class="card kpi positive">
+      <div class="label">Tasa de resolución</div>
+      <div class="value">34.1<span class="unit">%</span></div>
+      <div class="meta"><b>2,254</b> resueltos de 6,617</div>
+    </div>
+    <div class="card kpi negative">
+      <div class="label">Tickets vencidos</div>
+      <div class="value">2,431</div>
+      <div class="meta">55.7% de los <b>4,363</b> sin resolver</div>
+    </div>
+    <div class="card kpi">
+      <div class="label">Tiempo medio</div>
+      <div class="value">5.95<span class="unit">días</span></div>
+      <div class="meta">Mediana <b>5d</b> · P90 <b>14d</b></div>
+    </div>
+    <div class="card kpi positive">
+      <div class="label">Cumplimiento SLA</div>
+      <div class="value">85.0<span class="unit">%</span></div>
+      <div class="meta"><b>1,914</b> resueltos en tiempo</div>
+    </div>
+    <div class="card kpi warning">
+      <div class="label">Tickets abiertos</div>
+      <div class="value">2,451</div>
+      <div class="meta">37% del total · Antigüedad <b>13.3d</b></div>
+    </div>
+    <div class="card kpi">
+      <div class="label">Solicitantes únicos</div>
+      <div class="value">5,351</div>
+      <div class="meta"><b>1.24</b> tickets por solicitante</div>
+    </div>
+    <div class="card kpi">
+      <div class="label">Cobertura</div>
+      <div class="value">597</div>
+      <div class="meta">colonias · <b>49</b> tipos de servicio</div>
+    </div>
+  </div>
+
+  <div class="insight negative">
+    <b>Alerta operativa.</b> 2,431 tickets están vencidos. Aseo Público concentra 1,929 de ellos (≈79% del total vencido) y representa el principal cuello de botella.
+  </div>
+</section>
+
+<!-- ====================== DISTRIBUCIÓN ====================== -->
+<section class="section">
+  <div class="section-title">Distribución de tickets</div>
+  <div class="grid row-3">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Estado</h3>
+        <span class="card-sub">8 estados</span>
+      </div>
+      <div class="chart-wrap"><canvas id="chStatus"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Canal de origen</h3>
+        <span class="card-sub">7 canales</span>
+      </div>
+      <div class="chart-wrap"><canvas id="chCanal"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Prioridad</h3>
+        <span class="card-sub">99% Normal</span>
+      </div>
+      <div class="chart-wrap"><canvas id="chPriority"></canvas></div>
+    </div>
+  </div>
+  <div class="insight">
+    El canal <b>070</b> concentra el 85.6% del ingreso (5,663 tickets). WhatsApp aporta 8.9% y App Municipio 5.0%. Casi la totalidad (99.3%) entra como prioridad <b>Normal</b> — vale revisar criterios de escalamiento.
+  </div>
+</section>
+
+<!-- ====================== TENDENCIA ====================== -->
+<section class="section">
+  <div class="section-title">Tendencia diaria</div>
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Tickets creados vs resueltos</h3>
+      <span class="card-sub">Caídas marcan fines de semana</span>
+    </div>
+    <div class="chart-wrap tall"><canvas id="chTime"></canvas></div>
+  </div>
+
+  <div class="grid row-2" style="margin-top:16px">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Por día de la semana</h3>
+        <span class="card-sub">Pico lunes</span>
+      </div>
+      <div class="chart-wrap"><canvas id="chDow"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Tiempo de resolución</h3>
+        <span class="card-sub">Distribución (2,550 resueltos)</span>
+      </div>
+      <div class="chart-wrap"><canvas id="chHist"></canvas></div>
+    </div>
+  </div>
+  <div class="insight">
+    Estacionalidad clara: los lunes reciben 1,702 tickets, 2× más que los viernes y ~9× más que los domingos. Conviene dimensionar el equipo de atención inicial para absorber el repunte de inicios de semana.
+  </div>
+</section>
+
+<!-- ====================== DELEGACIONES ====================== -->
+<section class="section">
+  <div class="section-title">Desempeño por delegación y grupo</div>
+  <div class="grid row-2">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Delegaciones</h3>
+        <span class="card-sub">Volumen y % resolución</span>
+      </div>
+      <div class="chart-wrap tall"><canvas id="chDeleg"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Grupos de servicio (top 10)</h3>
+        <span class="card-sub">Volumen y % resolución</span>
+      </div>
+      <div class="chart-wrap tall"><canvas id="chGrupos"></canvas></div>
+    </div>
+  </div>
+  <div class="insight warning">
+    <b>Delegaciones:</b> Centro Histórico lidera en resolución (42.3%) y Felipe Carrillo Puerto la cierra (28.2%). Felix Osores Sotomayor recibe la mayor carga (1,610) con solo 29.1% resuelto. <br>
+    <b>Grupos:</b> Alumbrado Público es el más eficiente (86.2%). Aseo Público recibe el mayor volumen (2,565) pero solo cierra 8.0% — foco rojo del sistema.
+  </div>
+</section>
+
+<!-- ====================== HEATMAP ====================== -->
+<section class="section">
+  <div class="section-title">Mapa de calor</div>
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Delegación × grupo de servicio</h3>
+      <span class="card-sub">Top 7 × top 8</span>
+    </div>
+    <div style="overflow-x:auto" id="heatmap"></div>
+  </div>
+</section>
+
+<!-- ====================== SERVICIOS / COLONIAS ====================== -->
+<section class="section">
+  <div class="section-title">Servicios y zonas con más demanda</div>
+  <div class="grid row-2">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Tipos de servicio (top 15)</h3>
+      </div>
+      <div class="chart-wrap xtall"><canvas id="chServ"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Colonias (top 15)</h3>
+      </div>
+      <div class="chart-wrap xtall"><canvas id="chCol"></canvas></div>
+    </div>
+  </div>
+  <div class="insight">
+    <b>"Recolección de tiliches"</b> domina con 2,528 reportes (38% del total). Junto con poda (1,257) y alumbrado (613) suman 67% del volumen. <br>
+    <b>"AI Agent test"</b> aparece como colonia con 590 entradas: probablemente datos de prueba que conviene filtrar.
+  </div>
+</section>
+
+<!-- ====================== BACKLOG ====================== -->
+<section class="section">
+  <div class="section-title">Backlog y tickets vencidos</div>
+  <div class="grid row-2">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Antigüedad del backlog</h3>
+        <span class="card-sub">4,363 no resueltos · media 13.3d</span>
+      </div>
+      <div class="chart-wrap"><canvas id="chAnt"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Vencidos por grupo (top 10)</h3>
+      </div>
+      <div class="chart-wrap"><canvas id="chVenc"></canvas></div>
+    </div>
+  </div>
+  <div class="insight negative">
+    <b>Backlog crítico.</b> 1,842 tickets (≈42% del backlog) llevan más de 15 días abiertos. Aseo Público acumula casi 2,000 vencidos: su tasa de resolución del 8% más el volumen lo convierten en la prioridad #1 de intervención.
+  </div>
+</section>
+
+<!-- ====================== TABLAS ====================== -->
+<section class="section">
+  <div class="section-title">Detalle por delegación</div>
+  <div class="card" style="padding:8px 0">
+    <table id="tbDeleg">
+      <thead><tr>
+        <th style="padding-left:20px">Delegación</th>
+        <th class="num">Total</th>
+        <th class="num">Resueltos</th>
+        <th class="num">Sin resolver</th>
+        <th class="num">% Resolución</th>
+        <th style="width:160px;padding-right:20px"></th>
+      </tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-title">Detalle por grupo de servicio</div>
+  <div class="card" style="padding:8px 0">
+    <table id="tbGrupo">
+      <thead><tr>
+        <th style="padding-left:20px">Grupo</th>
+        <th class="num">Total</th>
+        <th class="num">Resueltos</th>
+        <th class="num">% Resolución</th>
+        <th style="width:160px;padding-right:20px"></th>
+      </tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ====================== RESUMEN ====================== -->
+<section class="section">
+  <div class="section-title">Resumen ejecutivo</div>
+  <div class="summary">
+    <p>Durante los <b>31 días</b> analizados, el sistema 070 recibió <b>6,617 reportes ciudadanos</b> con un promedio de 213 diarios. La tasa global de resolución es del <b>34.1%</b>, pero está fuertemente sesgada: cuando los tickets sí se cierran, lo hacen en <b>~6 días</b> con un <b>85% de cumplimiento del SLA</b>. Sin embargo, el backlog acumula <b>4,363 tickets sin resolver</b> y más de la mitad ya están vencidos.</p>
+    <p>Tres frentes deberían dominar la siguiente conversación operativa:</p>
+    <ol>
+      <li><b>Aseo Público</b> — concentra 39% del volumen y casi 80% de los vencidos. Su tasa de resolución del 8% es la más baja del sistema. Cuello de botella claro.</li>
+      <li><b>Felix Osores Sotomayor</b> — la delegación más cargada (1,610 reportes) tiene la segunda tasa de resolución más baja (29.1%).</li>
+      <li><b>Canal de entrada</b> — 86% de los tickets llegan por 070 y casi todos como prioridad Normal. Conviene revisar reglas de triage y matriz de priorización.</li>
+    </ol>
+    <p>Como hallazgo de calidad de datos, la colonia <b>"AI Agent test"</b> aparece 590 veces y debería revisarse antes de publicar el dashboard a stakeholders.</p>
+  </div>
+</section>
+
+<footer>
+  Generado el 20 de mayo de 2026 · Fuente: Zendesk · 6,617 registros analizados
+</footer>
+
+</div>
+
+<script>
+const DATA = {
+  "kpis": {
+    "total": 6617,
+    "resueltos": 2254,
+    "abiertos": 2451,
+    "nuevos": 656,
+    "asignados": 777,
+    "en_proceso": 3,
+    "pendiente_info": 180,
+    "improcedentes": 229,
+    "cancelados": 67,
+    "pct_resolucion": 34.1,
+    "tiempo_promedio_dias": 5.95,
+    "tiempo_mediana_dias": 5.0,
+    "tiempo_p90_dias": 14.0,
+    "no_resueltos": 4363,
+    "vencidos": 2431,
+    "pct_vencidos": 55.7,
+    "sla_cumplido": 1914,
+    "sla_total": 2253,
+    "pct_sla": 85.0,
+    "solicitantes_unicos": 5351,
+    "colonias_unicas": 597,
+    "tipos_servicio": 49,
+    "promedio_diario": 213.5,
+    "dia_pico": 387,
+    "antiguedad_promedio": 13.3,
+    "antiguedad_max": 30
+  },
+  "status": {
+    "Abierto": 2451,
+    "Resuelto": 2254,
+    "Asignado cuadrilla": 777,
+    "Nuevo": 656,
+    "Improcedente": 229,
+    "Pendiente de Información": 180,
+    "Cancelado": 67,
+    "En proceso cuadrilla": 3
+  },
+  "priority": {
+    "Normal": 6571,
+    "High": 33,
+    "Urgent": 13
+  },
+  "canal": {
+    "070": 5663,
+    "WHATSAPP": 589,
+    "APP MUNICIPIO": 332,
+    "CAJEROS INTELIGENTES": 20,
+    "EXPEDIENTE ELECTRONICO": 9,
+    "SITIO WEB": 3,
+    "TELEFONÍA": 1
+  },
+  "grupos": {
+    "Aseo Público": 2565,
+    "Áreas verdes": 1417,
+    "Alumbrado Público": 614,
+    "Aseo Público Quejas": 338,
+    "Centro histórico": 271,
+    "Inspección de comercios e industria": 179,
+    "Obras Públicas": 160,
+    "Felix Osores Sotomayor": 156,
+    "Movilidad": 152,
+    "Inspección de servicios públicos": 124,
+    "Desarrollo Urbano": 108,
+    "Seguridad pública": 100,
+    "Felipe Carrillo Puerto": 96,
+    "Infraestructura Urbana": 84,
+    "Epigmenio González": 79
+  },
+  "servicios": {
+    "Recolección de tiliches": 2528,
+    "Recolección de residuos de poda": 1257,
+    "Reporte de alumbrado público": 613,
+    "Retiro de escombro": 365,
+    "Queja del servicio de recolección a casas habitación": 294,
+    "Reporte de baches": 135,
+    "Inspeccion a Obras por Falta de Licencia de Construccion": 109,
+    "Recolección de animal muerto": 100,
+    "Limpieza de espacios públicos": 93,
+    "Desazolve de bocas de tormenta y rejillas en vialidades": 92,
+    "Remoción de vehículo abandonado": 88,
+    "Denuncia de residuos sólidos urbanos": 84,
+    "Inspección a comercio establecido": 80,
+    "Reporte de semáforos apagados": 76,
+    "Reparación de banquetas": 74
+  },
+  "delegacion": {
+    "FELIX OSORES SOTOMAYOR": 1610,
+    "CENTRO HISTORICO": 1324,
+    "EPIGMENIO GONZÁLEZ": 1250,
+    "FELIPE CARRILLO PUERTO": 991,
+    "JOSEFA VERGARA Y HERNÁNDEZ": 927,
+    "SANTA ROSA JÁUREGUI": 269,
+    "CAYETANO RUBIO": 242,
+    "CENTRO CIVICO": 3,
+    " ": 1
+  },
+  "colonias": {
+    "AI Agent test": 590,
+    "LOMAS DE CASA BLANCA": 186,
+    "CENTRO": 163,
+    "CERRITO COLORADO": 142,
+    "FRACCIONAMIENTO GEOPLAZAS": 109,
+    "FRACCIONAMIENTO VILLAS SANTIAGO DE QUERÉTARO": 106,
+    "SAN PEDRITO PEÑUELAS": 102,
+    "CIUDAD DEL SOL SECCION VALLE DE SANTIAGO": 85,
+    "DELEGACION CENTRO HISTORICO": 73,
+    "DELEGACION FELIPE CARRILLO PUERTO": 66,
+    "EDUARDO LOARCA CASTILLO": 65,
+    "FRACCIONAMIENTO LOMAS DE SAN PEDRITO PEÑUELAS": 62,
+    "FRACCIONAMIENTO LOS VIÑEDOS": 59,
+    "SAN MIGUEL": 58,
+    "FRACCIONAMIENTO COLINAS DEL CIMATARIO": 56
+  },
+  "ts_data": {
+    "fechas": [
+      "2026-04-20",
+      "2026-04-21",
+      "2026-04-22",
+      "2026-04-23",
+      "2026-04-24",
+      "2026-04-25",
+      "2026-04-26",
+      "2026-04-27",
+      "2026-04-28",
+      "2026-04-29",
+      "2026-04-30",
+      "2026-05-01",
+      "2026-05-02",
+      "2026-05-03",
+      "2026-05-04",
+      "2026-05-05",
+      "2026-05-06",
+      "2026-05-07",
+      "2026-05-08",
+      "2026-05-09",
+      "2026-05-10",
+      "2026-05-11",
+      "2026-05-12",
+      "2026-05-13",
+      "2026-05-14",
+      "2026-05-15",
+      "2026-05-16",
+      "2026-05-17",
+      "2026-05-18",
+      "2026-05-19",
+      "2026-05-20"
+    ],
+    "creados": [
+      297,
+      242,
+      232,
+      213,
+      209,
+      119,
+      55,
+      376,
+      243,
+      227,
+      219,
+      119,
+      113,
+      37,
+      387,
+      320,
+      307,
+      248,
+      250,
+      122,
+      41,
+      322,
+      284,
+      317,
+      232,
+      239,
+      143,
+      63,
+      320,
+      306,
+      15
+    ],
+    "resueltos": [
+      6,
+      18,
+      39,
+      48,
+      63,
+      15,
+      0,
+      120,
+      118,
+      79,
+      62,
+      83,
+      3,
+      0,
+      100,
+      90,
+      169,
+      82,
+      42,
+      64,
+      0,
+      148,
+      207,
+      128,
+      138,
+      112,
+      20,
+      0,
+      142,
+      142,
+      16
+    ]
+  },
+  "dow_chart": {
+    "labels": [
+      "Lunes",
+      "Martes",
+      "Miércoles",
+      "Jueves",
+      "Viernes",
+      "Sábado",
+      "Domingo"
+    ],
+    "values": [
+      1702,
+      1395,
+      1098,
+      912,
+      817,
+      497,
+      196
+    ]
+  },
+  "hist_data": {
+    "labels": [
+      "0-1d",
+      "2-3d",
+      "4-5d",
+      "6-7d",
+      "8-10d",
+      "11-15d",
+      "16-30d",
+      ">30d"
+    ],
+    "values": [
+      564,
+      459,
+      414,
+      419,
+      266,
+      238,
+      190,
+      0
+    ]
+  },
+  "heat_data": {
+    "delegaciones": [
+      "FELIX OSORES SOTOMAYOR",
+      "CENTRO HISTORICO",
+      "EPIGMENIO GONZÁLEZ",
+      "FELIPE CARRILLO PUERTO",
+      "JOSEFA VERGARA Y HERNÁNDEZ",
+      "SANTA ROSA JÁUREGUI",
+      "CAYETANO RUBIO"
+    ],
+    "grupos": [
+      "Aseo Público",
+      "Áreas verdes",
+      "Alumbrado Público",
+      "Aseo Público Quejas",
+      "Centro histórico",
+      "Inspección de comercios e industria",
+      "Obras Públicas",
+      "Felix Osores Sotomayor"
+    ],
+    "matriz": [
+      [
+        835,
+        292,
+        90,
+        64,
+        1,
+        30,
+        34,
+        152
+      ],
+      [
+        375,
+        287,
+        114,
+        63,
+        267,
+        30,
+        43,
+        0
+      ],
+      [
+        493,
+        283,
+        126,
+        70,
+        3,
+        35,
+        21,
+        4
+      ],
+      [
+        442,
+        186,
+        85,
+        41,
+        0,
+        25,
+        18,
+        0
+      ],
+      [
+        269,
+        262,
+        100,
+        79,
+        0,
+        32,
+        16,
+        0
+      ],
+      [
+        71,
+        46,
+        67,
+        7,
+        0,
+        16,
+        19,
+        0
+      ],
+      [
+        77,
+        61,
+        32,
+        14,
+        0,
+        11,
+        9,
+        0
+      ]
+    ]
+  },
+  "grp_data": {
+    "grupos": [
+      "Aseo Público",
+      "Áreas verdes",
+      "Alumbrado Público",
+      "Aseo Público Quejas",
+      "Centro histórico",
+      "Inspección de comercios e industria",
+      "Obras Públicas",
+      "Felix Osores Sotomayor",
+      "Movilidad",
+      "Inspección de servicios públicos"
+    ],
+    "total": [
+      2565,
+      1417,
+      614,
+      338,
+      271,
+      179,
+      160,
+      156,
+      152,
+      124
+    ],
+    "resueltos": [
+      206,
+      664,
+      529,
+      247,
+      170,
+      53,
+      37,
+      113,
+      33,
+      91
+    ],
+    "pct": [
+      8.0,
+      46.9,
+      86.2,
+      73.1,
+      62.7,
+      29.6,
+      23.1,
+      72.4,
+      21.7,
+      73.4
+    ]
+  },
+  "deleg_data": {
+    "delegaciones": [
+      "FELIX OSORES SOTOMAYOR",
+      "CENTRO HISTORICO",
+      "EPIGMENIO GONZÁLEZ",
+      "FELIPE CARRILLO PUERTO",
+      "JOSEFA VERGARA Y HERNÁNDEZ",
+      "SANTA ROSA JÁUREGUI",
+      "CAYETANO RUBIO"
+    ],
+    "total": [
+      1610,
+      1324,
+      1250,
+      991,
+      927,
+      269,
+      242
+    ],
+    "resueltos": [
+      469,
+      560,
+      406,
+      279,
+      370,
+      93,
+      77
+    ],
+    "pct": [
+      29.1,
+      42.3,
+      32.5,
+      28.2,
+      39.9,
+      34.6,
+      31.8
+    ]
+  },
+  "venc_grp": {
+    "Aseo Público": 1929,
+    "Áreas verdes": 187,
+    "Infraestructura Urbana": 60,
+    "Alumbrado Público": 53,
+    "Aseo Público Quejas": 45,
+    "Inspección de comercios e industria": 39,
+    "Desarrollo Urbano": 37,
+    "070": 27,
+    "Movilidad": 14,
+    "Centro histórico": 8
+  },
+  "antiguedad_chart": {
+    "labels": [
+      "0-3d",
+      "4-7d",
+      "8-14d",
+      "15-21d",
+      "22-30d",
+      ">30d"
+    ],
+    "values": [
+      667,
+      778,
+      1076,
+      856,
+      986,
+      0
+    ]
+  }
+};
+
+/* Palette minimalista */
+const COLORS = {
+  primary:'#2563eb',
+  positive:'#059669',
+  warning:'#d97706',
+  negative:'#dc2626',
+  neutral:'#6366f1',
+  accent:'#0891b2',
+  pink:'#db2777',
+  slate:'#64748b'
+};
+const PALETTE = [COLORS.primary, COLORS.positive, COLORS.warning, COLORS.negative, COLORS.neutral, COLORS.accent, COLORS.pink, COLORS.slate];
+
+Chart.defaults.font.family = 'Inter, system-ui, sans-serif';
+Chart.defaults.font.size = 11;
+Chart.defaults.color = '#6b7280';
+Chart.defaults.borderColor = '#ececec';
+Chart.defaults.plugins.legend.labels.boxWidth = 8;
+Chart.defaults.plugins.legend.labels.boxHeight = 8;
+Chart.defaults.plugins.legend.labels.padding = 14;
+Chart.defaults.plugins.legend.labels.usePointStyle = true;
+Chart.defaults.plugins.legend.labels.pointStyle = 'circle';
+Chart.defaults.plugins.tooltip.backgroundColor = '#1a1a1a';
+Chart.defaults.plugins.tooltip.titleColor = '#fff';
+Chart.defaults.plugins.tooltip.bodyColor = '#fff';
+Chart.defaults.plugins.tooltip.padding = 10;
+Chart.defaults.plugins.tooltip.cornerRadius = 6;
+Chart.defaults.plugins.tooltip.titleFont = {weight:'600',size:12};
+Chart.defaults.plugins.tooltip.bodyFont = {size:12};
+
+const baseGrid = {grid:{color:'#f3f4f6',drawTicks:false},border:{display:false},ticks:{padding:8}};
+const noGrid = {grid:{display:false},border:{display:false},ticks:{padding:8}};
+
+/* Status */
+new Chart(document.getElementById('chStatus'),{
+  type:'doughnut',
+  data:{labels:Object.keys(DATA.status),datasets:[{data:Object.values(DATA.status),backgroundColor:PALETTE,borderWidth:2,borderColor:'#fff'}]},
+  options:{plugins:{legend:{position:'right',align:'center'}},cutout:'70%'}
+});
+
+/* Canal */
+new Chart(document.getElementById('chCanal'),{
+  type:'doughnut',
+  data:{labels:Object.keys(DATA.canal),datasets:[{data:Object.values(DATA.canal),backgroundColor:PALETTE,borderWidth:2,borderColor:'#fff'}]},
+  options:{plugins:{legend:{position:'right',align:'center'}},cutout:'70%'}
+});
+
+/* Priority */
+new Chart(document.getElementById('chPriority'),{
+  type:'doughnut',
+  data:{labels:Object.keys(DATA.priority),datasets:[{data:Object.values(DATA.priority),backgroundColor:[COLORS.primary,COLORS.warning,COLORS.negative],borderWidth:2,borderColor:'#fff'}]},
+  options:{plugins:{legend:{position:'right',align:'center'}},cutout:'70%'}
+});
+
+/* Time series */
+new Chart(document.getElementById('chTime'),{
+  type:'line',
+  data:{labels:DATA.ts_data.fechas,datasets:[
+    {label:'Creados',data:DATA.ts_data.creados,borderColor:COLORS.primary,backgroundColor:'rgba(37,99,235,.08)',tension:.35,fill:true,borderWidth:2,pointRadius:0,pointHoverRadius:5},
+    {label:'Resueltos',data:DATA.ts_data.resueltos,borderColor:COLORS.positive,backgroundColor:'rgba(5,150,105,.06)',tension:.35,fill:true,borderWidth:2,pointRadius:0,pointHoverRadius:5}
+  ]},
+  options:{
+    plugins:{legend:{position:'top',align:'end'}},
+    scales:{x:{...noGrid,ticks:{...noGrid.ticks,maxRotation:0,autoSkip:true,maxTicksLimit:10,font:{size:10}}},y:baseGrid}
+  }
+});
+
+/* Day of week */
+new Chart(document.getElementById('chDow'),{
+  type:'bar',
+  data:{labels:DATA.dow_chart.labels,datasets:[{data:DATA.dow_chart.values,backgroundColor:COLORS.primary,borderRadius:4,barThickness:24}]},
+  options:{plugins:{legend:{display:false}},scales:{x:noGrid,y:baseGrid}}
+});
+
+/* Histogram */
+new Chart(document.getElementById('chHist'),{
+  type:'bar',
+  data:{labels:DATA.hist_data.labels,datasets:[{data:DATA.hist_data.values,backgroundColor:COLORS.positive,borderRadius:4,barThickness:28}]},
+  options:{plugins:{legend:{display:false}},scales:{x:noGrid,y:baseGrid}}
+});
+
+/* Delegación combo */
+new Chart(document.getElementById('chDeleg'),{
+  data:{labels:DATA.deleg_data.delegaciones,datasets:[
+    {type:'bar',label:'Total',data:DATA.deleg_data.total,backgroundColor:COLORS.primary,borderRadius:3,yAxisID:'y',order:2},
+    {type:'bar',label:'Resueltos',data:DATA.deleg_data.resueltos,backgroundColor:COLORS.positive,borderRadius:3,yAxisID:'y',order:2},
+    {type:'line',label:'% resolución',data:DATA.deleg_data.pct,borderColor:COLORS.warning,backgroundColor:COLORS.warning,borderWidth:2,tension:.3,yAxisID:'y1',pointRadius:4,pointBackgroundColor:'#fff',pointBorderWidth:2,order:1}
+  ]},
+  options:{
+    indexAxis:'y',
+    plugins:{legend:{position:'top',align:'end'}},
+    scales:{
+      x:{...baseGrid,beginAtZero:true},
+      y:{...noGrid,ticks:{...noGrid.ticks,font:{size:11}}},
+      y1:{position:'top',min:0,max:60,grid:{display:false},border:{display:false},ticks:{callback:v=>v+'%',font:{size:10},color:COLORS.warning}}
+    }
+  }
+});
+
+/* Grupos combo */
+new Chart(document.getElementById('chGrupos'),{
+  data:{labels:DATA.grp_data.grupos,datasets:[
+    {type:'bar',label:'Total',data:DATA.grp_data.total,backgroundColor:COLORS.primary,borderRadius:3,yAxisID:'y',order:2},
+    {type:'bar',label:'Resueltos',data:DATA.grp_data.resueltos,backgroundColor:COLORS.positive,borderRadius:3,yAxisID:'y',order:2},
+    {type:'line',label:'% resolución',data:DATA.grp_data.pct,borderColor:COLORS.warning,backgroundColor:COLORS.warning,borderWidth:2,tension:.3,yAxisID:'y1',pointRadius:4,pointBackgroundColor:'#fff',pointBorderWidth:2,order:1}
+  ]},
+  options:{
+    indexAxis:'y',
+    plugins:{legend:{position:'top',align:'end'}},
+    scales:{
+      x:{...baseGrid,beginAtZero:true},
+      y:{...noGrid,ticks:{...noGrid.ticks,font:{size:11}}},
+      y1:{position:'top',min:0,max:100,grid:{display:false},border:{display:false},ticks:{callback:v=>v+'%',font:{size:10},color:COLORS.warning}}
+    }
+  }
+});
+
+/* Heatmap */
+(function(){
+  const h = DATA.heat_data;
+  const max = Math.max(...h.matriz.flat());
+  const cols = h.grupos.length;
+  const container = document.getElementById('heatmap');
+  let html = `<div class="heatmap" style="grid-template-columns: 220px repeat(${cols},minmax(70px,1fr));margin-top:8px">`;
+  html += `<div></div>`;
+  h.grupos.forEach(g=>{html += `<div class="label col">${g}</div>`});
+  h.delegaciones.forEach((d,i)=>{
+    html += `<div class="label">${d}</div>`;
+    h.matriz[i].forEach(v=>{
+      const t = v/max;
+      // Soft blue gradient from very light to medium
+      const r = Math.round(248 - (248-37)*t);
+      const g_ = Math.round(250 - (250-99)*t);
+      const b = Math.round(252 - (252-235)*t);
+      const bg = `rgb(${r},${g_},${b})`;
+      const color = t > 0.5 ? '#fff' : '#1a1a1a';
+      html += `<div class="cell" style="background:${bg};color:${color}">${v}</div>`;
+    });
+  });
+  html += `</div>`;
+  container.innerHTML = html;
+})();
+
+/* Servicios */
+new Chart(document.getElementById('chServ'),{
+  type:'bar',
+  data:{labels:Object.keys(DATA.servicios),datasets:[{data:Object.values(DATA.servicios),backgroundColor:COLORS.neutral,borderRadius:3}]},
+  options:{indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{...baseGrid,beginAtZero:true},y:{...noGrid,ticks:{...noGrid.ticks,font:{size:10.5}}}}}
+});
+
+/* Colonias */
+new Chart(document.getElementById('chCol'),{
+  type:'bar',
+  data:{labels:Object.keys(DATA.colonias),datasets:[{data:Object.values(DATA.colonias),backgroundColor:COLORS.accent,borderRadius:3}]},
+  options:{indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{...baseGrid,beginAtZero:true},y:{...noGrid,ticks:{...noGrid.ticks,font:{size:10.5}}}}}
+});
+
+/* Antigüedad */
+new Chart(document.getElementById('chAnt'),{
+  type:'bar',
+  data:{labels:DATA.antiguedad_chart.labels,datasets:[{
+    data:DATA.antiguedad_chart.values,
+    backgroundColor:[COLORS.positive,'#84cc16',COLORS.warning,'#f97316',COLORS.negative,'#7f1d1d'],
+    borderRadius:4,
+    barThickness:32
+  }]},
+  options:{plugins:{legend:{display:false}},scales:{x:noGrid,y:baseGrid}}
+});
+
+/* Vencidos */
+new Chart(document.getElementById('chVenc'),{
+  type:'bar',
+  data:{labels:Object.keys(DATA.venc_grp),datasets:[{data:Object.values(DATA.venc_grp),backgroundColor:COLORS.negative,borderRadius:3}]},
+  options:{indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{...baseGrid,beginAtZero:true},y:{...noGrid,ticks:{...noGrid.ticks,font:{size:10.5}}}}}
+});
+
+/* Tabla delegaciones */
+(function(){
+  const d = DATA.deleg_data;
+  const tbody = document.querySelector('#tbDeleg tbody');
+  d.delegaciones.forEach((name,i)=>{
+    const pct = d.pct[i];
+    const noRes = d.total[i]-d.resueltos[i];
+    const cls = pct >= 40 ? 'positive' : (pct >= 30 ? 'warning' : 'negative');
+    const color = pct >= 40 ? COLORS.positive : (pct >= 30 ? COLORS.warning : COLORS.negative);
+    tbody.insertAdjacentHTML('beforeend',`
+      <tr>
+        <td style="padding-left:20px">${name}</td>
+        <td class="num">${d.total[i].toLocaleString()}</td>
+        <td class="num">${d.resueltos[i].toLocaleString()}</td>
+        <td class="num">${noRes.toLocaleString()}</td>
+        <td class="num"><span class="pill ${cls}">${pct}%</span></td>
+        <td style="padding-right:20px"><div class="progress"><span style="width:${pct}%;background:${color}"></span></div></td>
+      </tr>`);
+  });
+})();
+
+/* Tabla grupos */
+(function(){
+  const g = DATA.grp_data;
+  const tbody = document.querySelector('#tbGrupo tbody');
+  g.grupos.forEach((name,i)=>{
+    const pct = g.pct[i];
+    const cls = pct >= 70 ? 'positive' : (pct >= 40 ? 'warning' : 'negative');
+    const color = pct >= 70 ? COLORS.positive : (pct >= 40 ? COLORS.warning : COLORS.negative);
+    tbody.insertAdjacentHTML('beforeend',`
+      <tr>
+        <td style="padding-left:20px">${name}</td>
+        <td class="num">${g.total[i].toLocaleString()}</td>
+        <td class="num">${g.resueltos[i].toLocaleString()}</td>
+        <td class="num"><span class="pill ${cls}">${pct}%</span></td>
+        <td style="padding-right:20px"><div class="progress"><span style="width:${pct}%;background:${color}"></span></div></td>
+      </tr>`);
+  });
+})();
+</script>
+</body>
+</html>

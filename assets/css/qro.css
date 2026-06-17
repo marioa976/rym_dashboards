@@ -1,0 +1,192 @@
+/* =====================================================================
+   Querétaro con Futuro — Sistema de diseño (basado en manual de marca)
+   ===================================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap');
+
+:root {
+  --qro-red: #ce3a2b;
+  --qro-blue-dark: #254185;
+  --qro-blue: #005ab2;
+  --qro-blue-light: #2a9eda;
+
+  --qro-white: #ffffff;
+  --qro-bg: #f5f7fb;
+  --qro-surface: #ffffff;
+  --qro-border: #d9e2f0;
+
+  --qro-text-primary: #1f2937;
+  --qro-text-secondary: #5b667a;
+  --qro-text-muted: #8a94a6;
+
+  --qro-success: #188a5b;
+  --qro-warning: #d99000;
+  --qro-danger: #ce3a2b;
+
+  --qro-radius-sm: 6px;
+  --qro-radius-md: 10px;
+  --qro-radius-lg: 16px;
+
+  --qro-shadow-sm: 0 2px 6px rgba(37, 65, 133, 0.08);
+  --qro-shadow-md: 0 8px 24px rgba(37, 65, 133, 0.12);
+
+  --sidebar-w: 248px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: "Montserrat", Arial, sans-serif;
+  font-size: 16px;
+  color: var(--qro-text-primary);
+  background: var(--qro-bg);
+}
+
+h1, h2, h3, h4 { margin: 0 0 .4em; line-height: 1.25; }
+h1 { font-size: 32px; font-weight: 800; color: var(--qro-blue-dark); }
+h2 { font-size: 26px; font-weight: 700; color: var(--qro-blue-dark); }
+h3 { font-size: 20px; font-weight: 700; color: var(--qro-text-primary); }
+a  { color: var(--qro-blue); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.text-secondary { color: var(--qro-text-secondary); }
+.text-muted { color: var(--qro-text-muted); }
+
+/* ---------- Layout administrativo ---------- */
+.layout { display: flex; min-height: 100vh; }
+
+.sidebar {
+  width: var(--sidebar-w);
+  flex: 0 0 var(--sidebar-w);
+  background: var(--qro-blue);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+.sidebar-brand {
+  display: flex; align-items: center; justify-content: center;
+  padding: 16px 18px; background: var(--qro-blue);
+  border-bottom: 1px solid rgba(255,255,255,.12);
+}
+.sidebar-logo { width: 100%; max-width: 190px; height: auto; display: block; }
+.sidebar-brand-text { font-weight: 800; font-size: 15px; line-height: 1.15; }
+.sidebar-nav { padding: 12px 10px; display: flex; flex-direction: column; gap: 4px; }
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  color: #dce4f5; padding: 11px 14px; border-radius: var(--qro-radius-md);
+  font-weight: 600; font-size: 15px; border-left: 4px solid transparent;
+}
+.nav-item:hover { background: rgba(255,255,255,.08); text-decoration: none; color: #fff; }
+.nav-item.active {
+  background: rgba(42, 158, 218, 0.22);
+  border-left: 4px solid var(--qro-blue-light);
+  color: #fff;
+}
+.nav-ico { opacity: .85; }
+
+.main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+
+.topbar {
+  height: 64px; background: var(--qro-surface);
+  border-bottom: 1px solid var(--qro-border);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 28px; position: sticky; top: 0; z-index: 5;
+}
+.topbar-title { font-weight: 700; color: var(--qro-blue-dark); }
+.topbar-user { display: flex; align-items: center; gap: 12px; }
+.user-name { font-weight: 600; font-size: 14px; }
+
+.content { padding: 28px; flex: 1; }
+.footer {
+  padding: 16px 28px; color: var(--qro-text-muted);
+  font-size: 13px; border-top: 1px solid var(--qro-border);
+}
+
+.page-head { margin-bottom: 22px; }
+
+/* ---------- Cards ---------- */
+.card {
+  background: var(--qro-surface);
+  border: 1px solid var(--qro-border);
+  border-radius: var(--qro-radius-lg);
+  box-shadow: var(--qro-shadow-sm);
+  padding: 20px;
+}
+.grid-cards {
+  display: grid; gap: 18px;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+}
+.card-modulo { position: relative; display: block; color: inherit; transition: .15s; }
+.card-modulo:hover { box-shadow: var(--qro-shadow-md); text-decoration: none; transform: translateY(-2px); }
+.card-modulo-dot {
+  position: absolute; top: 20px; right: 20px;
+  width: 12px; height: 12px; border-radius: 999px; background: var(--accent, var(--qro-blue));
+}
+.card-modulo h3 { color: var(--qro-blue-dark); }
+
+/* KPIs */
+.kpi-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); }
+.kpi .kpi-label { font-size: 13px; color: var(--qro-text-secondary); font-weight: 600; }
+.kpi .kpi-value { font-size: 30px; font-weight: 800; color: var(--qro-blue-dark); }
+.kpi .kpi-delta { font-size: 13px; font-weight: 600; }
+.kpi .kpi-delta.up { color: var(--qro-success); }
+.kpi .kpi-delta.down { color: var(--qro-danger); }
+
+/* ---------- Botones ---------- */
+.btn {
+  display: inline-block; border-radius: var(--qro-radius-md);
+  font-weight: 700; padding: 12px 18px; border: none; cursor: pointer;
+  font-family: inherit; font-size: 15px; text-align: center;
+}
+.btn-sm { padding: 8px 14px; font-size: 14px; }
+.btn-block { width: 100%; }
+.btn-primary { background: var(--qro-blue-dark); color: #fff; }
+.btn-primary:hover { background: var(--qro-blue); text-decoration: none; }
+.btn-secondary { background: #fff; color: var(--qro-blue-dark); border: 1px solid var(--qro-blue-dark); }
+.btn-secondary:hover { background: #eef5fc; text-decoration: none; }
+.btn-danger { background: var(--qro-red); color: #fff; }
+
+/* ---------- Formularios ---------- */
+.field { margin-bottom: 16px; }
+.field label { display: block; font-size: 13px; font-weight: 600; color: var(--qro-blue-dark); margin-bottom: 6px; }
+.input {
+  width: 100%; border: 1px solid var(--qro-border); border-radius: var(--qro-radius-md);
+  padding: 12px 14px; font-family: inherit; font-size: 15px; background: #fff;
+}
+.input:focus { outline: none; border-color: var(--qro-blue); box-shadow: 0 0 0 3px rgba(42,158,218,.18); }
+
+/* ---------- Tablas ---------- */
+.table { width: 100%; border-collapse: collapse; }
+.table th { color: var(--qro-blue-dark); font-weight: 700; background: #eef5fc; text-align: left; padding: 12px 14px; }
+.table td { color: var(--qro-text-primary); border-bottom: 1px solid var(--qro-border); padding: 12px 14px; }
+.table tbody tr:hover { background: #f7fafe; }
+
+/* ---------- Badges / alertas ---------- */
+.badge { border-radius: 999px; padding: 5px 10px; font-weight: 600; font-size: 12px; display: inline-block; }
+.badge-info { background: rgba(42,158,218,.12); color: var(--qro-blue); }
+.badge-success { background: rgba(24,138,91,.12); color: var(--qro-success); }
+.badge-warning { background: rgba(217,144,0,.14); color: var(--qro-warning); }
+.badge-danger { background: rgba(206,58,43,.12); color: var(--qro-danger); }
+
+.alert { border-radius: var(--qro-radius-md); padding: 12px 14px; margin-bottom: 16px; font-size: 14px; }
+.alert-danger { background: rgba(206,58,43,.10); color: var(--qro-danger); border: 1px solid rgba(206,58,43,.25); }
+
+/* ---------- Login ---------- */
+.login-body { background: linear-gradient(160deg, var(--qro-blue-dark), var(--qro-blue)); min-height: 100vh; }
+.login-wrap { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; }
+.login-card { width: 100%; max-width: 420px; background: #fff; border-radius: 20px; box-shadow: var(--qro-shadow-md); padding: 32px; overflow: hidden; }
+.login-brand { text-align: center; margin: -32px -32px 24px; padding: 26px 28px 20px; background: var(--qro-blue); border-radius: 20px 20px 0 0; }
+.login-logo { width: 100%; max-width: 270px; height: auto; display: block; margin: 0 auto 6px; }
+.login-title { display: none; }
+.login-sub { color: rgba(255,255,255,.9); margin: 0; font-size: 14px; }
+.login-foot { color: #dbe6fb; font-size: 13px; margin-top: 18px; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 860px) {
+  .sidebar { position: fixed; left: 0; z-index: 20; transform: translateX(-100%); transition: .2s; }
+  .sidebar.open { transform: translateX(0); }
+  .content { padding: 18px; }
+}

@@ -1,0 +1,17 @@
+# Raíz del portal — protección básica.
+
+# No servir archivos ocultos por web (.env, .gitignore, .htaccess, etc.)
+<FilesMatch "^\.">
+  Require all denied
+</FilesMatch>
+
+# No servir archivos sensibles o de despliegue
+<FilesMatch "\.(env|sql|lock|md|yml|yaml)$">
+  Require all denied
+</FilesMatch>
+<FilesMatch "^(Dockerfile|composer\.(json|lock))$">
+  Require all denied
+</FilesMatch>
+
+# Página de entrada
+DirectoryIndex index.php

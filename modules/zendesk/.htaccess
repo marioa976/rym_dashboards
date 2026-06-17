@@ -1,0 +1,15 @@
+# Solo charset por default (las tildes y ñ se ven bien).
+# Los límites de PHP están en .user.ini para que funcionen tanto con
+# mod_php como con PHP-FPM (este último es el default de MAMP 7+).
+
+AddDefaultCharset UTF-8
+# --- Blindaje del portal: bloquear archivos de datos e includes ---
+<FilesMatch "\.(sql|csv|xlsx|xls|zip|lock)$">
+  Require all denied
+</FilesMatch>
+<FilesMatch "^(config|db|import_lib|_nav|_navzendesk|_portalbar|_zendesk_lib|cron_import)\.php$">
+  Require all denied
+</FilesMatch>
+<FilesMatch "^lib_.*\.php$">
+  Require all denied
+</FilesMatch>

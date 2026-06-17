@@ -1,0 +1,33 @@
+# ===== Secretos / entorno local (NUNCA subir) =====
+.env
+.env.local
+.env.*.local
+
+# ===== Sistema operativo =====
+.DS_Store
+Thumbs.db
+
+# ===== Logs y temporales =====
+*.log
+/tmp/
+*.cache
+
+# ===== Archivos subidos por usuarios (datos, no código) =====
+modules/*/uploads/
+uploads/
+
+# ===== Dependencias (si llegaran a existir) =====
+/vendor/
+/node_modules/
+
+# ===== Editores =====
+.vscode/
+.idea/
+
+# Nota: .env.example SÍ se versiona (es la plantilla sin secretos).
+
+# IDE NetBeans
+nbproject/
+
+# Datos sueltos
+*.csv
