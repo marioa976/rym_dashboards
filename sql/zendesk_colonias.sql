@@ -4,6 +4,7 @@
 -- Idempotente: se puede re-ejecutar. Usa la BD portal_qro.
 -- ====================================================================
 SET NAMES utf8mb4;
+USE portal_qro;
 
 CREATE TABLE IF NOT EXISTS zendesk_colonias (
   colonia_ulid      CHAR(26)     NOT NULL,

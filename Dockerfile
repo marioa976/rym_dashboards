@@ -5,8 +5,14 @@
 # ============================================================
 FROM php:8.2-apache
 
-# Extensiones que usa el portal (PDO/MySQL) y módulos de Apache
-RUN docker-php-ext-install pdo_mysql mysqli \
+# Librerías del sistema que necesitan algunas extensiones de PHP
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends libzip-dev libonig-dev \
+ && rm -rf /var/lib/apt/lists/*
+
+# Extensiones que usa el portal:
+#   pdo_mysql/mysqli -> BD;  zip -> ZipArchive (openspout/XLSX);  mbstring -> mb_*
+RUN docker-php-ext-install pdo_mysql mysqli zip mbstring \
  && a2enmod rewrite headers
 
 # Permitir que los .htaccess del proyecto tomen efecto
@@ -16,6 +22,7 @@ RUN sed -ri 's/AllowOverride None/AllowOverride All/g' /etc/apache2/apache2.conf
 RUN { \
       echo 'display_errors=Off'; \
       echo 'log_errors=On'; \
+      echo 'error_log=/dev/stderr'; \
       echo 'upload_max_filesize=32M'; \
       echo 'post_max_size=32M'; \
       echo 'memory_limit=256M'; \

@@ -23,6 +23,15 @@ function zd_get(string $url, string $user, string $token): array {
     return [$status, (string)$body];
 }
 
+/** Normaliza el subdominio: acepta "municipioqueretaro", "https://municipioqueretaro"
+ *  o "https://municipioqueretaro.zendesk.com" y devuelve solo "municipioqueretaro". */
+function zd_sub(array $api): string {
+    $s = (string)($api['subdomain'] ?? '');
+    $s = preg_replace('#^https?://#i', '', $s);          // quita esquema
+    $s = preg_replace('#\.zendesk\.com.*$#i', '', $s);   // quita dominio/ruta si los pusieron
+    return trim($s, "/ \t");
+}
+
 /** Busca tickets en la Search API. Devuelve [resultados, error, total, query]. */
 function zd_buscar(array $api, string $desde, string $hasta, string $tag, int $limite): array {
     $partes = ['type:ticket'];
@@ -30,7 +39,7 @@ function zd_buscar(array $api, string $desde, string $hasta, string $tag, int $l
     if ($desde !== '') $partes[] = 'created>=' . $desde;
     if ($hasta !== '') $partes[] = 'created<=' . $hasta;
     $query = implode(' ', $partes);
-    $url = 'https://' . ($api['subdomain'] ?? '') . '.zendesk.com/api/v2/search.json?query='
+    $url = 'https://' . zd_sub($api) . '.zendesk.com/api/v2/search.json?query='
          . urlencode($query) . '&sort_by=created_at&sort_order=desc';
     $res = []; $err = ''; $total = 0; $pages = 0;
     try {
@@ -57,7 +66,7 @@ function zd_buscar(array $api, string $desde, string $hasta, string $tag, int $l
  */
 function zd_incremental(array $api, string $url, int $startTs = 0): array {
     if ($url === '') {
-        $url = 'https://' . ($api['subdomain'] ?? '') . '.zendesk.com/api/v2/incremental/tickets.json?start_time=' . max(0, $startTs);
+        $url = 'https://' . zd_sub($api) . '.zendesk.com/api/v2/incremental/tickets.json?start_time=' . max(0, $startTs);
     }
     try {
         [$status, $body] = zd_get($url, $api['user'] ?? '', $api['token'] ?? '');
@@ -270,7 +279,7 @@ function zd_meta(array $api): array {
         if (is_array($c) && isset($c['grupos'])) return $c;
     }
 
-    $base = 'https://' . $api['subdomain'] . '.zendesk.com/api/v2/';
+    $base = 'https://' . zd_sub($api) . '.zendesk.com/api/v2/';
     $u = $api['user'] ?? ''; $t = $api['token'] ?? '';
 
     // Grupos (group_id -> nombre, p.ej. "Aseo Público")
