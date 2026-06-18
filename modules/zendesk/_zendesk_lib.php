@@ -482,6 +482,40 @@ function zd_upsert(PDO $pdo, array $row): bool {
  * Trae UNA vez los metadatos (grupos + opciones de campos) para resolver
  * etiquetas legibles. Devuelve [insertados/actualizados_ok, errores[]].
  */
+/**
+ * Asigna la sección electoral (tickets.seccion_id) a los tickets nuevos.
+ * Precálculo para el reporte "por sección": así NO se hace ST_Contains en cada
+ * carga del dashboard. Crea la columna si falta. Corre en READ COMMITTED para
+ * que el índice espacial funcione. No rompe el import si algo falla.
+ */
+function zd_asignar_secciones(PDO $pdo): void {
+    static $listo = null;     // null=sin revisar · false=no aplica · true=listo
+    try {
+        if ($listo === null) {
+            $listo = false;
+            $haySecGeo = (int)$pdo->query("SELECT COUNT(*) FROM information_schema.tables
+                           WHERE table_schema=DATABASE() AND table_name='secciones_geo'")->fetchColumn();
+            if (!$haySecGeo) return;                       // sin tablas IEEQ no hay nada que cruzar
+            $cols = $pdo->query("SHOW COLUMNS FROM tickets")->fetchAll(PDO::FETCH_COLUMN);
+            if (!in_array('seccion_id', $cols, true)) {
+                $pdo->exec("ALTER TABLE tickets ADD COLUMN seccion_id INT NULL,
+                            ADD INDEX idx_tickets_seccion (seccion_id), ALGORITHM=INPLACE, LOCK=NONE");
+            }
+            $pdo->exec("SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED");
+            $listo = true;
+        }
+        if ($listo) {
+            $pdo->exec("
+                UPDATE tickets t
+                  JOIN secciones_geo sg
+                    ON ST_Contains(sg.geom, ST_GeomFromText(CONCAT('POINT(',t.latitud,' ',t.longitud,')'), 4326))
+                  SET t.seccion_id = sg.seccion_id
+                  WHERE t.seccion_id IS NULL AND t.latitud IS NOT NULL AND t.longitud IS NOT NULL
+            ");
+        }
+    } catch (Throwable $e) { /* no rompemos el import */ }
+}
+
 function zd_importar(PDO $pdo, array $api, array $tickets, array $mapeo): array {
     $meta = zd_meta($api);
     $ok = 0; $err = [];
@@ -492,6 +526,7 @@ function zd_importar(PDO $pdo, array $api, array $tickets, array $mapeo): array 
             $err[] = '#' . ($t['id'] ?? '?') . ': ' . $e->getMessage();
         }
     }
+    zd_asignar_secciones($pdo);   // precálculo de seccion_id para los tickets nuevos
     return [$ok, $err];
 }
 

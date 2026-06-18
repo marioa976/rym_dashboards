@@ -313,6 +313,39 @@ function padronImport(
         throw new RuntimeException("No se encontró la hoja '$sheetName'");
     }
 
+    // -----------------------------------------------------------------
+    //  Precálculo de la sección electoral de los registros nuevos.
+    //  Así el reporte electoral solo agrupa por seccion_id (sin ST_Contains
+    //  en cada carga). Se hace aquí, una sola vez por import, para no olvidarlo.
+    //  Corre en READ COMMITTED para que el índice espacial funcione.
+    // -----------------------------------------------------------------
+    try {
+        $pdo->exec("SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED");
+        $colsP = $pdo->query("SHOW COLUMNS FROM padron")->fetchAll(PDO::FETCH_COLUMN);
+        $haySecGeo = (int)$pdo->query("SELECT COUNT(*) FROM information_schema.tables
+                       WHERE table_schema=DATABASE() AND table_name='secciones_geo'")->fetchColumn();
+        if ($haySecGeo) {
+            if (!in_array('seccion_id', $colsP, true)) {  // crea la columna si no existe
+                $pdo->exec("ALTER TABLE padron
+                            ADD COLUMN seccion_id INT NULL,
+                            ADD INDEX idx_padron_seccion (seccion_id),
+                            ALGORITHM=INPLACE, LOCK=NONE");
+            }
+            $n = $pdo->exec("
+                UPDATE padron p
+                  JOIN secciones_geo sg
+                    ON ST_Contains(sg.geom, ST_GeomFromText(CONCAT('POINT(',p.latitud,' ',p.longitud,')'), 4326))
+                  SET p.seccion_id = sg.seccion_id
+                  WHERE p.seccion_id IS NULL AND p.latitud IS NOT NULL AND p.longitud IS NOT NULL
+            ");
+            $emit(['event'=>'seccion_id', 'mensaje'=>"Secciones electorales asignadas: $n registros."]);
+        }
+    } catch (Throwable $e) {
+        // No rompemos el import si esto falla: los datos ya quedaron cargados.
+        $emit(['event'=>'warn', 'mensaje'=>'No se pudo asignar seccion_id automáticamente ('
+            . $e->getMessage() . '). Corre el UPDATE de seccion_id manualmente.']);
+    }
+
     $pdo->prepare("UPDATE import_log SET filas_leidas=?, filas_insertadas=?, filas_error=?, terminado_at=NOW() WHERE id=?")
         ->execute([$totalLeidas, $totalInsert, $totalError, $importId]);
 

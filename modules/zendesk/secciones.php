@@ -20,8 +20,8 @@ $action   = $_GET['action'] ?? '';
 // ---------------------------------------------------------------------
 // SQL helpers
 // ---------------------------------------------------------------------
-$SPATIAL = "JOIN secciones_geo sg
-              ON ST_Contains(sg.geom, ST_GeomFromText(CONCAT('POINT(',t.latitud,' ',t.longitud,')'), 4326))";
+// Ya no se hace cruce espacial en el request: el reporte usa tickets.seccion_id
+// precalculado por el importador. Solo queda el join al estado.
 $JOINEST = "LEFT JOIN cat_estado e ON e.id = t.estado_id";
 
 function buildWhere(array $f): array {
@@ -37,22 +37,22 @@ function buildWhere(array $f): array {
     if ($est === 'sin_resolver') $where[] = "e.es_resuelto = 0";
     if ($est === 'abierto')      $where[] = "e.nombre = 'Abierto'";
     if ($est === 'vencido')      $where[] = "e.es_resuelto = 0 AND t.fecha_estimada < CURDATE()";
-    if (!empty($f['distrito']))  { $where[] = "sg.seccion_id IN (SELECT id FROM secciones WHERE distrito_id = :dist)"; $params[':dist'] = (int)$f['distrito']; }
+    if (!empty($f['distrito']))  { $where[] = "t.seccion_id IN (SELECT id FROM secciones WHERE distrito_id = :dist)"; $params[':dist'] = (int)$f['distrito']; }
     return [$where, $params];
 }
 
 function countsByFilter(PDO $pdo, array $f): array {
-    global $SPATIAL, $JOINEST;
+    global $JOINEST;
     [$where, $params] = buildWhere($f);
-    $where[] = "t.latitud IS NOT NULL AND t.longitud IS NOT NULL";
+    $where[] = "t.seccion_id IS NOT NULL";
     $wsql = "WHERE " . implode(" AND ", $where);
-    $sql = "SELECT sg.seccion_id,
+    $sql = "SELECT t.seccion_id,
                    COUNT(*) AS n,
                    COALESCE(SUM(e.es_resuelto),0) AS resueltos,
                    SUM(CASE WHEN e.es_resuelto = 0 AND t.fecha_estimada < CURDATE() THEN 1 ELSE 0 END) AS vencidos
-              FROM tickets t $JOINEST $SPATIAL
+              FROM tickets t $JOINEST
               $wsql
-             GROUP BY sg.seccion_id";
+             GROUP BY t.seccion_id";
     try {
         $st = $pdo->prepare($sql); $st->execute($params);
         $out = []; $tot = 0;
@@ -73,9 +73,6 @@ function countsByFilter(PDO $pdo, array $f): array {
 function sectionDetail(PDO $pdo, int $id): array {
     global $JOINEST;
     if ($id <= 0) return ['error' => 'id inválido'];
-    $sp = "JOIN secciones_geo sg
-             ON sg.seccion_id = :id
-            AND ST_Contains(sg.geom, ST_GeomFromText(CONCAT('POINT(',t.latitud,' ',t.longitud,')'), 4326))";
 
     $sec = $pdo->prepare("SELECT s.*, d.numero AS distrito_numero, d.nombre AS distrito_nombre
                             FROM secciones s LEFT JOIN distritos d ON d.id = s.distrito_id
@@ -86,20 +83,20 @@ function sectionDetail(PDO $pdo, int $id): array {
     $res = $pdo->prepare("SELECT COUNT(*) AS n,
                                  COALESCE(SUM(e.es_resuelto),0) AS resueltos,
                                  SUM(CASE WHEN e.es_resuelto = 0 AND t.fecha_estimada < CURDATE() THEN 1 ELSE 0 END) AS vencidos
-                            FROM tickets t $JOINEST $sp
-                           WHERE t.latitud IS NOT NULL");
+                            FROM tickets t $JOINEST
+                           WHERE t.seccion_id = :id");
     $res->execute([':id' => $id]);
     $resumen = $res->fetch(PDO::FETCH_ASSOC) ?: ['n'=>0,'resueltos'=>0,'vencidos'=>0];
 
     $tsv = $pdo->prepare("SELECT ts.nombre, COUNT(*) AS n
-                            FROM tickets t LEFT JOIN cat_tipo_servicio ts ON ts.id = t.tipo_servicio_id $sp
-                           WHERE t.latitud IS NOT NULL
+                            FROM tickets t LEFT JOIN cat_tipo_servicio ts ON ts.id = t.tipo_servicio_id
+                           WHERE t.seccion_id = :id
                            GROUP BY ts.nombre ORDER BY n DESC LIMIT 10");
     $tsv->execute([':id' => $id]);
 
     $grp = $pdo->prepare("SELECT g.nombre, COUNT(*) AS n
-                            FROM tickets t LEFT JOIN cat_grupo g ON g.id = t.grupo_id $sp
-                           WHERE t.latitud IS NOT NULL
+                            FROM tickets t LEFT JOIN cat_grupo g ON g.id = t.grupo_id
+                           WHERE t.seccion_id = :id
                            GROUP BY g.nombre ORDER BY n DESC LIMIT 10");
     $grp->execute([':id' => $id]);
 
