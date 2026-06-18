@@ -20,6 +20,10 @@ require __DIR__ . '/vendor/autoload.php';
 require __DIR__ . '/import_lib.php';
 
 $config = require __DIR__ . '/config.php';
+
+// Cargar padrón = escritura. Solo editor/admin; los visores no entran.
+if (PHP_SAPI !== 'cli') require_editor('dif');
+
 $action = $_GET['action'] ?? '';
 
 if ($action === 'upload') {

@@ -13,8 +13,11 @@ $navItems = [
     'mapa.php'              => 'Mapa',
     'secciones.php'         => 'Por sección',
     'cuadrillas.php'        => 'Cuadrillas',
-    'descargar_zendesk.php' => 'Descargar de Zendesk',
 ];
+// El conector (escritura) solo para editores/admin; los visores no lo ven.
+if (function_exists('puede_editar') && puede_editar('zendesk')) {
+    $navItems['descargar_zendesk.php'] = 'Descargar de Zendesk';
+}
 ?>
 <div class="nav">
   <?php foreach ($navItems as $archivo => $etiqueta): ?>

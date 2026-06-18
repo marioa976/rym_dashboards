@@ -73,3 +73,26 @@ function puede_editar(string $clave): bool
 {
     return in_array(nivel_modulo($clave), ['editor', 'admin'], true);
 }
+
+/**
+ * Exige nivel editor/admin en el módulo. Úsalo para BLOQUEAR acciones de
+ * escritura (sincronizar Zendesk, cargar padrón, etc.) a los visores (lector).
+ * - En peticiones AJAX (accion 'ajax_*' o X-Requested-With) responde JSON 403.
+ * - En páginas normales manda a acceso-denegado.
+ */
+function require_editor(string $clave): void
+{
+    require_module($clave);                 // login + acceso al módulo
+    if (puede_editar($clave)) return;
+
+    http_response_code(403);
+    $accion = (string)($_POST['accion'] ?? $_GET['action'] ?? '');
+    $esAjax = (($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '') !== '') || str_starts_with($accion, 'ajax_');
+    if ($esAjax) {
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(['ok' => false, 'error' => 'Sin permiso: esta acción requiere nivel editor en el módulo.']);
+    } else {
+        redirect('acceso-denegado.php');
+    }
+    exit;
+}

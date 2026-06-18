@@ -9,10 +9,13 @@ $items = [
     'home'      => ['emoji'=>'🏠', 'label'=>'Inicio',       'href'=>'index.php'],
     'dashboard' => ['emoji'=>'📊', 'label'=>'Dashboard',    'href'=>'dashboard.php'],
     'electoral' => ['emoji'=>'🗳', 'label'=>'Electoral',     'href'=>'electoral.php'],
-    'upload'    => ['emoji'=>'📤', 'label'=>'Importar',      'href'=>'upload.php'],
-    'dedupe'    => ['emoji'=>'🧹', 'label'=>'Deduplicar',    'href'=>'dedupe.php'],
-    'geocode'   => ['emoji'=>'🌐', 'label'=>'Geocodificar',  'href'=>'geocode_ui.php'],
 ];
+// Herramientas de escritura (cargar, deduplicar, geocodificar): solo editor/admin.
+if (function_exists('puede_editar') && puede_editar('dif')) {
+    $items['upload']  = ['emoji'=>'📤', 'label'=>'Importar',     'href'=>'upload.php'];
+    $items['dedupe']  = ['emoji'=>'🧹', 'label'=>'Deduplicar',   'href'=>'dedupe.php'];
+    $items['geocode'] = ['emoji'=>'🌐', 'label'=>'Geocodificar', 'href'=>'geocode_ui.php'];
+}
 // Capa de homologación visual QRO (tipografía + paleta + chrome)
 include __DIR__ . '/../_qro_theme.php';
 ?>

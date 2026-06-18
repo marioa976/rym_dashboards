@@ -12,6 +12,9 @@ $pdo = db();
 $cfg = require __DIR__ . '/config.php';
 $api = $cfg['zendesk_api'] ?? [];
 
+// Conector = herramienta de escritura. Solo editor/admin; los visores no entran.
+require_editor('zendesk');
+
 function cf(array $ticket, $id) {
     foreach (($ticket['custom_fields'] ?? []) as $f) {
         if ((string)$f['id'] === (string)$id) return $f['value'];

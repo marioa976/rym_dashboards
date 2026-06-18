@@ -43,6 +43,9 @@ if (PHP_SAPI !== 'cli') {
 
 $config = require __DIR__ . '/config.php';
 
+// Endpoint de geocodificación (escribe coordenadas). Por web solo editor/admin.
+if (PHP_SAPI !== 'cli') require_editor('dif');
+
 $opts  = getopt('', [
     'test', 'limit::', 'reintenta-errores', 'solo-id::', 'dry-run',
     'clear-cache', 'clear-errores', 'reset-padron'

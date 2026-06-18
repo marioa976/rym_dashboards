@@ -39,6 +39,10 @@ use OpenSpout\Reader\XLSX\Reader as XlsxReader;
 use OpenSpout\Reader\XLSX\Options as XlsxOptions;
 
 $config = require __DIR__ . '/config.php';
+
+// Importar padrón = escritura. Por web solo editor/admin (CLI queda libre para cron).
+if (PHP_SAPI !== 'cli') require_editor('dif');
+
 $opts = getopt('', ['file::', 'truncate', 'sheet::', 'limit::']);
 
 $xlsxPath  = $opts['file']  ?? $config['paths']['xlsx'];

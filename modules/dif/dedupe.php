@@ -25,6 +25,10 @@ set_time_limit(0);
 ini_set('memory_limit', '512M');
 
 $config = require __DIR__ . '/config.php';
+
+// Deduplicar modifica el padrón = escritura. Solo editor/admin.
+if (PHP_SAPI !== 'cli') require_editor('dif');
+
 $db = $config['db'];
 $pdo = new PDO(
     "mysql:host={$db['host']};port={$db['port']};dbname={$db['name']};charset={$db['charset']}",
