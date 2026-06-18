@@ -23,6 +23,9 @@ function db(): PDO {
             PDO::ATTR_EMULATE_PREPARES   => false,
             PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4",
         ]);
+        // El índice espacial (R-tree) no funciona bajo READ-UNCOMMITTED (error 1207).
+        // Forzamos un nivel sano sin depender de la config del servidor.
+        $pdo->exec("SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED");
     } catch (PDOException $e) {
         // Mensaje legible cuando la BD aún no existe
         $msg = $e->getMessage();

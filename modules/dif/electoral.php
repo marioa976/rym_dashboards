@@ -21,6 +21,9 @@ $pdo = new PDO(
     [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_EMULATE_PREPARES => false]
 );
 $pdo->exec("SET NAMES utf8mb4");
+// El índice espacial (R-tree) necesita un nivel de aislamiento que permita locks.
+// Si el servidor quedó en READ-UNCOMMITTED, ST_Contains truena con error 1207.
+$pdo->exec("SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED");
 
 $gmapsKey = (string)($config['google_maps']['api_key'] ?? '');
 $action = $_GET['action'] ?? '';
