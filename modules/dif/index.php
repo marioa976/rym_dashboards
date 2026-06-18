@@ -22,6 +22,7 @@ if (is_array($config)) {
             [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
         );
         $pdo->exec("SET NAMES utf8mb4");
+        $pdo->exec("SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED"); // el índice espacial no funciona bajo READ-UNCOMMITTED (error 1207)
 
         $cols = $pdo->query("SHOW COLUMNS FROM padron")->fetchAll(PDO::FETCH_COLUMN);
         $tieneActivo = in_array('activo', $cols, true);

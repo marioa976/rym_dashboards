@@ -50,6 +50,7 @@ function qrb_portal_pdo(): ?PDO {
             $d['user'], $d['pass'],
             [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_EMULATE_PREPARES => false]
         );
+        $pdb->exec("SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED"); // índice espacial + READ-UNCOMMITTED = error 1207
     } catch (Throwable $e) { $pdb = null; }
     return $pdb;
 }
