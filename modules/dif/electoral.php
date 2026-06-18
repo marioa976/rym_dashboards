@@ -85,12 +85,10 @@ if ($ok) {
     $aidCounts = [];
     try {
         $rs = $pdo->query("
-            SELECT sg.seccion_id, COUNT(*) AS n
+            SELECT seccion_id, COUNT(*) AS n
               FROM padron p
-              JOIN secciones_geo sg
-                ON ST_Contains(sg.geom, ST_GeomFromText(CONCAT('POINT(',p.latitud,' ',p.longitud,')'), 4326))
-             WHERE $activoWhere p.latitud IS NOT NULL AND p.longitud IS NOT NULL
-             GROUP BY sg.seccion_id
+             WHERE $activoWhere seccion_id IS NOT NULL
+             GROUP BY seccion_id
         ");
         foreach ($rs as $r) $aidCounts[(int)$r['seccion_id']] = (int)$r['n'];
     } catch (Throwable $e) {
@@ -121,7 +119,7 @@ function getCountsByFilter(PDO $pdo, array $f): array
     $where = [];
     $params = [];
     if ($tieneActivo) $where[] = "p.activo=1";
-    $where[] = "p.latitud IS NOT NULL AND p.longitud IS NOT NULL";
+    $where[] = "p.seccion_id IS NOT NULL";
 
     if (!empty($f['programa']))    { $where[] = "p.programa=:programa";       $params[':programa']=$f['programa']; }
     if (!empty($f['tipo_apoyo']))  { $where[] = "p.tipo_apoyo=:tipo";         $params[':tipo']=$f['tipo_apoyo']; }
@@ -130,16 +128,14 @@ function getCountsByFilter(PDO $pdo, array $f): array
     if (!empty($f['recibe']))      { $where[] = "p.recibe_ciudadano=:rec";    $params[':rec']=$f['recibe']; }
     if (!empty($f['fecha_desde'])) { $where[] = "p.fecha_entrega>=:fd";       $params[':fd']=$f['fecha_desde']; }
     if (!empty($f['fecha_hasta'])) { $where[] = "p.fecha_entrega<=:fh";       $params[':fh']=$f['fecha_hasta']; }
-    if (!empty($f['distrito_id'])) { $where[] = "sg.seccion_id IN (SELECT id FROM secciones WHERE distrito_id=:dist)"; $params[':dist']=(int)$f['distrito_id']; }
+    if (!empty($f['distrito_id'])) { $where[] = "p.seccion_id IN (SELECT id FROM secciones WHERE distrito_id=:dist)"; $params[':dist']=(int)$f['distrito_id']; }
 
     $wsql = "WHERE " . implode(" AND ", $where);
     $sql = "
-        SELECT sg.seccion_id, COUNT(*) AS n
+        SELECT p.seccion_id, COUNT(*) AS n
           FROM padron p
-          JOIN secciones_geo sg
-            ON ST_Contains(sg.geom, ST_GeomFromText(CONCAT('POINT(',p.latitud,' ',p.longitud,')'), 4326))
          $wsql
-         GROUP BY sg.seccion_id
+         GROUP BY p.seccion_id
     ";
     try {
         $st = $pdo->prepare($sql);
@@ -174,13 +170,11 @@ function getSectionDetail(PDO $pdo, int $id, array $f): array
     $sec->execute([$id]);
     $secRow = $sec->fetch(PDO::FETCH_ASSOC);
 
-    // Top programas/tipos en esa sección
+    // Top programas/tipos en esa sección (usa el seccion_id precalculado)
     $topProg = $pdo->prepare("
         SELECT p.programa, COUNT(*) n
           FROM padron p
-          JOIN secciones_geo sg ON sg.seccion_id=:id
-         WHERE $aw p.latitud IS NOT NULL
-           AND ST_Contains(sg.geom, ST_GeomFromText(CONCAT('POINT(',p.latitud,' ',p.longitud,')'), 4326))
+         WHERE $aw p.seccion_id = :id
          GROUP BY p.programa ORDER BY n DESC LIMIT 10
     ");
     $topProg->execute([':id' => $id]);
@@ -188,9 +182,7 @@ function getSectionDetail(PDO $pdo, int $id, array $f): array
     $topTipo = $pdo->prepare("
         SELECT p.tipo_apoyo, COUNT(*) n
           FROM padron p
-          JOIN secciones_geo sg ON sg.seccion_id=:id
-         WHERE $aw p.latitud IS NOT NULL
-           AND ST_Contains(sg.geom, ST_GeomFromText(CONCAT('POINT(',p.latitud,' ',p.longitud,')'), 4326))
+         WHERE $aw p.seccion_id = :id
          GROUP BY p.tipo_apoyo ORDER BY n DESC LIMIT 10
     ");
     $topTipo->execute([':id' => $id]);
@@ -198,9 +190,7 @@ function getSectionDetail(PDO $pdo, int $id, array $f): array
     $apoyos = $pdo->prepare("
         SELECT COUNT(*) n
           FROM padron p
-          JOIN secciones_geo sg ON sg.seccion_id=:id
-         WHERE $aw p.latitud IS NOT NULL
-           AND ST_Contains(sg.geom, ST_GeomFromText(CONCAT('POINT(',p.latitud,' ',p.longitud,')'), 4326))");
+         WHERE $aw p.seccion_id = :id");
     $apoyos->execute([':id'=>$id]);
 
     return [
