@@ -548,7 +548,7 @@ function initMap() {
   // Ajustar bounds si hay muchos marcadores
   if (mkObjs.length > 3) {
     const bounds = new google.maps.LatLngBounds();
-    mkObjs.forEach(m => bounds.extend(m.getPosition()));
+    mkObjs.forEach(m => bounds.extend(m.position));
     map.fitBounds(bounds, 50);
   }
 

@@ -26,6 +26,19 @@ require_once __DIR__ . '/lib_informe.php';
 
 $cfg = require __DIR__ . '/config.php';
 
+// Periodo del informe: por default ÚLTIMOS 15 DÍAS (antes jalaba todo el histórico y tardaba).
+// Override:  ?dias=N   o   ?desde=YYYY-MM-DD&hasta=YYYY-MM-DD
+$dias = isset($_GET['dias']) ? max(1, min(365, (int)$_GET['dias'])) : 15;
+if (!empty($_GET['desde']) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $_GET['desde'])) {
+    $cfg['fecha_desde'] = $_GET['desde'] . ' 00:00:00';
+    $cfg['fecha_hasta'] = (!empty($_GET['hasta']) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $_GET['hasta']))
+        ? $_GET['hasta'] . ' 23:59:59'
+        : date('Y-m-d 23:59:59');
+} else {
+    $cfg['fecha_hasta'] = date('Y-m-d H:i:s');
+    $cfg['fecha_desde'] = date('Y-m-d 00:00:00', strtotime("-{$dias} days"));
+}
+
 if (!empty($cfg['debug'])) {
     error_reporting(E_ALL);
     ini_set('display_errors', '1');
@@ -41,7 +54,7 @@ try {
 }
 
 // cache opcional
-$cache_file = sys_get_temp_dir() . '/qrobici_informe_cache.json';
+$cache_file = sys_get_temp_dir() . '/qrobici_informe_' . md5($cfg['fecha_desde'] . '|' . $cfg['fecha_hasta']) . '.json';
 $data = null;
 $cache_seg = (int)($cfg['cache_segundos'] ?? 0);
 if ($cache_seg > 0 && is_file($cache_file)

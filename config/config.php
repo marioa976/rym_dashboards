@@ -49,7 +49,7 @@ $dbPortal = [
     'charset' => 'utf8mb4',
 ];
 $gmaps = env_str('GOOGLE_MAPS_API_KEY');
-$mapId = env_str('MAP_ID', 'DEMO_MAP_ID');
+$mapId = env_str('MAP_ID', 'DEMO_MAP_ID') ?: 'DEMO_MAP_ID';  // vacío -> DEMO (los marcadores avanzados exigen un Map ID)
 
 return [
     'app' => [
