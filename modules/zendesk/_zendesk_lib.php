@@ -505,10 +505,13 @@ function zd_asignar_secciones(PDO $pdo): void {
             $listo = true;
         }
         if ($listo) {
+            // Cálculo PLANO (SRID 0) y punto en orden (lng lat): es lo que funciona
+            // igual en MySQL 8 y MariaDB (el 4326 da 0 en MariaDB por interpretarlo geográfico).
             $pdo->exec("
                 UPDATE tickets t
                   JOIN secciones_geo sg
-                    ON ST_Contains(sg.geom, ST_GeomFromText(CONCAT('POINT(',t.latitud,' ',t.longitud,')'), 4326))
+                    ON ST_Contains(ST_GeomFromWKB(ST_AsWKB(sg.geom),0),
+                                   ST_GeomFromText(CONCAT('POINT(',t.longitud,' ',t.latitud,')'),0))
                   SET t.seccion_id = sg.seccion_id
                   WHERE t.seccion_id IS NULL AND t.latitud IS NOT NULL AND t.longitud IS NOT NULL
             ");

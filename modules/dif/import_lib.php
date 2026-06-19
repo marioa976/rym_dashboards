@@ -331,10 +331,12 @@ function padronImport(
                             ADD INDEX idx_padron_seccion (seccion_id),
                             ALGORITHM=INPLACE, LOCK=NONE");
             }
+            // Cálculo PLANO (SRID 0) y punto (lng lat): consistente en MySQL 8 y MariaDB.
             $n = $pdo->exec("
                 UPDATE padron p
                   JOIN secciones_geo sg
-                    ON ST_Contains(sg.geom, ST_GeomFromText(CONCAT('POINT(',p.latitud,' ',p.longitud,')'), 4326))
+                    ON ST_Contains(ST_GeomFromWKB(ST_AsWKB(sg.geom),0),
+                                   ST_GeomFromText(CONCAT('POINT(',p.longitud,' ',p.latitud,')'),0))
                   SET p.seccion_id = sg.seccion_id
                   WHERE p.seccion_id IS NULL AND p.latitud IS NOT NULL AND p.longitud IS NOT NULL
             ");
