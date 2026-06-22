@@ -79,5 +79,12 @@ while (true) {
     sleep(2);                                    // gentil con el rate limit incremental
 }
 
+// Cruce espacial UNA sola vez al final (no por página): asigna seccion_id a los
+// tickets nuevos con coordenadas. En CLI no hay límite de tiempo.
+out("Asignando secciones a tickets nuevos (cruce espacial, una pasada)…");
+@set_time_limit(0);
+zd_asignar_secciones($pdo);
+out("Secciones asignadas.");
+
 out("Listo. Guardados/actualizados: $totOk · Traídos: $totFetch · Errores: $totErr · Páginas: $pagina");
 exit($totErr > 0 ? 2 : 0);

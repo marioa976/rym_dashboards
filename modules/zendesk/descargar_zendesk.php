@@ -5,6 +5,7 @@
  */
 declare(strict_types=1);
 set_time_limit(120);
+ignore_user_abort(true);   // que un corte del navegador no deje la importación a medias
 
 require __DIR__ . '/db.php';           // dispara el guard del portal (zendesk)
 require_once __DIR__ . '/_zendesk_lib.php';
@@ -30,7 +31,7 @@ $mapaCol = [];
 foreach ($mapeo as $m) { $mapaCol[(string)$m['campo_id']] = $m; }
 
 /* ---- AJAX (devuelve JSON y termina): sync / ventana / incremental ---- */
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($_POST['accion'] ?? '', ['ajax_sync', 'ajax_importar', 'ajax_incremental'], true)) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($_POST['accion'] ?? '', ['ajax_sync', 'ajax_importar', 'ajax_incremental', 'ajax_asignar'], true)) {
     header('Content-Type: application/json; charset=utf-8');
     if (!csrf_check())      { echo json_encode(['error' => 'Sesión expirada']); exit; }
     if (!$mapeo)            { echo json_encode(['error' => 'Sin mapeo: importa sql/zendesk_mapeo.sql']); exit; }
@@ -40,6 +41,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($_POST['accion'] ?? '', ['
         if (($_POST['accion']) === 'ajax_sync') {
             [$add] = zd_sincronizar_estructura($pdo, $mapeo);
             echo json_encode(['ok' => true, 'agregadas' => $add]); exit;
+        }
+
+        if (($_POST['accion']) === 'ajax_asignar') {
+            // Cruce espacial en una sola pasada al terminar el sync (no por página).
+            @set_time_limit(300);
+            zd_asignar_secciones($pdo);
+            echo json_encode(['ok' => true]); exit;
         }
 
         if (($_POST['accion']) === 'ajax_incremental') {
@@ -403,7 +411,12 @@ try {
         $('bf-totales').textContent = `Guardados/actualizados: ${okTot} · Traídos: ${fetchTot} · Errores: ${errTot}`;
         await sleep(450);  // pausa gentil con el API
       }
-      if (!detener) $('bf-status').textContent = `✓ Año en curso completado (${wins.length} ventanas).`;
+      // Cruce espacial UNA sola vez al terminar (no por ventana).
+      if (!detener) {
+        $('bf-status').textContent = 'Asignando secciones (cruce espacial)…';
+        try { await post({accion:'ajax_asignar'}); log('✓ Secciones asignadas a los tickets nuevos.'); $('bf-status').textContent = `✓ Año en curso completado (${wins.length} ventanas).`; }
+        catch(e){ log('⚠ Tickets importados, pero la asignación de secciones quedó pendiente (córrela por CLI).'); }
+      }
       fin();
     });
 
@@ -444,6 +457,12 @@ try {
         await sleep(2000);   // gentil con el rate limit del endpoint incremental
       }
       if (errTot > 0) incLog('⚠ Hubo ' + errTot + ' errores — recarga la página para verlos en el visor de errores.');
+      // Cruce espacial UNA sola vez al terminar (no por página): asigna seccion_id.
+      if (!incStop && pagina > 0) {
+        $('inc-status').textContent = 'Asignando secciones (cruce espacial)…';
+        try { await post({accion:'ajax_asignar'}); incLog('✓ Secciones asignadas a los tickets nuevos.'); $('inc-status').textContent = '✓ Sincronización completa (' + pagina + ' páginas, ' + okTot + ' guardados).'; }
+        catch(e){ incLog('⚠ Tickets importados, pero la asignación de secciones quedó pendiente (vuelve a sincronizar o córrela por CLI).'); }
+      }
       incFin();
     });
   })();

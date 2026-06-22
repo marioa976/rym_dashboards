@@ -62,6 +62,9 @@ return [
     // ---- Base de datos del PORTAL (usuarios/roles/módulos) ----
     'db' => $dbPortal,
 
+    // Google Maps a nivel portal (lo usa el módulo electoral; misma key).
+    'google_maps' => ['api_key' => $gmaps],
+
     'session' => [
         'nombre'        => 'QRO_PORTAL',
         'vida_minutos'  => env_int('SESSION_VIDA_MIN', 60),

@@ -212,7 +212,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'guard
     } else { $save_error = 'No hay plan que guardar.'; }
 }
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'eliminar_plan' && csrf_check()) {
-    try { $pdo->prepare("DELETE FROM cuadrillas_planes WHERE id=?")->execute([(int)($_POST['id'] ?? 0)]); } catch (Throwable $e) {}
+    try {
+        $pid = (int)($_POST['id'] ?? 0);
+        $uid = (int)(Auth::user()['id'] ?? 0);
+        // Un editor/admin puede eliminar cualquier plan; un visor SOLO los suyos
+        // (no puede limpiar datos ajenos).
+        if (function_exists('puede_editar') && puede_editar('zendesk')) {
+            $pdo->prepare("DELETE FROM cuadrillas_planes WHERE id=?")->execute([$pid]);
+        } else {
+            $pdo->prepare("DELETE FROM cuadrillas_planes WHERE id=? AND usuario_id=?")->execute([$pid, $uid]);
+        }
+    } catch (Throwable $e) {}
     header('Location: cuadrillas.php?planes=1'); exit;
 }
 
@@ -220,7 +230,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'elimi
 $vista_planes = isset($_GET['planes']);
 $listaPlanes = [];
 if ($vista_planes) {
-    try { $listaPlanes = $pdo->query("SELECT id,nombre,n_cuadrillas,n_tickets,km,creado_en FROM cuadrillas_planes ORDER BY creado_en DESC")->fetchAll(PDO::FETCH_ASSOC); }
+    try { $listaPlanes = $pdo->query("SELECT id,nombre,n_cuadrillas,n_tickets,km,creado_en,usuario_id FROM cuadrillas_planes ORDER BY creado_en DESC")->fetchAll(PDO::FETCH_ASSOC); }
     catch (Throwable $e) {}
 }
 
@@ -728,12 +738,18 @@ if ($vista === 'lista'):
           <td style="color:var(--text-muted);font-size:12px"><?= htmlspecialchars(date('d/m/Y H:i', strtotime($pl['creado_en']))) ?></td>
           <td style="text-align:right;white-space:nowrap">
             <a class="open-route" href="cuadrillas.php?plan_id=<?= (int)$pl['id'] ?>" style="display:inline-flex">Abrir →</a>
+            <?php
+              $puedeBorrar = (function_exists('puede_editar') && puede_editar('zendesk'))
+                          || ((int)($pl['usuario_id'] ?? 0) === (int)(Auth::user()['id'] ?? 0) && (int)($pl['usuario_id'] ?? 0) > 0);
+            ?>
+            <?php if ($puedeBorrar): ?>
             <form method="post" style="display:inline" onsubmit="return confirm('¿Eliminar este plan guardado?')">
               <?= csrf_field() ?>
               <input type="hidden" name="accion" value="eliminar_plan">
               <input type="hidden" name="id" value="<?= (int)$pl['id'] ?>">
               <button class="btn-ghost" style="color:var(--negative);border-color:#fecaca;cursor:pointer">Eliminar</button>
             </form>
+            <?php endif; ?>
           </td>
         </tr>
       <?php endforeach; ?>

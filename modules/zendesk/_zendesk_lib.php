@@ -12,14 +12,20 @@ function zd_get(string $url, string $user, string $token): array {
         CURLOPT_USERPWD        => $user . ':' . $token,
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_HTTPHEADER     => ['Content-Type: application/json'],
-        CURLOPT_TIMEOUT        => 40,
-        CURLOPT_CONNECTTIMEOUT => 10,
+        // Mantener por debajo del FcgidIOTimeout de MAMP (def. 40s): si Zendesk
+        // tarda, fallamos limpio con un error legible en vez de que Apache mate
+        // el worker PHP ("incomplete headers"). NOSIGNAL evita cuelgues de DNS.
+        CURLOPT_TIMEOUT        => 25,
+        CURLOPT_CONNECTTIMEOUT => 8,
+        CURLOPT_NOSIGNAL       => 1,
+        CURLOPT_ACCEPT_ENCODING => '',   // habilita gzip: payloads de 1000 tickets bajan mucho más rápido
     ]);
     $body   = curl_exec($ch);
     $status = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $errno  = curl_errno($ch);
     $err    = curl_error($ch);
     curl_close($ch);
-    if ($body === false) throw new RuntimeException('cURL: ' . $err);
+    if ($body === false) throw new RuntimeException("cURL($errno): " . ($err ?: 'sin detalle') . " · URL " . preg_replace('/\?.*/', '', $url));
     return [$status, (string)$body];
 }
 
@@ -488,6 +494,37 @@ function zd_upsert(PDO $pdo, array $row): bool {
  * carga del dashboard. Crea la columna si falta. Corre en READ COMMITTED para
  * que el índice espacial funcione. No rompe el import si algo falla.
  */
+/**
+ * Construye/refresca `secciones_bbox`: el rectángulo (min/max lng/lat) de cada
+ * sección, con índices B-tree. Es el prefiltro que evita el producto cartesiano
+ * del cruce espacial. Idempotente y barato (1 fila por polígono).
+ */
+function zd_construir_bbox_secciones(PDO $pdo): void {
+    $pdo->exec("CREATE TABLE IF NOT EXISTS secciones_bbox (
+        seccion_id INT NOT NULL PRIMARY KEY,
+        minlng DECIMAL(12,8) NULL, minlat DECIMAL(12,8) NULL,
+        maxlng DECIMAL(12,8) NULL, maxlat DECIMAL(12,8) NULL,
+        KEY idx_bbox_lng (minlng, maxlng),
+        KEY idx_bbox_lat (minlat, maxlat)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+    $nGeo = (int)$pdo->query("SELECT COUNT(*) FROM secciones_geo")->fetchColumn();
+    $nBox = (int)$pdo->query("SELECT COUNT(*) FROM secciones_bbox")->fetchColumn();
+    if ($nGeo > 0 && $nBox === $nGeo) return;   // ya está al día
+    $pdo->exec("TRUNCATE TABLE secciones_bbox");
+    // El envelope (MBR) es un polígono; sus vértices 1 y 3 son las esquinas opuestas.
+    $pdo->exec("
+        INSERT INTO secciones_bbox (seccion_id, minlng, minlat, maxlng, maxlat)
+        SELECT z.seccion_id,
+               ST_X(ST_PointN(ST_ExteriorRing(z.env),1)),
+               ST_Y(ST_PointN(ST_ExteriorRing(z.env),1)),
+               ST_X(ST_PointN(ST_ExteriorRing(z.env),3)),
+               ST_Y(ST_PointN(ST_ExteriorRing(z.env),3))
+          FROM (SELECT seccion_id, ST_Envelope(ST_GeomFromWKB(ST_AsWKB(geom),0)) AS env
+                  FROM secciones_geo) z
+         WHERE z.env IS NOT NULL
+    ");
+}
+
 function zd_asignar_secciones(PDO $pdo): void {
     static $listo = null;     // null=sin revisar · false=no aplica · true=listo
     try {
@@ -504,18 +541,39 @@ function zd_asignar_secciones(PDO $pdo): void {
             $pdo->exec("SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED");
             $listo = true;
         }
-        if ($listo) {
-            // Cálculo PLANO (SRID 0) y punto en orden (lng lat): es lo que funciona
-            // igual en MySQL 8 y MariaDB (el 4326 da 0 en MariaDB por interpretarlo geográfico).
-            $pdo->exec("
-                UPDATE tickets t
-                  JOIN secciones_geo sg
-                    ON ST_Contains(ST_GeomFromWKB(ST_AsWKB(sg.geom),0),
-                                   ST_GeomFromText(CONCAT('POINT(',t.longitud,' ',t.latitud,')'),0))
-                  SET t.seccion_id = sg.seccion_id
-                  WHERE t.seccion_id IS NULL AND t.latitud IS NOT NULL AND t.longitud IS NOT NULL
-            ");
+        if (!$listo) return;
+
+        // Camino RÁPIDO: prefiltro por bounding-box (índice B-tree) → solo se evalúa
+        // ST_Contains contra el puñado de polígonos cuyo rectángulo contiene el punto.
+        $bboxOk = false;
+        try { zd_construir_bbox_secciones($pdo); $bboxOk = true; } catch (Throwable $e) { /* usaremos el fallback */ }
+
+        if ($bboxOk) {
+            try {
+                $pdo->exec("
+                    UPDATE tickets t
+                      JOIN secciones_bbox b
+                        ON t.longitud BETWEEN b.minlng AND b.maxlng
+                       AND t.latitud  BETWEEN b.minlat AND b.maxlat
+                      JOIN secciones_geo sg ON sg.seccion_id = b.seccion_id
+                      SET t.seccion_id = b.seccion_id
+                     WHERE t.seccion_id IS NULL AND t.latitud IS NOT NULL AND t.longitud IS NOT NULL
+                       AND ST_Contains(ST_GeomFromWKB(ST_AsWKB(sg.geom),0),
+                                       ST_GeomFromText(CONCAT('POINT(',t.longitud,' ',t.latitud,')'),0))
+                ");
+                return;
+            } catch (Throwable $e) { /* cae al método directo */ }
         }
+
+        // FALLBACK directo (sin prefiltro): PLANO SRID 0 y punto (lng lat), válido en MySQL 8 y MariaDB.
+        $pdo->exec("
+            UPDATE tickets t
+              JOIN secciones_geo sg
+                ON ST_Contains(ST_GeomFromWKB(ST_AsWKB(sg.geom),0),
+                               ST_GeomFromText(CONCAT('POINT(',t.longitud,' ',t.latitud,')'),0))
+              SET t.seccion_id = sg.seccion_id
+              WHERE t.seccion_id IS NULL AND t.latitud IS NOT NULL AND t.longitud IS NOT NULL
+        ");
     } catch (Throwable $e) { /* no rompemos el import */ }
 }
 
@@ -529,7 +587,10 @@ function zd_importar(PDO $pdo, array $api, array $tickets, array $mapeo): array 
             $err[] = '#' . ($t['id'] ?? '?') . ': ' . $e->getMessage();
         }
     }
-    zd_asignar_secciones($pdo);   // precálculo de seccion_id para los tickets nuevos
+    // NOTA: el cruce espacial (seccion_id) ya NO se hace aquí por página, porque
+    // sobre un backlog grande se volvía un producto cartesiano lentísimo y mataba
+    // el worker (FastCGI) o "colgaba" el CLI. Ahora se corre UNA sola vez al final
+    // del sync vía zd_asignar_secciones() (en cron_import.php y en ajax_asignar).
     return [$ok, $err];
 }
 
