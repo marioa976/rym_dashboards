@@ -743,6 +743,38 @@ function ir_commit(
                                      observaciones=VALUES(observaciones), import_log_id=VALUES(import_log_id)"
         );
 
+        // --- Inserción por LOTES (clave con BD remota: 1 viaje de red por lote en vez de por fila) ---
+        $RES_CHUNK = 500;
+        $resBuf = []; $metaBuf = [];
+        $flushBufs = function (bool $force = false) use (&$resBuf, &$metaBuf, $pdo, &$stats, $insResultado, $insMeta) {
+            if ($resBuf && ($force || count($resBuf) >= 500)) {
+                $n = count($resBuf);
+                $sql = "INSERT INTO resultados_casilla (eleccion_id, casilla_id, voto_codigo, votos, import_log_id, created_at) VALUES "
+                     . implode(',', array_fill(0, $n, '(?,?,?,?,?,?)'))
+                     . " ON DUPLICATE KEY UPDATE votos=VALUES(votos), import_log_id=VALUES(import_log_id)";
+                try {
+                    $flat = []; foreach ($resBuf as $row) foreach ($row as $v) $flat[] = $v;
+                    $pdo->prepare($sql)->execute($flat);
+                } catch (Throwable $e) {                 // fallback fila por fila si el lote falla
+                    foreach ($resBuf as $row) { try { $insResultado->execute($row); } catch (Throwable $e2) { $stats['rows_failed']++; } }
+                }
+                $resBuf = [];
+            }
+            if ($metaBuf && ($force || count($metaBuf) >= 500)) {
+                $n = count($metaBuf);
+                $sql = "INSERT INTO resultados_casilla_meta (eleccion_id, casilla_id, lista_nominal, total_votos, observaciones, import_log_id) VALUES "
+                     . implode(',', array_fill(0, $n, '(?,?,?,?,?,?)'))
+                     . " ON DUPLICATE KEY UPDATE lista_nominal=VALUES(lista_nominal), total_votos=VALUES(total_votos), observaciones=VALUES(observaciones), import_log_id=VALUES(import_log_id)";
+                try {
+                    $flat = []; foreach ($metaBuf as $row) foreach ($row as $v) $flat[] = $v;
+                    $pdo->prepare($sql)->execute($flat);
+                } catch (Throwable $e) {
+                    foreach ($metaBuf as $row) { try { $insMeta->execute($row); } catch (Throwable $e2) {} }
+                }
+                $metaBuf = [];
+            }
+        };
+
         foreach ($parsed['rows'] as $r) {
             try {
                 // Sección fantasma sin registrar → skip
@@ -853,13 +885,14 @@ function ir_commit(
                     }
                 }
 
-                // Insertar votos
+                // Insertar votos (a buffer; se vacía por lotes)
                 foreach ($r['votos'] as $code => $votos) {
-                    $insResultado->execute([$eid, $cid, $code, (int)$votos, $logId, $now]);
+                    $resBuf[] = [$eid, $cid, $code, (int)$votos, $logId, $now];
                     $stats['resultados_insertados']++;
                 }
-                // Meta
-                $insMeta->execute([$eid, $cid, $r['lista_nominal'], $r['total_votos'], $r['observaciones'], $logId]);
+                // Meta (a buffer)
+                $metaBuf[] = [$eid, $cid, $r['lista_nominal'], $r['total_votos'], $r['observaciones'], $logId];
+                $flushBufs(false);   // vacía si algún buffer ya llegó al tope
 
                 $stats['rows_ok']++;
             } catch (Throwable $e) {
@@ -869,6 +902,7 @@ function ir_commit(
                 }
             }
         }
+        $flushBufs(true);   // vacía los lotes restantes de votos/meta
 
         // Cierra bitácora
         $pdo->prepare(
