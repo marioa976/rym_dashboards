@@ -74,15 +74,7 @@ INSERT INTO `procesos_electorales` (`anio`,`nivel`,`descripcion`,`status`,`creat
  (2024, 'federal', 'Proceso Electoral Federal 2023-2024',        'publicado', NOW())
 ON DUPLICATE KEY UPDATE descripcion = VALUES(descripcion);
 
-CREATE TABLE IF NOT EXISTS `partidos_proceso` (
-  `partido_id`         SMALLINT UNSIGNED NOT NULL,
-  `proceso_id`         TINYINT UNSIGNED  NOT NULL,
-  `registrado`         TINYINT(1)      NOT NULL DEFAULT 1,
-  `perdio_registro`    TINYINT(1)      NOT NULL DEFAULT 0,
-  PRIMARY KEY (`partido_id`, `proceso_id`),
-  CONSTRAINT `fk_pp_partido` FOREIGN KEY (`partido_id`) REFERENCES `partidos`(`id`) ON DELETE CASCADE,
-  CONSTRAINT `fk_pp_proceso` FOREIGN KEY (`proceso_id`) REFERENCES `procesos_electorales`(`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+-- (Eliminada `partidos_proceso`: no la usa ningún código del módulo.)
 
 CREATE TABLE IF NOT EXISTS `tipos_eleccion` (
   `id`         TINYINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -153,20 +145,7 @@ CREATE TABLE IF NOT EXISTS `secciones_historicas` (
   PRIMARY KEY (`num_seccion`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS `secciones_mapeo` (
-  `id`              INT UNSIGNED  NOT NULL AUTO_INCREMENT,
-  `seccion_origen`  SMALLINT UNSIGNED NOT NULL,
-  `anio_origen`     SMALLINT UNSIGNED NOT NULL,
-  `seccion_destino` SMALLINT UNSIGNED NOT NULL,
-  `anio_destino`    SMALLINT UNSIGNED NOT NULL,
-  `porcentaje`      DECIMAL(5,2)  NOT NULL DEFAULT 100.00,
-  `tipo_cambio`     ENUM('renumeracion','division','fusion','sin_cambio') NOT NULL DEFAULT 'sin_cambio',
-  `notas`           VARCHAR(255)  NULL,
-  `created_at`      DATETIME      NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `idx_map_origen`  (`seccion_origen`,`anio_origen`),
-  KEY `idx_map_destino` (`seccion_destino`,`anio_destino`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+-- (Eliminada `secciones_mapeo`: no la usa ningún código del módulo.)
 
 CREATE TABLE IF NOT EXISTS `casillas` (
   `id`            INT UNSIGNED   NOT NULL AUTO_INCREMENT,
