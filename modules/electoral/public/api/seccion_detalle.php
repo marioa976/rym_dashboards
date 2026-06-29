@@ -15,6 +15,7 @@ ob_start();
 
 try {
     require_once __DIR__ . '/../../lib/bootstrap.php';
+    require_once __DIR__ . '/../../lib/ranking_alfredo.php';
 
     $pdo = reporteador_pdo();
     $procesoId  = (int)($_GET['proceso_id'] ?? 0);

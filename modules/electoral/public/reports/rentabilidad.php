@@ -663,8 +663,20 @@ include __DIR__ . '/../partials/layout_top.php';
     const T = <?= json_encode($tips, JSON_HEX_QUOT | JSON_HEX_APOS) ?>;
     const H = (label, key) => `<span style="border-bottom:1px dotted #9CA3AF;cursor:help" title="${T[key]||''}">${label}</span>`;
 
+    const rk = d.ranking;
+    const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+    const rline = (l, v) => v ? `<div style="font-size:12px;margin-top:2px"><b>${l}:</b> ${esc(v)}</div>` : '';
+    const rankingBlock = rk ? `<div style="border:1px solid #FDE68A;background:#FFFBEB;border-radius:10px;padding:10px 12px;margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-weight:800;color:#92400E;font-size:12px;text-transform:uppercase;letter-spacing:.4px">Ranking Alfredo</span>
+          <span style="font-weight:800;color:#B45309;font-size:18px">#${rk.rank ?? '—'}</span></div>
+        ${rline('Delegación', rk.delegacion)}${rline('21-24', rk.p21_24)}${rline('Identidad', rk.identidad)}
+        ${rk.colonias ? `<details style="margin-top:5px"><summary style="font-size:12px;cursor:pointer;color:#92400E">Colonias y localidades</summary><div style="font-size:11px;max-height:130px;overflow:auto;margin-top:4px;color:#475569;line-height:1.4">${esc(rk.colonias)}</div></details>` : ''}
+      </div>` : '';
+
     body.innerHTML = `
       <div style="margin-bottom:14px">${catalogoChips}</div>
+      ${rankingBlock}
 
       <table style="width:100%;font-size:13px;margin-bottom:14px">
         <tr><td>${H('Voto efectivo PAN','voto_efectivo')}</td><td style="text-align:right;font-weight:700">${fmtNum(d.voto_efectivo)}</td></tr>

@@ -37,6 +37,7 @@ $U = function_exists('auth_user') ? auth_user() : null;
       <a href="<?= $BASE ?>/index.php" class="<?= $active === 'dashboard' ? 'active' : '' ?>"><span class="nav-ico">▦</span> Inicio</a>
       <a href="<?= $BASE ?>/reports/rentabilidad.php" class="<?= $active === 'rentabilidad' ? 'active' : '' ?>"><span class="nav-ico">▣</span> Rentabilidad electoral</a>
       <a href="<?= $BASE ?>/reports/cruce.php" class="<?= $active === 'cruce' ? 'active' : '' ?>"><span class="nav-ico">▣</span> Cruce por sección</a>
+      <a href="<?= $BASE ?>/reports/afinidad.php" class="<?= $active === 'afinidad' ? 'active' : '' ?>"><span class="nav-ico">▣</span> Afinidad partidista</a>
       <?php if ($U && $U['role'] === 'administrador'): ?>
         <a href="<?= $BASE ?>/admin/importar_resultados.php" class="<?= $active === 'importar-resultados' ? 'active' : '' ?>"><span class="nav-ico">⬆</span> Importar resultados</a>
         <a href="<?= $BASE ?>/admin/elecciones.php" class="<?= $active === 'elecciones-admin' ? 'active' : '' ?>"><span class="nav-ico">⚙</span> Elecciones</a>

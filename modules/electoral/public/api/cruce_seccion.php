@@ -16,6 +16,7 @@ ob_start();
 try {
     require_once __DIR__ . '/../../lib/bootstrap.php';
     require_once __DIR__ . '/../../lib/electoral_metrics.php';
+    require_once __DIR__ . '/../../lib/ranking_alfredo.php';
     $pdo = reporteador_pdo();
 
     $procesoId  = (int)($_GET['proceso_id'] ?? 0);
@@ -208,6 +209,7 @@ try {
         'votos'         => $votos,
         'apoyos'        => ['total'=>$apTotal, 'beneficiarios'=>$apBenef, 'por_programa'=>$apProgramas, 'por_tipo'=>$apPorTipo],
         'tickets'       => ['total'=>$tkTotal, 'abiertos'=>$tkAb, 'resueltos'=>$tkRe, 'por_tipo'=>$tkPorTipo, 'por_estado'=>$tkPorEstado],
+        'ranking'       => ranking_alfredo_seccion($secNum),
     ], JSON_UNESCAPED_UNICODE);
 
 } catch (Throwable $e) {
