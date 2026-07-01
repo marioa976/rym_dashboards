@@ -18,6 +18,9 @@ $cfg    = qb_config();
 $apiKey = $cfg['google_maps_api_key'] ?? '';
 $gm     = $cfg['geocode'] ?? [];
 $tabla  = qb_tabla();
+// Costo estimado de la Geocoding API (US$5.00 / 1,000; ~10,000 gratis/mes desde mar-2025). Editable por env.
+$USD_1000 = (float)(getenv('QROBUS_GEO_USD_1000') ?: 5.0);
+$FREE_MES = (int)(getenv('QROBUS_GEO_FREE_MES') ?: 10000);
 $SINCOORDS = "latitud IS NOT NULL AND latitud <> 0 AND longitud IS NOT NULL AND longitud <> 0";
 $CONDIR    = "(TRIM(COALESCE(calle,''))<>'' OR TRIM(COALESCE(colonia,''))<>'' OR TRIM(COALESCE(municipio,''))<>'')";
 
@@ -165,6 +168,7 @@ try { $stats = qb_stats(qb_pdo()); } catch (Throwable $e) { $dbError = $e->getMe
         <?php endif; ?>
       </div>
       <div class="qb-bar"><span id="qb-progress"></span></div>
+      <div id="qb-costo" style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:8px 10px;font-size:12px;color:#92400e;margin:8px 0"></div>
       <div style="display:flex;gap:10px;align-items:end;margin-top:8px">
         <div class="field" style="margin:0"><label>Por lote</label>
           <select id="qb-lote" class="input" style="width:90px"><option>10</option><option>25</option><option selected>50</option></select>
@@ -180,7 +184,16 @@ try { $stats = qb_stats(qb_pdo()); } catch (Throwable $e) { $dbError = $e->getMe
 
 <script>
 const HASKEY = <?= $apiKey ? 'true' : 'false' ?>;
+const USD1000 = <?= json_encode($USD_1000) ?>, FREE = <?= (int)$FREE_MES ?>, PEND0 = <?= (int)($stats['pendientes'] ?? 0) ?>;
+let apiCalls = 0;
 const $ = id => document.getElementById(id);
+function renderCosto(pend){
+  const el=$('qb-costo'); if(!el) return;
+  const cp = pend/1000*USD1000, cs = apiCalls/1000*USD1000;
+  el.innerHTML = `💲 Geocodificar los <b>${pend.toLocaleString()}</b> pendientes ≈ <b>US$${cp.toFixed(2)}</b> `
+    + `<span style="opacity:.85">(US$${USD1000.toFixed(2)}/1,000 · ~${FREE.toLocaleString()} gratis/mes · la caché no recobra direcciones repetidas)</span>`
+    + `<br>Esta sesión: <b>${apiCalls.toLocaleString()}</b> llamadas a la API ≈ <b>US$${cs.toFixed(2)}</b>`;
+}
 function esc(s){ return String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 async function post(action, data){
   const fd = new FormData(); fd.append('action', action);
@@ -292,6 +305,7 @@ $('qb-btn-batch').addEventListener('click', async () => {
     const r = await post('batch', {lote});
     if(r.error){ $('qb-batch-status').innerHTML='<span class="badge-bad">'+esc(r.error)+'</span>'; break; }
     totOk+=r.ok; totFail+=r.fail;
+    apiCalls += (r.items||[]).filter(i=>i.status!=='SIN_DIRECCION' && !i.cache).length;  // caché no cuenta
     for(const it of r.items){
       const ok = it.status==='OK';
       $('qb-log').insertAdjacentHTML('afterbegin',
@@ -299,6 +313,7 @@ $('qb-btn-batch').addEventListener('click', async () => {
     }
     if(r.stats){ $('qb-progress').style.width=pct(r.stats)+'%';
       $('qb-stats').innerHTML=`<strong>${r.stats.con_coords.toLocaleString()}</strong> con coords · <strong>${r.stats.pendientes.toLocaleString()}</strong> pendientes · ${r.stats.total.toLocaleString()} totales`; }
+    renderCosto(r.restantes);
     $('qb-batch-status').textContent=`Acumulado: ${totOk} geocodificados, ${totFail} con error · restantes ${r.restantes.toLocaleString()}`;
     if(r.procesados===0 || r.restantes===0){ $('qb-batch-status').textContent=`✓ Terminado. ${totOk} geocodificados, ${totFail} con error.`; break; }
     await new Promise(res=>setTimeout(res,300));
@@ -307,6 +322,7 @@ $('qb-btn-batch').addEventListener('click', async () => {
 });
 $('qb-btn-stop').addEventListener('click', ()=>{ stop=true; $('qb-btn-stop').style.display='none'; });
 
+renderCosto(PEND0);
 if(!HASKEY){ if($('qb-map')) $('qb-map').innerHTML='<div style="padding:20px;color:#991B1B">Google Maps API key no configurada.</div>'; }
 </script>
 <?php if ($apiKey): ?>
