@@ -176,7 +176,7 @@ if (!is_array($payload)) {
   </div>
 
   <div class="m-kpis">
-    <div class="m-kpi"><div class="v" id="k-vista">0</div><div class="l">Beneficiarios en vista</div></div>
+    <div class="m-kpi"><div class="v" id="k-vista">0</div><div class="l">Beneficiarios (filtros)</div><div class="l" id="k-vista-sub" style="color:var(--qro-text-muted);font-weight:500"></div></div>
     <div class="m-kpi"><div class="v" id="k-secs">0</div><div class="l">Secciones con beneficiarios</div></div>
     <div class="m-kpi"><div class="v" id="k-sinsec">0</div><div class="l">Fuera de sección</div></div>
     <div class="m-kpi"><div class="v" id="k-top">—</div><div class="l">Sección con más</div></div>
@@ -264,6 +264,7 @@ function render(){
   // KPIs
   const secs=Object.keys(bySecCount);
   $('k-vista').textContent=curPts.length.toLocaleString();
+  $('k-vista-sub').textContent='de '+MP.pts.length.toLocaleString()+' geocodificados cargados';
   $('k-secs').textContent=secs.length.toLocaleString();
   $('k-sinsec').textContent=sinSec.toLocaleString();
   let top='—',tv=0; for(const s of secs) if(bySecCount[s]>tv){tv=bySecCount[s];top=s;}
