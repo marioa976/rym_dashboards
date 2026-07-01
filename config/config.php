@@ -116,5 +116,21 @@ return [
             'map_id' => $mapId,
             'waze_feed_url' => env_str('WAZE_FEED_URL'),
         ],
+
+        // ---------------- Qrobus (Beneficiarios Unidos) ---------
+        'qrobus' => [
+            'db' => [                           // BD remota propia de Qrobus (tabla dwh_unidos)
+                'host'    => env_str('QROBUS_DB_HOST', '35.238.216.82'),
+                'port'    => env_int('QROBUS_DB_PORT', 3306),
+                'name'    => env_str('QROBUS_DB_NAME', 'iqt'),
+                'user'    => env_str('QROBUS_DB_USER'),
+                'pass'    => env_str('QROBUS_DB_PASS'),
+                'charset' => 'utf8mb4',
+            ],
+            'tabla'               => env_str('QROBUS_TABLA', 'dwh_unidos'),
+            'google_maps_api_key' => $gmaps,
+            'map_id'              => $mapId,
+            'geocode' => ['region' => 'mx', 'language' => 'es'],
+        ],
     ],
 ];
