@@ -26,7 +26,7 @@ function qb_en_ring(float $x, float $y, array $ring): bool {
     return $inside;
 }
 
-$cacheFile = sys_get_temp_dir() . '/qrobus_mapa_ayto2024_' . md5($tabla . '|' . $PARTIDO) . '.json';
+$cacheFile = sys_get_temp_dir() . '/qrobus_mapa_ayto2024pl_' . md5($tabla . '|' . $PARTIDO) . '.json';
 $noCache   = isset($_GET['nocache']);
 $payload   = null; $dbError = null;
 if (!$noCache && is_file($cacheFile) && (time() - filemtime($cacheFile)) < 600) {
@@ -42,7 +42,8 @@ if (!is_array($payload)) {
                     edad_anios edad,
                     COALESCE(NULLIF(TRIM(estatus_nombre),''),'N/D') t,
                     COALESCE(NULLIF(TRIM(municipio),''),'N/D') m,
-                    COALESCE(NULLIF(TRIM(tipo_nombre),''),'N/D') tp
+                    COALESCE(NULLIF(TRIM(tipo_nombre),''),'N/D') tp,
+                    COALESCE(NULLIF(TRIM(plataforma_nombre),''),'N/D') pl
                FROM `$tabla`
               WHERE latitud IS NOT NULL AND latitud <> 0 AND longitud IS NOT NULL AND longitud <> 0"
         )->fetchAll();
@@ -126,7 +127,7 @@ if (!is_array($payload)) {
         $pts=[];
         foreach($rows as $r){ $lat=(float)$r['lat'];$lng=(float)$r['lng']; $ed=(int)$r['edad'];
             $eg = $ed<=0?'N/D':($ed<18?'0-17':($ed<26?'18-25':($ed<36?'26-35':($ed<46?'36-45':($ed<60?'46-59':'60+')))));
-            $pts[]=['y'=>$lat,'x'=>$lng,'s'=>$asignar($lng,$lat),'g'=>$r['g'],'e'=>$eg,'t'=>$r['t'],'m'=>$r['m'],'tp'=>$r['tp']]; }
+            $pts[]=['y'=>$lat,'x'=>$lng,'s'=>$asignar($lng,$lat),'g'=>$r['g'],'e'=>$eg,'t'=>$r['t'],'m'=>$r['m'],'tp'=>$r['tp'],'pl'=>$r['pl']]; }
 
         $payload = ['pts'=>$pts,'geo'=>['type'=>'FeatureCollection','features'=>$features],'elec'=>$elec,'partido'=>$PARTIDO];
         @file_put_contents($cacheFile, json_encode($payload, JSON_UNESCAPED_UNICODE));
@@ -170,6 +171,7 @@ if (!is_array($payload)) {
   <div class="m-filtros">
     <select id="f-mun" class="input"><option value="">Todos los municipios</option></select>
     <select id="f-tipo" class="input"><option value="">Todos los tipos de aplicante</option></select>
+    <select id="f-plat" class="input"><option value="">Todas las plataformas</option></select>
     <select id="f-sexo" class="input"><option value="">Todos los sexos</option></select>
     <select id="f-edad" class="input"><option value="">Todas las edades</option></select>
     <select id="f-est" class="input"><option value="">Todos los estatus</option></select>
@@ -214,11 +216,12 @@ function uniq(k){ return [...new Set(MP.pts.map(p=>p[k]).filter(v=>v&&v!=='N/D')
 function fill(id,vals,label){ $(id).innerHTML=`<option value="">${label}</option>`+vals.map(v=>`<option>${esc(v)}</option>`).join(''); }
 fill('f-mun',uniq('m'),'Todos los municipios');
 fill('f-tipo',uniq('tp'),'Todos los tipos de aplicante');
+fill('f-plat',uniq('pl'),'Todas las plataformas');
 fill('f-sexo',uniq('g'),'Todos los sexos');
 fill('f-edad',['0-17','18-25','26-35','36-45','46-59','60+'],'Todas las edades');
 fill('f-est',uniq('t'),'Todos los estatus');
-function filtrados(){ const fm=$('f-mun').value,fp=$('f-tipo').value,fs=$('f-sexo').value,fe=$('f-edad').value,ft=$('f-est').value;
-  return MP.pts.filter(p=>(!fm||p.m===fm)&&(!fp||p.tp===fp)&&(!fs||p.g===fs)&&(!fe||p.e===fe)&&(!ft||p.t===ft)); }
+function filtrados(){ const fm=$('f-mun').value,fp=$('f-tipo').value,fpl=$('f-plat').value,fs=$('f-sexo').value,fe=$('f-edad').value,ft=$('f-est').value;
+  return MP.pts.filter(p=>(!fm||p.m===fm)&&(!fp||p.tp===fp)&&(!fpl||p.pl===fpl)&&(!fs||p.g===fs)&&(!fe||p.e===fe)&&(!ft||p.t===ft)); }
 
 /* Colores */
 const GRIS='#E5E7EB';
@@ -293,6 +296,8 @@ function detalle(s){
   if(pts.length){
     html+=`<div style="font-size:11px;color:#64748b;margin-bottom:2px">Por tipo de aplicante</div>`;
     html+=tipos.slice(0,6).map(([k,v])=>bar(k,v,maxT)).join('');
+    html+=`<div style="font-size:11px;color:#64748b;margin:6px 0 2px">Por dónde llega la solicitud</div>`;
+    html+=cnt('pl').slice(0,6).map(([k,v])=>`<div class="m-row"><span>${esc(k)}</span><b>${v.toLocaleString()}</b></div>`).join('');
     html+=`<div style="font-size:11px;color:#64748b;margin:6px 0 2px">Por sexo</div>`;
     html+=sexos.map(([k,v])=>`<div class="m-row"><span>${esc(k)}</span><b>${v.toLocaleString()}</b></div>`).join('');
   } else html+=`<div class="text-secondary" style="font-size:12px">Sin beneficiarios en la vista.</div>`;
@@ -308,7 +313,7 @@ function detalle(s){
   $('m-detail').innerHTML=html;
 }
 
-['f-mun','f-tipo','f-sexo','f-edad','f-est'].forEach(id=>$(id).addEventListener('change',render));
+['f-mun','f-tipo','f-plat','f-sexo','f-edad','f-est'].forEach(id=>$(id).addEventListener('change',render));
 document.querySelectorAll('[data-metric]').forEach(b=>b.addEventListener('click',()=>{
   metric=b.dataset.metric; document.querySelectorAll('[data-metric]').forEach(x=>x.classList.toggle('on',x===b)); render();
 }));

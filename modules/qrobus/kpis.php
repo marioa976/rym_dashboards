@@ -30,6 +30,7 @@ try {
         'municipio'  => $q("SELECT COALESCE(NULLIF(TRIM(municipio),''),'N/D') k, COUNT(*) n FROM `$tabla` GROUP BY k ORDER BY n DESC LIMIT 12"),
         'colonia'    => $q("SELECT COALESCE(NULLIF(TRIM(colonia),''),'N/D') k, COUNT(*) n FROM `$tabla` GROUP BY k ORDER BY n DESC LIMIT 12"),
         'educativo'  => $q("SELECT COALESCE(NULLIF(TRIM(nivel_educativo),''),'N/D') k, COUNT(*) n FROM `$tabla` GROUP BY k ORDER BY n DESC LIMIT 10"),
+        'plataforma' => $q("SELECT COALESCE(NULLIF(TRIM(plataforma_nombre),''),'N/D') k, COUNT(*) n FROM `$tabla` GROUP BY k ORDER BY n DESC LIMIT 10"),
         'mes'        => $q("SELECT DATE_FORMAT(fecha,'%Y-%m') m, COUNT(*) n FROM `$tabla` WHERE fecha IS NOT NULL GROUP BY m ORDER BY m"),
         // Pirámide: grupo de edad × sexo
         'pir'        => $q("SELECT CASE
@@ -98,6 +99,7 @@ $topTipo = ($D && $D['tipo']) ? $D['tipo'][0] : null;
       <div class="k-panel"><h3>Tipo de aplicante × sexo</h3><div class="box"><canvas id="c-tiposexo"></canvas></div></div>
       <div class="k-panel"><h3>Top municipios</h3><div class="box"><canvas id="c-mun"></canvas></div></div>
       <div class="k-panel"><h3>Top colonias</h3><div class="box"><canvas id="c-col"></canvas></div></div>
+      <div class="k-panel"><h3>Por dónde llega la solicitud</h3><div class="box"><canvas id="c-plat"></canvas></div></div>
       <div class="k-panel"><h3>Estatus</h3><div class="box"><canvas id="c-est"></canvas></div></div>
       <div class="k-panel"><h3>Nivel educativo</h3><div class="box"><canvas id="c-edu"></canvas></div></div>
       <div class="k-panel k-wide"><h3>Registros por mes</h3><div class="box"><canvas id="c-mes"></canvas></div></div>
@@ -122,6 +124,7 @@ bars('c-tipo', D.tipo.map(r=>r.k), D.tipo.map(r=>+r.n), '#ce3a2b', true);
 bars('c-mun', D.municipio.map(r=>r.k), D.municipio.map(r=>+r.n), '#254185', true);
 bars('c-col', D.colonia.map(r=>r.k), D.colonia.map(r=>+r.n), '#005ab2', true);
 donut('c-est', D.estatus);
+donut('c-plat', D.plataforma);
 bars('c-edu', D.educativo.map(r=>r.k), D.educativo.map(r=>+r.n), '#188a5b', true);
 
 /* Pirámide de edad por sexo */
