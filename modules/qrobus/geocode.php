@@ -73,9 +73,12 @@ if ($action !== '') {
         if ($action === 'batch') {
             if (!$apiKey) throw new RuntimeException('Falta GOOGLE_MAPS_API_KEY en la configuración.');
             $lote = max(1, min(50, (int)($_POST['lote'] ?? 10)));
+            // Opcional: saltar registros con C.P. vacío.
+            $reqCp = (($_POST['req_cp'] ?? '0') === '1');
+            $wCp   = $reqCp ? " AND TRIM(COALESCE(cp,''))<>'' " : "";
             $sel = $pdo->query("SELECT id_tramite, calle, colonia, municipio, cp
                                   FROM `$tabla`
-                                 WHERE NOT ($SINCOORDS) AND $CONDIR
+                                 WHERE NOT ($SINCOORDS) AND $CONDIR $wCp
                               ORDER BY id_tramite LIMIT $lote");
             $rows = $sel->fetchAll();
             $upd = $pdo->prepare("UPDATE `$tabla` SET latitud=?, longitud=? WHERE id_tramite=?");
@@ -95,8 +98,10 @@ if ($action !== '') {
                 }
             }
             $st = qb_stats($pdo);
+            // Restantes según el mismo filtro (respeta "ignorar sin C.P.").
+            $restantes = (int)$pdo->query("SELECT COUNT(*) FROM `$tabla` WHERE NOT ($SINCOORDS) AND $CONDIR $wCp")->fetchColumn();
             echo json_encode(['procesados'=>count($rows), 'ok'=>$okN, 'fail'=>$failN,
-                              'items'=>$items, 'stats'=>$st, 'restantes'=>$st['pendientes']]); exit;
+                              'items'=>$items, 'stats'=>$st, 'restantes'=>$restantes]); exit;
         }
         throw new RuntimeException('Acción no reconocida.');
     } catch (Throwable $e) {
@@ -173,6 +178,7 @@ try { $stats = qb_stats(qb_pdo()); } catch (Throwable $e) { $dbError = $e->getMe
         <div class="field" style="margin:0"><label>Por lote</label>
           <select id="qb-lote" class="input" style="width:90px"><option>10</option><option>25</option><option selected>50</option></select>
         </div>
+        <div class="field" style="margin:0"><label style="white-space:nowrap"><input type="checkbox" id="qb-req-cp"> Ignorar sin C.P.</label></div>
         <button class="btn btn-primary" id="qb-btn-batch">▶ Iniciar</button>
         <button class="btn btn-secondary" id="qb-btn-stop" style="display:none">⏹ Detener</button>
       </div>
@@ -299,10 +305,11 @@ $('qb-btn-batch').addEventListener('click', async () => {
   stop=false; $('qb-btn-batch').style.display='none'; $('qb-btn-stop').style.display='';
   $('qb-log').style.display='block'; $('qb-log').innerHTML='';
   const lote = +$('qb-lote').value || 10;
+  const reqCp = $('qb-req-cp').checked ? 1 : 0;
   let totOk=0, totFail=0;
   while(!stop){
     $('qb-batch-status').textContent='Procesando lote…';
-    const r = await post('batch', {lote});
+    const r = await post('batch', {lote, req_cp:reqCp});
     if(r.error){ $('qb-batch-status').innerHTML='<span class="badge-bad">'+esc(r.error)+'</span>'; break; }
     totOk+=r.ok; totFail+=r.fail;
     apiCalls += (r.items||[]).filter(i=>i.status!=='SIN_DIRECCION' && !i.cache).length;  // caché no cuenta
