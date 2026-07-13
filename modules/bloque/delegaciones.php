@@ -125,7 +125,7 @@ const rows = D.base.map(r=>{
   return {...r, usuarios:+r.usuarios||0, asistencias:a, presentes:p, ausentes:+r.ausentes||0,
           edad_prom:r.edad_prom!==null?+r.edad_prom:null, tasa: a>0 ? +(p/a*100).toFixed(1) : null};
 });
-const top = rows.slice(0,12);
+const topDel = rows.slice(0,12);   // 'top' es global del navegador (window.top): no usar
 
 /* KPIs */
 (function(){
@@ -140,13 +140,13 @@ const top = rows.slice(0,12);
 })();
 
 /* Usuarios por delegación */
-new Chart($('c-usu'),{type:'bar',data:{labels:top.map(r=>r.k),datasets:[{data:top.map(r=>r.usuarios),backgroundColor:'#254185',borderRadius:6}]},
+new Chart($('c-usu'),{type:'bar',data:{labels:topDel.map(r=>r.k),datasets:[{data:topDel.map(r=>r.usuarios),backgroundColor:'#254185',borderRadius:6}]},
   options:{indexAxis:'y',plugins:{legend:{display:false}},maintainAspectRatio:false,scales:{x:{grid:{color:'#eef2f6'}},y:{grid:{display:false}}}}});
 
 /* Asistencias apiladas */
-new Chart($('c-asis'),{type:'bar',data:{labels:top.map(r=>r.k),datasets:[
-    {label:'Presentes',data:top.map(r=>r.presentes),backgroundColor:'#188a5b',borderRadius:4},
-    {label:'Ausentes', data:top.map(r=>r.ausentes), backgroundColor:'#ce3a2b',borderRadius:4}]},
+new Chart($('c-asis'),{type:'bar',data:{labels:topDel.map(r=>r.k),datasets:[
+    {label:'Presentes',data:topDel.map(r=>r.presentes),backgroundColor:'#188a5b',borderRadius:4},
+    {label:'Ausentes', data:topDel.map(r=>r.ausentes), backgroundColor:'#ce3a2b',borderRadius:4}]},
   options:{indexAxis:'y',maintainAspectRatio:false,plugins:{legend:{position:'top'}},
     scales:{x:{stacked:true,grid:{color:'#eef2f6'}},y:{stacked:true,grid:{display:false}}}}});
 
@@ -163,8 +163,8 @@ new Chart($('c-asis'),{type:'bar',data:{labels:top.map(r=>r.k),datasets:[
 (function(){
   const generos=[...new Set(D.gen.map(r=>r.g))];
   const val=(k,g)=>{const r=D.gen.find(x=>x.k===k&&x.g===g); return r?+r.n:0;};
-  new Chart($('c-gen'),{type:'bar',data:{labels:top.map(r=>r.k),
-      datasets:generos.map((g,i)=>({label:g,data:top.map(r=>val(r.k,g)),backgroundColor:QC[i%QC.length],borderRadius:4}))},
+  new Chart($('c-gen'),{type:'bar',data:{labels:topDel.map(r=>r.k),
+      datasets:generos.map((g,i)=>({label:g,data:topDel.map(r=>val(r.k,g)),backgroundColor:QC[i%QC.length],borderRadius:4}))},
     options:{indexAxis:'y',maintainAspectRatio:false,plugins:{legend:{position:'top'}},
       scales:{x:{stacked:true,grid:{color:'#eef2f6'}},y:{stacked:true,grid:{display:false}}}}});
 })();
