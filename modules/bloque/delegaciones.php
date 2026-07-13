@@ -42,8 +42,45 @@ try {
             GROUP BY k, act")
         : [];
 
+    /* ---- Ubicación geográfica de las delegaciones ----
+       El portal NO tiene polígonos de delegación (solo catálogos de nombre y los
+       polígonos de secciones electorales). Derivamos un CENTROIDE por delegación
+       a partir de datos ya geocodificados: tickets de Zendesk (delegacion_id + coords)
+       y, como respaldo, el padrón DIF (delegacion + coords). */
+    $cent = [];
+    try {
+        if (bl_existe($pdo,'tickets') && bl_existe($pdo,'cat_delegacion')) {
+            foreach ($pdo->query("SELECT cd.nombre k, AVG(t.latitud) lat, AVG(t.longitud) lng, COUNT(*) n
+                                    FROM tickets t JOIN cat_delegacion cd ON cd.id = t.delegacion_id
+                                   WHERE t.latitud IS NOT NULL AND t.latitud <> 0
+                                     AND t.longitud IS NOT NULL AND t.longitud <> 0
+                                GROUP BY cd.nombre") as $r) {
+                $cent[bl_norm((string)$r['k'])] = ['lat'=>(float)$r['lat'], 'lng'=>(float)$r['lng'], 'src'=>'tickets', 'n'=>(int)$r['n']];
+            }
+        }
+        if (bl_existe($pdo,'padron')) {
+            foreach ($pdo->query("SELECT delegacion k, AVG(latitud) lat, AVG(longitud) lng, COUNT(*) n
+                                    FROM padron
+                                   WHERE TRIM(COALESCE(delegacion,'')) <> ''
+                                     AND latitud IS NOT NULL AND latitud <> 0
+                                     AND longitud IS NOT NULL AND longitud <> 0
+                                GROUP BY delegacion") as $r) {
+                $k = bl_norm((string)$r['k']);
+                if (!isset($cent[$k])) $cent[$k] = ['lat'=>(float)$r['lat'], 'lng'=>(float)$r['lng'], 'src'=>'padron', 'n'=>(int)$r['n']];
+            }
+        }
+    } catch (Throwable $e) { /* sin centroides: el mapa lo dirá */ }
+
+    foreach ($base as &$b) {
+        $k = bl_norm((string)$b['k']);
+        $b['lat'] = isset($cent[$k]) ? $cent[$k]['lat'] : null;
+        $b['lng'] = isset($cent[$k]) ? $cent[$k]['lng'] : null;
+    }
+    unset($b);
+
     $D = ['base'=>$base, 'gen'=>$gen, 'act'=>$act];
 } catch (Throwable $e) { $dbError = $e->getMessage(); }
+$apiKey = bl_config()['google_maps_api_key'] ?? '';
 ?><!doctype html>
 <html lang="es">
 <head>
@@ -83,6 +120,15 @@ try {
     <div class="d-kpis" id="d-kpis"></div>
 
     <div class="d-grid">
+      <div class="d-panel d-wide">
+        <h3>🗺 Mapa de delegaciones</h3>
+        <p class="text-secondary" style="margin:0 0 8px;font-size:12px">
+          El portal no tiene polígonos de delegación, así que ubicamos cada una con un <strong>centroide</strong> derivado de datos ya geocodificados (tickets de Zendesk y padrón DIF).
+          El <strong>tamaño</strong> de la burbuja = usuarios de Bloque; el <strong>color</strong> = tasa de asistencia. <span id="d-map-nota"></span>
+        </p>
+        <div class="d-legend" id="d-legend" style="display:flex;gap:10px;flex-wrap:wrap;font-size:11px;color:var(--qro-text-secondary);margin-bottom:8px"></div>
+        <div id="d-map" style="height:520px;border-radius:12px;border:1px solid var(--qro-border);overflow:hidden"></div>
+      </div>
       <div class="d-panel d-wide"><h3>Usuarios por delegación</h3><div class="box"><canvas id="c-usu"></canvas></div></div>
       <div class="d-panel d-wide"><h3>Asistencias por delegación (presentes vs ausentes)</h3><div class="box"><canvas id="c-asis"></canvas></div></div>
       <div class="d-panel"><h3>Tasa de asistencia por delegación</h3><div class="box"><canvas id="c-tasa"></canvas></div></div>
@@ -185,6 +231,48 @@ let chartAct=null;
   if(dels.length) pinta();
 })();
 
+/* ---- Mapa de delegaciones (burbujas sobre centroides) ---- */
+const HASKEY = <?= $apiKey ? 'true' : 'false' ?>;
+function colorTasa(t){ return t===null?'#9ca3af':(t>=80?'#15803d':t>=60?'#65a30d':t>=40?'#d99000':'#ce3a2b'); }
+window.initBlMap = function(){
+  const el=$('d-map');
+  const geo = rows.filter(r=>r.lat!==null && r.lng!==null && r.k!=='N/D');
+  $('d-map-nota').innerHTML = `<b>${geo.length}</b> de ${rows.filter(r=>r.k!=='N/D').length} delegaciones ubicadas.`;
+  if(!geo.length){ el.innerHTML='<div style="padding:24px;color:#6b7280">No se pudo ubicar ninguna delegación (no hay datos geocodificados con delegación en el portal).</div>'; return; }
+  const map=new google.maps.Map(el,{center:{lat:20.59,lng:-100.39},zoom:11,mapTypeControl:false,streetViewControl:false,
+    styles:[{featureType:'poi',stylers:[{visibility:'off'}]}]});
+  const info=new google.maps.InfoWindow();
+  const bounds=new google.maps.LatLngBounds();
+  const maxU=Math.max(...geo.map(r=>r.usuarios),1);
+  for(const r of geo){
+    const c=colorTasa(r.tasa);
+    const circle=new google.maps.Circle({
+      map, center:{lat:r.lat,lng:r.lng},
+      radius: 400 + Math.sqrt(r.usuarios/maxU)*2600,
+      fillColor:c, fillOpacity:0.45, strokeColor:c, strokeOpacity:0.9, strokeWeight:1.5, clickable:true
+    });
+    bounds.extend(new google.maps.LatLng(r.lat,r.lng));
+    circle.addListener('click',()=>{
+      info.setContent(`<div style="font-family:Montserrat,Arial;font-size:13px;min-width:190px">
+        <div style="font-weight:800;color:#254185;margin-bottom:4px">${esc(r.k)}</div>
+        <div style="display:flex;justify-content:space-between"><span>Usuarios</span><b>${r.usuarios.toLocaleString()}</b></div>
+        <div style="display:flex;justify-content:space-between"><span>Asistencias</span><b>${r.asistencias.toLocaleString()}</b></div>
+        <div style="display:flex;justify-content:space-between"><span>Presentes</span><b style="color:#15803d">${r.presentes.toLocaleString()}</b></div>
+        <div style="display:flex;justify-content:space-between"><span>Ausentes</span><b style="color:#ce3a2b">${r.ausentes.toLocaleString()}</b></div>
+        <div style="display:flex;justify-content:space-between"><span>Tasa asistencia</span><b style="color:${c}">${r.tasa===null?'—':r.tasa+'%'}</b></div>
+        <div style="display:flex;justify-content:space-between"><span>Edad prom.</span><b>${r.edad_prom===null?'—':r.edad_prom}</b></div>
+      </div>`);
+      info.setPosition({lat:r.lat,lng:r.lng});
+      info.open(map);
+    });
+  }
+  if(!bounds.isEmpty()) map.fitBounds(bounds);
+  $('d-legend').innerHTML = `<span>Tamaño = usuarios · Color = tasa de asistencia:</span>`
+    + [['<40%','#ce3a2b'],['40-60','#d99000'],['60-80','#65a30d'],['≥80%','#15803d'],['sin asistencias','#9ca3af']]
+        .map(x=>`<span><i style="display:inline-block;width:14px;height:12px;border-radius:3px;background:${x[1]};margin-right:3px;vertical-align:middle"></i>${x[0]}</span>`).join('');
+};
+if(!HASKEY){ $('d-map').innerHTML='<div style="padding:20px;color:#991B1B">Google Maps API key no configurada.</div>'; }
+
 /* Tabla + orden + CSV */
 let sk='usuarios', sd=-1;
 function pintaTabla(){
@@ -210,6 +298,9 @@ $('btn-csv').addEventListener('click',()=>{
 });
 pintaTabla();
 </script>
+<?php if ($apiKey): ?>
+<script async src="https://maps.googleapis.com/maps/api/js?key=<?= urlencode($apiKey) ?>&callback=initBlMap&loading=async&v=weekly"></script>
+<?php endif; ?>
 <?php endif; ?>
 </body>
 </html>

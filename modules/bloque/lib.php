@@ -62,6 +62,14 @@ function bl_pick(PDO $pdo, string $t, array $cands, ?string $def = null): ?strin
     return $def;
 }
 
+/** Normaliza un nombre para empatar catálogos (mayúsculas, sin acentos, espacios simples). */
+function bl_norm(?string $s): string {
+    $s = mb_strtoupper(trim((string)$s), 'UTF-8');
+    $s = strtr($s, ['Á'=>'A','É'=>'E','Í'=>'I','Ó'=>'O','Ú'=>'U','Ñ'=>'N','Ü'=>'U',
+                    'á'=>'A','é'=>'E','í'=>'I','ó'=>'O','ú'=>'U','ñ'=>'N']);
+    return preg_replace('/\s+/', ' ', $s) ?? $s;
+}
+
 /** Metadatos detectados del esquema variable (actividades / sesiones). */
 function bl_meta(PDO $pdo): array {
     static $m = null;
