@@ -248,7 +248,7 @@ function hint(string $label, string $tip): string {
     return '<span class="hint" title="' . htmlspecialchars($tip) . '">' . htmlspecialchars($label) . '</span>';
 }
 
-$title = 'Rentabilidad electoral';
+$title = 'Rentabilidad seccional';
 $active = 'rentabilidad';
 include __DIR__ . '/../partials/layout_top.php';
 ?>
@@ -260,7 +260,7 @@ include __DIR__ . '/../partials/layout_top.php';
 
 <div class="page-header">
   <div>
-    <h1>Rentabilidad electoral · análisis estratégico</h1>
+    <h1>Rentabilidad seccional · análisis estratégico</h1>
     <p>
       Voto efectivo PAN (PAN puro + coaliciones) por sección, con tendencia respecto a la elección anterior del mismo tipo,
       cruzado con estructura ciudadana y metas. Cuadrantes BCG para priorizar acción.

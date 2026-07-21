@@ -236,7 +236,7 @@ CREATE TABLE IF NOT EXISTS `import_log_resultados` (
 -- a los demás se les asigna desde Administración → Usuarios).
 -- ====================================================================
 INSERT INTO modulos (clave, nombre, descripcion, icono, ruta, color, orden) VALUES
-  ('electoral', 'Electoral', 'Resultados IEEQ y rentabilidad por sección',
+  ('electoral', 'Seccional', 'Resultados IEEQ y rentabilidad por sección',
    'chart', 'modules/electoral/public/index.php', '#ce3a2b', 4)
 ON DUPLICATE KEY UPDATE nombre = VALUES(nombre), descripcion = VALUES(descripcion),
                         ruta = VALUES(ruta), icono = VALUES(icono), color = VALUES(color);

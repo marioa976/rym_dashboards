@@ -200,14 +200,14 @@ $historial = $pdo->query(
       LIMIT 25"
 )->fetchAll();
 
-$title = 'Importar resultados electorales';
+$title = 'Importar resultados por sección';
 $active = 'importar-resultados';
 include __DIR__ . '/../partials/layout_top.php';
 ?>
 
 <div class="page-header">
   <div>
-    <h1>Importar resultados electorales</h1>
+    <h1>Importar resultados por sección</h1>
     <p>Carga atómica con validación previa, bitácora y reversa. Si algo falla, no queda nada a medias.</p>
   </div>
 </div>

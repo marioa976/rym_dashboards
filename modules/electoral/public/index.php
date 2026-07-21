@@ -33,8 +33,8 @@ try {
 
 /* Reportes disponibles (el "cajón") */
 $reportes = [
-    ['Rentabilidad electoral', 'Voto efectivo del partido objetivo por sección, tendencia y cuadrantes BCG.', 'reports/rentabilidad.php', '#254185', '▣'],
-    ['Cruce por sección',      'Electoral × padrón DIF × atención ciudadana (Zendesk), con mapa y filtros.', 'reports/cruce.php', '#0ea5e9', '◍'],
+    ['Rentabilidad seccional', 'Voto efectivo del partido objetivo por sección, tendencia y cuadrantes BCG.', 'reports/rentabilidad.php', '#254185', '▣'],
+    ['Cruce por sección',      'Voto por sección × padrón DIF × atención ciudadana (Zendesk), con mapa y filtros.', 'reports/cruce.php', '#0ea5e9', '◍'],
     ['Afinidad partidista',    'Índice de afinidad (IAP) por sección con pesos ajustables, gauge y mapa.',  'reports/afinidad.php', '#ce3a2b', '◐'],
 ];
 
@@ -67,7 +67,7 @@ include __DIR__ . '/partials/layout_top.php';
 
 <section class="el-hero">
   <h1>Hola, <?= htmlspecialchars($U['name']) ?></h1>
-  <p>Reporteador electoral · análisis territorial con datos del IEEQ / INE.</p>
+  <p>Reporteador seccional · análisis territorial con datos del IEEQ / INE.</p>
   <?php if ($ultima && $ultima['fecha']): ?>
     <span class="chip-upd">Última importación: <?= htmlspecialchars(date('d/m/Y H:i', strtotime((string)$ultima['fecha']))) ?><?= $ultima['archivo'] ? ' · ' . htmlspecialchars($ultima['archivo']) : '' ?></span>
   <?php endif; ?>

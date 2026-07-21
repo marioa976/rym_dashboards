@@ -137,7 +137,7 @@ if (!is_array($payload)) {
 <html lang="es">
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Qrobus · Mapa electoral</title>
+  <title>Qrobus · Mapa seccional</title>
   <link rel="stylesheet" href="../../assets/css/qro.css">
   <script src="https://unpkg.com/deck.gl@8.9.35/dist.min.js"></script>
   <style>
@@ -163,7 +163,7 @@ if (!is_array($payload)) {
 <?php $portalModulo='Qrobus'; $navActive='mapa'; include __DIR__ . '/_nav.php'; ?>
 
 <main class="content" style="padding:28px 32px">
-  <div class="page-head"><h1>Mapa electoral · Unidos</h1><p class="text-secondary">Densidad de beneficiarios cruzada con la geografía electoral (partido objetivo: <strong><?= htmlspecialchars($PARTIDO) ?></strong>).</p></div>
+  <div class="page-head"><h1>Mapa seccional · Unidos</h1><p class="text-secondary">Densidad de beneficiarios cruzada con la geografía por sección (partido objetivo: <strong><?= htmlspecialchars($PARTIDO) ?></strong>).</p></div>
 
   <?php if ($dbError): ?><div class="alert alert-danger">No se pudieron cargar los datos.<br><span style="font-size:12px"><?= htmlspecialchars($dbError) ?></span></div><?php endif; ?>
   <?php if (!$apiKey): ?><div class="alert alert-danger">Falta <code>GOOGLE_MAPS_API_KEY</code>.</div><?php endif; ?>
@@ -199,7 +199,7 @@ if (!is_array($payload)) {
     <div id="m-map"></div>
     <div class="m-side">
       <strong>Detalle de sección</strong>
-      <div id="m-detail" style="margin-top:8px"><p class="text-secondary" style="font-size:13px">Haz clic en una sección para ver beneficiarios y resultado electoral.</p></div>
+      <div id="m-detail" style="margin-top:8px"><p class="text-secondary" style="font-size:13px">Haz clic en una sección para ver beneficiarios y resultado por sección.</p></div>
     </div>
   </div>
 </main>
@@ -302,14 +302,14 @@ function detalle(s){
     html+=sexos.map(([k,v])=>`<div class="m-row"><span>${esc(k)}</span><b>${v.toLocaleString()}</b></div>`).join('');
   } else html+=`<div class="text-secondary" style="font-size:12px">Sin beneficiarios en la vista.</div>`;
   // Electoral
-  html+=`<div class="m-sec-h" style="color:#ce3a2b">🗳 Electoral (ayuntamiento 2024)</div>`;
+  html+=`<div class="m-sec-h" style="color:#ce3a2b">🗳 Resultado por sección (ayuntamiento 2024)</div>`;
   if(e){
     html+=`<div class="m-row"><span>Afinidad ${esc(PARTIDO)}</span><b style="color:${greenPct(e.rent)}">${e.rent!=null?e.rent+'%':'—'}</b></div>`;
     html+=`<div class="m-row"><span>Participación</span><b>${e.part!=null?e.part+'%':'—'}</b></div>`;
     html+=`<div class="m-row"><span>Ganador</span><b>${esc(e.gan||'—')}${e.ganp!=null?' ('+e.ganp+'%)':''}</b></div>`;
     html+=`<div class="m-row"><span>Lista nominal</span><b>${(+e.ln).toLocaleString()}</b></div>`;
     html+=`<div class="m-row"><span>Votos válidos</span><b>${(+e.val).toLocaleString()}</b></div>`;
-  } else html+=`<div class="text-secondary" style="font-size:12px">Sin datos electorales para esta sección.</div>`;
+  } else html+=`<div class="text-secondary" style="font-size:12px">Sin datos de resultados para esta sección.</div>`;
   $('m-detail').innerHTML=html;
 }
 

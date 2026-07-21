@@ -164,7 +164,7 @@ foreach ($rowsElec as $sec => $r) {
 $rentMed   = mediana(array_column($rows, 'rentabilidad'));
 $apoyosMed = mediana(array_column($rows, 'apoyos'));
 $quadDefs = [
-    'prioridad'   => ['t'=>'Prioridad de inversión', 'd'=>'Afín (rentabilidad ≥ mediana) pero con pocos apoyos. Capital electoral sin atender.', 'c'=>'#16a34a'],
+    'prioridad'   => ['t'=>'Prioridad de inversión', 'd'=>'Afín (rentabilidad ≥ mediana) pero con pocos apoyos. Voto afín sin atender.', 'c'=>'#16a34a'],
     'consolidada' => ['t'=>'Consolidada',            'd'=>'Afín y bien atendida. Mantener.', 'c'=>'#0ea5e9'],
     'fidelizar'   => ['t'=>'Revisar ROI',            'd'=>'Poco afín pero con muchos apoyos. Evaluar retorno.', 'c'=>'#d99000'],
     'explorar'    => ['t'=>'Explorar',               'd'=>'Poco afín y poco atendida. Bajo costo de oportunidad.', 'c'=>'#94a3b8'],
@@ -333,8 +333,8 @@ include __DIR__ . '/../partials/layout_top.php';
 
 <div class="page-header">
   <div>
-    <h1>Cruce territorial · electoral × ciudadanía × padrón</h1>
-    <p>Afinidad electoral de <strong><?= htmlspecialchars($partido) ?></strong>, apoyos del DIF y reportes de Zendesk, cruzados por sección. Enlace por <code>num_seccion</code>.</p>
+    <h1>Cruce territorial · seccional × ciudadanía × padrón</h1>
+    <p>Afinidad seccional de <strong><?= htmlspecialchars($partido) ?></strong>, apoyos del DIF y reportes de Zendesk, cruzados por sección. Enlace por <code>num_seccion</code>.</p>
   </div>
 </div>
 
@@ -440,7 +440,7 @@ include __DIR__ . '/../partials/layout_top.php';
 <!-- ===== Charts ===== -->
 <div class="cx-charts">
   <div class="card">
-    <strong>Afinidad electoral vs apoyos DIF</strong>
+    <strong>Afinidad seccional vs apoyos DIF</strong>
     <p class="muted" style="margin:2px 0 10px;font-size:12px">Cada burbuja es una sección (tamaño = lista nominal). Líneas punteadas = medianas. Color = cuadrante.</p>
     <div style="height:320px"><canvas id="cx-scatter"></canvas></div>
   </div>
@@ -456,7 +456,7 @@ include __DIR__ . '/../partials/layout_top.php';
 <div class="cx-lists">
   <div class="card">
     <strong style="color:#16a34a">⬤ Secciones afines sin apoyo</strong>
-    <p class="muted" style="margin:2px 0 8px;font-size:12px">Rentabilidad alta y 0 apoyos del DIF — capital electoral desatendido.</p>
+    <p class="muted" style="margin:2px 0 8px;font-size:12px">Rentabilidad alta y 0 apoyos del DIF — voto afín desatendido.</p>
     <?php if (!$afines): ?><p class="muted">Sin secciones en esta categoría.</p><?php endif; ?>
     <?php foreach ($afines as $r): ?>
       <div class="cx-li"><span><span class="sec">Sec. <?= $r['num_seccion'] ?></span> <span class="mut"><?= htmlspecialchars($r['ambito_nombre']) ?></span></span>
@@ -648,7 +648,7 @@ function renderModal(d){
   const votosHtml=(d.votos||[]).map(v=>`<div class="cx-bar">
       <span class="nm" title="${escapeHtml(v.nombre)}">${v.es_objetivo?'★ ':''}${escapeHtml(v.nombre)}</span>
       <span class="tr"><span style="width:${Math.max(2,v.votos/maxV*100)}%;background:${v.color}"></span></span>
-      <span class="vl">${(+v.votos).toLocaleString()}${v.pct!=null?' · '+v.pct+'%':''}</span></div>`).join('') || '<p class="muted">Sin resultados electorales.</p>';
+      <span class="vl">${(+v.votos).toLocaleString()}${v.pct!=null?' · '+v.pct+'%':''}</span></div>`).join('') || '<p class="muted">Sin resultados seccionales.</p>';
   const rent=d.rentabilidad!=null?d.rentabilidad.toFixed(1)+'%':'—';
   const part=d.participacion!=null?d.participacion.toFixed(1)+'%':'—';
   return `

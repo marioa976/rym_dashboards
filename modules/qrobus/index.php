@@ -50,8 +50,8 @@ $pct = ($stats && $stats['total'] > 0) ? round($stats['con_coords'] / $stats['to
     </a>
     <a class="card card-modulo" href="mapa.php" style="--accent:#005ab2">
       <span class="card-modulo-dot"></span>
-      <h3>🗺 Mapa electoral</h3>
-      <p class="text-secondary" style="font-size:13px">Mapa de calor de beneficiarios y secciones electorales coloreadas por concentración, con filtros.</p>
+      <h3>🗺 Mapa seccional</h3>
+      <p class="text-secondary" style="font-size:13px">Mapa de calor de beneficiarios y secciones coloreadas por concentración, con filtros.</p>
     </a>
     <?php if ($puedeEditar): ?>
     <a class="card card-modulo" href="geocode.php" style="--accent:#188a5b">

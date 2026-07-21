@@ -15,6 +15,6 @@ $editable = function_exists('puede_editar') && puede_editar('qrobus');
 <div class="qb-nav">
   <a href="index.php" class="<?= $navActive==='home'?'active':'' ?>">🏠 Inicio</a>
   <a href="kpis.php" class="<?= $navActive==='kpis'?'active':'' ?>">📊 KPIs</a>
-  <a href="mapa.php" class="<?= $navActive==='mapa'?'active':'' ?>">🗺 Mapa electoral</a>
+  <a href="mapa.php" class="<?= $navActive==='mapa'?'active':'' ?>">🗺 Mapa seccional</a>
   <?php if ($editable): ?><a href="geocode.php" class="<?= $navActive==='geocode'?'active':'' ?>">🌐 Geocodificar</a><?php endif; ?>
 </div>
