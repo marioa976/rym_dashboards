@@ -44,10 +44,14 @@ if (!function_exists('zd_forms')) {
         $ok = false;
         if (function_exists('db')) {
             try {
-                $ok = (bool)db()->query(
-                    "SELECT COUNT(*) FROM information_schema.columns
-                      WHERE table_schema = DATABASE() AND table_name = 'tickets'
+                // Debe existir en la tabla Y en la vista v_tickets: los reportes
+                // consultan ambas, y las vistas de MySQL congelan sus columnas.
+                $n = (int)db()->query(
+                    "SELECT COUNT(DISTINCT table_name) FROM information_schema.columns
+                      WHERE table_schema = DATABASE()
+                        AND table_name IN ('tickets','v_tickets')
                         AND column_name = 'ticket_form_id'")->fetchColumn();
+                $ok = ($n >= 2);
             } catch (Throwable $e) { $ok = false; }
         }
         return $ok;

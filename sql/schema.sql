@@ -460,6 +460,7 @@ SELECT
     ELSE 0
   END AS vencido,
   t.cantidad_reportes,
+  t.ticket_form_id,
   t.fuente_archivo,
   t.fecha_carga
 FROM tickets t
