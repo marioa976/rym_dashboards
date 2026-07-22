@@ -34,10 +34,32 @@ if (!function_exists('zd_forms')) {
     }
 
     /**
+     * ¿Ya existe la columna tickets.ticket_form_id?
+     * Si aún no se ha importado/migrado, el filtro se desactiva solo (no rompe
+     * los reportes con "Unknown column"). Usa la conexión del módulo (db()).
+     */
+    function zd_form_col_existe(): bool {
+        static $ok = null;
+        if ($ok !== null) return $ok;
+        $ok = false;
+        if (function_exists('db')) {
+            try {
+                $ok = (bool)db()->query(
+                    "SELECT COUNT(*) FROM information_schema.columns
+                      WHERE table_schema = DATABASE() AND table_name = 'tickets'
+                        AND column_name = 'ticket_form_id'")->fetchColumn();
+            } catch (Throwable $e) { $ok = false; }
+        }
+        return $ok;
+    }
+
+    /**
      * Condición SQL. $alias = prefijo de tabla ('t' → t.ticket_form_id).
      * El id se valida contra el catálogo y se castea, así que no hay inyección.
+     * Devuelve '1=1' (sin filtrar) si la columna todavía no existe.
      */
     function zd_form_sql(string $alias = '', ?string $form = null): string {
+        if (!zd_form_col_existe()) return '1=1';
         $f   = $form ?? zd_form_actual();
         $col = ($alias !== '' ? $alias . '.' : '') . 'ticket_form_id';
         return $f === 'all' ? '1=1' : "$col = " . (int)$f;
@@ -50,6 +72,11 @@ if (!function_exists('zd_forms')) {
 
     /** <select> del filtro (conserva el resto de parámetros al enviarse el form). */
     function zd_form_select(string $attrs = ''): string {
+        if (!zd_form_col_existe()) {
+            return '<select disabled title="Aún no se ha importado el campo ticket_form_id: '
+                 . 'vuelve a sincronizar Zendesk para activar este filtro." ' . $attrs . '>'
+                 . '<option>Todos (sin dato aún)</option></select>';
+        }
         $sel = zd_form_actual();
         $h   = '<select name="form" ' . $attrs . '>';
         foreach (zd_forms() as $id => $nom) {
