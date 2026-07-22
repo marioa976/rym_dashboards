@@ -42,8 +42,10 @@ $from = $_GET['from'] ?? $def_from;
 $to   = $_GET['to']   ?? $hoy_;
 if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', (string)$from)) $from = $def_from;
 if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', (string)$to))   $to   = $hoy_;
-$WF = "fecha_creacion BETWEEN '$from' AND '$to'";       // condición reutilizable (creación)
-$WR = "fecha_resolucion BETWEEN '$from' AND '$to'";     // por resolución
+require_once __DIR__ . '/_filtro_form.php';             // filtro por formulario de Zendesk
+$FORM = zd_form_sql();                                  // p. ej. "ticket_form_id = 30573528367899"
+$WF = "fecha_creacion BETWEEN '$from' AND '$to' AND $FORM";     // condición reutilizable (creación)
+$WR = "fecha_resolucion BETWEEN '$from' AND '$to' AND $FORM";   // por resolución
 $dias_periodo = max(1, (int)((strtotime($to) - strtotime($from)) / 86400) + 1);
 
 // ============================================================
@@ -389,9 +391,11 @@ $num_deleg = (int)$pdo->query("SELECT COUNT(DISTINCT delegacion_id) FROM tickets
     <input type="date" name="from" value="<?= htmlspecialchars($from) ?>" style="border:1px solid var(--border);border-radius:8px;padding:8px 10px;font:inherit;font-size:13px"></div>
   <div><label style="font-size:11px;color:var(--text-muted);font-weight:600;display:block;margin-bottom:4px">Hasta</label>
     <input type="date" name="to" value="<?= htmlspecialchars($to) ?>" style="border:1px solid var(--border);border-radius:8px;padding:8px 10px;font:inherit;font-size:13px"></div>
+  <div><label style="font-size:11px;color:var(--text-muted);font-weight:600;display:block;margin-bottom:4px">Formulario</label>
+    <?= zd_form_select('style="border:1px solid var(--border);border-radius:8px;padding:8px 10px;font:inherit;font-size:13px"') ?></div>
   <button type="submit" style="background:var(--accent);color:#fff;border:0;border-radius:8px;padding:9px 16px;font:inherit;font-weight:600;font-size:13px;cursor:pointer">Aplicar</button>
   <a href="dashboard.php" style="font-size:12px;color:var(--text-muted);align-self:center;text-decoration:none">últimos 30 días</a>
-  <span class="card-sub" style="align-self:center;margin-left:auto">Periodo: <b><?= htmlspecialchars($from) ?> → <?= htmlspecialchars($to) ?></b></span>
+  <span class="card-sub" style="align-self:center;margin-left:auto">Periodo: <b><?= htmlspecialchars($from) ?> → <?= htmlspecialchars($to) ?></b> · <b><?= htmlspecialchars(zd_form_nombre()) ?></b></span>
 </form>
 
 <!-- ====================== KPIs ====================== -->

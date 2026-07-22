@@ -357,6 +357,10 @@ function zd_colonias_map(PDO $pdo): array {
  */
 function zd_ticket_a_fila(PDO $pdo, array $ticket, array $mapeo, array $meta = []): array {
     $row = [];
+    // Formulario de Zendesk (campo de nivel ticket, no viene del mapeo de custom fields).
+    if (isset($ticket['ticket_form_id']) && $ticket['ticket_form_id'] !== null) {
+        $row['ticket_form_id'] = (int)$ticket['ticket_form_id'];
+    }
     // Resuelve el valor de un campo lista a su etiqueta legible (o el valor crudo).
     $label = function (string $fid, $val) use ($meta) {
         if (!is_string($val) || $val === '') return null;
@@ -525,6 +529,20 @@ function zd_construir_bbox_secciones(PDO $pdo): void {
     ");
 }
 
+/** Asegura la columna `tickets.ticket_form_id` (formulario de Zendesk). */
+function zd_asegurar_form_id(PDO $pdo): void {
+    static $ok = false;
+    if ($ok) return;
+    try {
+        $cols = $pdo->query("SHOW COLUMNS FROM tickets")->fetchAll(PDO::FETCH_COLUMN);
+        if (!in_array('ticket_form_id', $cols, true)) {
+            $pdo->exec("ALTER TABLE tickets ADD COLUMN ticket_form_id BIGINT UNSIGNED NULL,
+                        ADD INDEX idx_tickets_form (ticket_form_id), ALGORITHM=INPLACE, LOCK=NONE");
+        }
+        $ok = true;
+    } catch (Throwable $e) { /* si no hay permiso, el importador simplemente no la llena */ }
+}
+
 function zd_asignar_secciones(PDO $pdo): void {
     static $listo = null;     // null=sin revisar · false=no aplica · true=listo
     try {
@@ -578,6 +596,7 @@ function zd_asignar_secciones(PDO $pdo): void {
 }
 
 function zd_importar(PDO $pdo, array $api, array $tickets, array $mapeo): array {
+    zd_asegurar_form_id($pdo);      // columna del formulario de Zendesk
     $meta = zd_meta($api);
     $ok = 0; $err = [];
     foreach ($tickets as $t) {

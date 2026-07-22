@@ -34,7 +34,8 @@ $f_to         = $_GET['to']        ?? date('Y-m-d');
 // ============================================================
 //  Construcción dinámica de WHERE
 // ============================================================
-$where = ['1=1']; $params = [];
+require_once __DIR__ . '/_filtro_form.php';          // filtro por formulario de Zendesk
+$where = ['1=1', zd_form_sql('t')]; $params = [];
 if ($f_grupo)      { $where[] = "t.grupo_id = ?";         $params[] = $f_grupo; }
 if ($f_delegacion) { $where[] = "t.delegacion_id = ?";    $params[] = $f_delegacion; }
 if ($f_canal)      { $where[] = "t.canal_origen_id = ?";  $params[] = $f_canal; }
@@ -443,6 +444,10 @@ if ($f_estado) {
     <div>
       <label>Hasta</label>
       <input type="date" name="to"   value="<?= htmlspecialchars($f_to) ?>"   min="<?= $rango['d_min'] ?>" max="<?= $rango['d_max'] ?>">
+    </div>
+    <div>
+      <label>Formulario</label>
+      <?= zd_form_select() ?>
     </div>
   </div>
   <div style="display:flex;gap:8px;margin-top:12px;justify-content:flex-end">

@@ -46,7 +46,8 @@ $tiene_geo = (int)$pdo->query("
 //  $W_filtros = filtros del usuario (para stats)
 //  $W         = filtros + restricción geo (para markers)
 // ============================================================
-$where_user = ['1=1']; $params = [];
+require_once __DIR__ . '/_filtro_form.php';          // filtro por formulario de Zendesk
+$where_user = ['1=1', zd_form_sql('t')]; $params = [];
 if ($f_grupo)      { $where_user[] = "t.grupo_id = ?";         $params[] = $f_grupo; }
 if ($f_delegacion) { $where_user[] = "t.delegacion_id = ?";    $params[] = $f_delegacion; }
 if ($f_canal)      { $where_user[] = "t.canal_origen_id = ?";  $params[] = $f_canal; }
@@ -270,6 +271,8 @@ $pintados = count($markers);
       <input type="date" name="from" value="<?= htmlspecialchars($f_from) ?>">
       <label>Hasta</label>
       <input type="date" name="to" value="<?= htmlspecialchars($f_to) ?>">
+      <label style="margin-top:8px;display:block">Formulario</label>
+      <?= zd_form_select() ?>
 
       <label>Límite de marcadores (max 10,000)</label>
       <input type="number" name="limite" min="100" max="10000" step="100" value="<?= $f_limite ?>">

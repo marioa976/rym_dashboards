@@ -11,6 +11,7 @@ ini_set('memory_limit', '768M');
 set_time_limit(0);
 
 require __DIR__ . '/db.php';          // dispara el guard del portal (zendesk)
+require_once __DIR__ . '/_filtro_form.php';   // filtro por formulario de Zendesk
 $pdo = db();
 $cfg = require __DIR__ . '/config.php';
 $gmapsKey = (string)($cfg['google_maps_api_key'] ?? '');
@@ -38,6 +39,8 @@ function buildWhere(array $f): array {
     if ($est === 'abierto')      $where[] = "e.nombre = 'Abierto'";
     if ($est === 'vencido')      $where[] = "e.es_resuelto = 0 AND t.fecha_estimada < CURDATE()";
     if (!empty($f['distrito']))  { $where[] = "t.seccion_id IN (SELECT id FROM secciones WHERE distrito_id = :dist)"; $params[':dist'] = (int)$f['distrito']; }
+    // Formulario de Zendesk (default: Servicios). El id se valida contra el catálogo.
+    $where[] = zd_form_sql('t', isset($f['form']) && $f['form'] !== '' ? (string)$f['form'] : null);
     return [$where, $params];
 }
 
@@ -276,6 +279,7 @@ if ($ok) {
       </div>
       <div class="field"><label>Creado desde</label><input type="date" id="f-from" value="<?= htmlspecialchars($def_from) ?>"></div>
       <div class="field"><label>Creado hasta</label><input type="date" id="f-to" value="<?= htmlspecialchars($def_to) ?>"></div>
+      <div class="field"><label>Formulario</label><?= zd_form_select('id="f-form"') ?></div>
       <button class="btn" onclick="aplicar()">🔎 Aplicar</button>
       <button class="btn ghost" onclick="limpiar()" style="margin-top:6px">🧹 Limpiar</button>
       <div id="filter-status" style="margin-top:8px;font-size:11.5px;color:var(--mut);min-height:16px"></div>
@@ -522,6 +526,7 @@ function readFilters(){
     estado:        document.getElementById('f-estado').value,
     from:          document.getElementById('f-from').value,
     to:            document.getElementById('f-to').value,
+    form:          document.getElementById('f-form').value,
   };
 }
 async function aplicar(){
