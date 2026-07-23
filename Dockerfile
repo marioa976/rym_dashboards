@@ -18,10 +18,14 @@ RUN docker-php-ext-install pdo_mysql mysqli zip mbstring \
 # Permitir que los .htaccess del proyecto tomen efecto
 RUN sed -ri 's/AllowOverride None/AllowOverride All/g' /etc/apache2/apache2.conf
 
+# Endurecimiento seguro: ocultar versión de Apache y desactivar TRACE.
+RUN printf 'ServerTokens Prod\nServerSignature Off\nTraceEnable Off\n' > /etc/apache2/conf-enabled/zz-security.conf
+
 # Ajustes de PHP para producción (sin mostrar errores al usuario, subidas razonables)
 RUN { \
       echo 'display_errors=Off'; \
       echo 'log_errors=On'; \
+      echo 'expose_php=Off'; \
       echo 'error_log=/dev/stderr'; \
       echo 'upload_max_filesize=32M'; \
       echo 'post_max_size=32M'; \
