@@ -19,6 +19,18 @@ Módulos (carpeta `modules/<clave>/`):
 - **obras** — obra pública municipal POA 2024-2026: reporte geográfico (marcadores
   color=estatus, tamaño=inversión) + KPIs de inversión/avance + tabla. Coordenadas
   extraídas resolviendo los links cortos `maps.app.goo.gl` del Excel fuente.
+- **ejecutivo** — tablero de dirección que CRUZA los demás módulos por delegación.
+  Solo lee (no carga datos). Tres vistas: `index.php` (KPIs cruzados + matriz
+  delegación×módulo + gráficas Chart.js; incluye Qrobici vía su BD remota, agregado
+  y cacheado en `sys_get_temp_dir()`), `mapa.php` (capas encendibles: límites, obras,
+  áreas verdes, estaciones Qrobici, tickets/DIF en calor deck.gl vía `data.php` AJAX)
+  y `electoral.php` (mapa seccional Ayuntamiento 2024: participación / partido ganador).
+  Capas del mapa además incluyen: calor de RUTAS Qrobici (decodifica `RECORRIDO` con
+  `qrb_polyline_decode` del módulo qrobici, streaming sin búfer para no agotar memoria)
+  y Waze en vivo (alertas por categoría + embotellamientos; reusa `lib_waze.php`/
+  `waze_feed_url` de qrobici SIN incluir su `config.php` para no disparar su guard).
+  Qrobus queda FUERA por decisión del usuario. La delegación de cada fuente se
+  normaliza con `ej_canon()`; Qrobici usa point-in-polygon en PHP (`ej_deleg_punto`).
 
 ## Cómo correr en local (MAMP)
 - Apache/MySQL de MAMP. Web en `http://localhost:8888/portal/`, MySQL en `127.0.0.1:8889` (root/root).
@@ -70,7 +82,8 @@ Módulos (carpeta `modules/<clave>/`):
 
 ## SQL relevante en `sql/`
 `schema.sql` (base), `electoral.sql`, `qrobus.sql`, `bloque.sql`, `areasverdes.sql`,
-`areasverdes_delegaciones.sql` (límites oficiales `delegaciones_geo`), `obras.sql`
-(registro de módulos; los de areasverdes/obras además crean su tabla y cargan datos),
+`areasverdes_delegaciones.sql` (límites oficiales `delegaciones_geo`), `obras.sql`,
+`ejecutivo.sql` (registro de módulos; los de areasverdes/obras además crean su tabla y
+cargan datos; `ejecutivo.sql` solo registra, no crea tablas — el módulo solo lee),
 `zendesk_ticket_form*.sql` (columna + vista del filtro por formulario),
 `rename_electoral_a_seccional.sql`. Todos pensados para ser idempotentes.
