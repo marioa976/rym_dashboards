@@ -136,6 +136,30 @@ const wazeMk={hazard:[],closed:[],accident:[],jam:[]}, wazeJams=[];
 const WZ_COLOR={hazard:'#f9a825',closed:'#b71c1c',accident:'#e53935',jam:'#fb8c00'};
 const WZ_LABEL={hazard:'🕳 Peligro',closed:'🚧 Cierre',accident:'🚗 Accidente',jam:'🐌 Tráfico'};
 
+/* ---- Pines con estilo (gota + icono FontAwesome embebido, sin dependencias) ---- */
+const FA = {
+  obras: {w:576, h:512, d:"M256 32c-17.7 0-32 14.3-32 32v2.3 99.6c0 5.6-4.5 10.1-10.1 10.1c-3.6 0-7-1.9-8.8-5.1L157.1 87C83 123.5 32 199.8 32 288v64H544l0-66.4c-.9-87.2-51.7-162.4-125.1-198.6l-48 83.9c-1.8 3.2-5.2 5.1-8.8 5.1c-5.6 0-10.1-4.5-10.1-10.1V66.3 64c0-17.7-14.3-32-32-32H256zM16.6 384C7.4 384 0 391.4 0 400.6c0 4.7 2 9.2 5.8 11.9C27.5 428.4 111.8 480 288 480s260.5-51.6 282.2-67.5c3.8-2.8 5.8-7.2 5.8-11.9c0-9.2-7.4-16.6-16.6-16.6H16.6z"},
+  areas: {w:448, h:512, d:"M210.6 5.9L62 169.4c-3.9 4.2-6 9.8-6 15.5C56 197.7 66.3 208 79.1 208H104L30.6 281.4c-4.2 4.2-6.6 10-6.6 16C24 309.9 34.1 320 46.6 320H80L5.4 409.5C1.9 413.7 0 419 0 424.5c0 13 10.5 23.5 23.5 23.5H192v32c0 17.7 14.3 32 32 32s32-14.3 32-32V448H424.5c13 0 23.5-10.5 23.5-23.5c0-5.5-1.9-10.8-5.4-15L368 320h33.4c12.5 0 22.6-10.1 22.6-22.6c0-6-2.4-11.8-6.6-16L344 208h24.9c12.7 0 23.1-10.3 23.1-23.1c0-5.7-2.1-11.3-6-15.5L237.4 5.9C234 2.1 229.1 0 224 0s-10 2.1-13.4 5.9z"},
+  bici: {w:640, h:512, d:"M312 32c-13.3 0-24 10.7-24 24s10.7 24 24 24h25.7l34.6 64H222.9l-27.4-38C191 99.7 183.7 96 176 96H120c-13.3 0-24 10.7-24 24s10.7 24 24 24h43.7l22.1 30.7-26.6 53.1c-10-2.5-20.5-3.8-31.2-3.8C57.3 224 0 281.3 0 352s57.3 128 128 128c65.3 0 119.1-48.9 127-112h49c8.5 0 16.3-4.5 20.7-11.8l84.8-143.5 21.7 40.1C402.4 276.3 384 312 384 352c0 70.7 57.3 128 128 128s128-57.3 128-128s-57.3-128-128-128c-13.5 0-26.5 2.1-38.7 6L375.4 48.8C369.8 38.4 359 32 347.2 32H312zM458.6 303.7l32.3 59.7c6.3 11.7 20.9 16 32.5 9.7s16-20.9 9.7-32.5l-32.3-59.7c3.6-.6 7.4-.9 11.2-.9c39.8 0 72 32.2 72 72s-32.2 72-72 72s-72-32.2-72-72c0-18.6 7-35.5 18.6-48.3zM133.2 368h65c-7.3 32.1-36 56-70.2 56c-39.8 0-72-32.2-72-72s32.2-72 72-72c1.7 0 3.4 .1 5.1 .2l-24.2 48.5c-9 18.1 4.1 39.4 24.3 39.4zm33.7-48l50.7-101.3 72.9 101.2-.1 .1H166.8zm90.6-128H365.9L317 274.8 257.4 192z"},
+  hazard: {w:512, h:512, d:"M256 32c14.2 0 27.3 7.5 34.5 19.8l216 368c7.3 12.4 7.3 27.7 .2 40.1S486.3 480 472 480H40c-14.3 0-27.6-7.7-34.7-20.1s-7-27.8 .2-40.1l216-368C228.7 39.5 241.8 32 256 32zm0 128c-13.3 0-24 10.7-24 24V296c0 13.3 10.7 24 24 24s24-10.7 24-24V184c0-13.3-10.7-24-24-24zm32 224a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"},
+  closed: {w:640, h:512, d:"M32 32C14.3 32 0 46.3 0 64V448c0 17.7 14.3 32 32 32s32-14.3 32-32V266.3L149.2 96H64V64c0-17.7-14.3-32-32-32zM405.2 96H330.8l-5.4 10.7L234.8 288h74.3l5.4-10.7L405.2 96zM362.8 288h74.3l5.4-10.7L533.2 96H458.8l-5.4 10.7L362.8 288zM202.8 96l-5.4 10.7L106.8 288h74.3l5.4-10.7L277.2 96H202.8zm288 192H576V448c0 17.7 14.3 32 32 32s32-14.3 32-32V64c0-17.7-14.3-32-32-32s-32 14.3-32 32v53.7L490.8 288z"},
+  accident: {w:640, h:512, d:"M176 8c-6.6 0-12.4 4-14.9 10.1l-29.4 74L55.6 68.9c-6.3-1.9-13.1 .2-17.2 5.3s-4.6 12.2-1.4 17.9l39.5 69.1L10.9 206.4c-5.4 3.7-8 10.3-6.5 16.7s6.7 11.2 13.1 12.2l78.7 12.2L90.6 327c-.5 6.5 3.1 12.7 9 15.5s12.9 1.8 17.8-2.6l35.3-32.5 9.5-35.4 10.4-38.6c8-29.9 30.5-52.1 57.9-60.9l41-59.2c11.3-16.3 26.4-28.9 43.5-37.2c-.4-.6-.8-1.2-1.3-1.8c-4.1-5.1-10.9-7.2-17.2-5.3L220.3 92.1l-29.4-74C188.4 12 182.6 8 176 8zM367.7 161.5l135.6 36.3c6.5 1.8 11.3 7.4 11.8 14.2l4.6 56.5-201.5-54 32.2-46.6c3.8-5.6 10.8-8.1 17.3-6.4zm-69.9-30l-47.9 69.3c-21.6 3-40.3 18.6-46.3 41l-10.4 38.6-16.6 61.8-8.3 30.9c-4.6 17.1 5.6 34.6 22.6 39.2l15.5 4.1c17.1 4.6 34.6-5.6 39.2-22.6l8.3-30.9 247.3 66.3-8.3 30.9c-4.6 17.1 5.6 34.6 22.6 39.2l15.5 4.1c17.1 4.6 34.6-5.6 39.2-22.6l8.3-30.9L595 388l10.4-38.6c6-22.4-2.5-45.2-19.6-58.7l-6.8-84c-2.7-33.7-26.4-62-59-70.8L384.2 99.7c-32.7-8.8-67.3 4-86.5 31.8zm-17 131a24 24 0 1 1 -12.4 46.4 24 24 0 1 1 12.4-46.4zm217.9 83.2A24 24 0 1 1 545 358.1a24 24 0 1 1 -46.4-12.4z"},
+  jam: {w:320, h:512, d:"M64 0C28.7 0 0 28.7 0 64V352c0 88.4 71.6 160 160 160s160-71.6 160-160V64c0-35.3-28.7-64-64-64H64zm96 416a48 48 0 1 1 0-96 48 48 0 1 1 0 96zm48-176a48 48 0 1 1 -96 0 48 48 0 1 1 96 0zm-48-80a48 48 0 1 1 0-96 48 48 0 1 1 0 96z"},
+};
+const PIN_PATH='M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z';
+function pinIcon(color, key, mag){
+  mag = mag || 1;
+  const W = Math.round(30*mag), H = Math.round(30*mag);
+  const g = FA[key]; let glyph='';
+  if(g){ const gs = 8/Math.max(g.w,g.h); const gx = 12-(g.w*gs)/2, gy = 9-(g.h*gs)/2;
+    glyph = `<g transform="translate(${gx.toFixed(2)} ${gy.toFixed(2)}) scale(${gs.toFixed(4)})"><path d="${g.d}" fill="${color}"/></g>`; }
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 24 24">`
+    + `<path d="${PIN_PATH}" fill="${color}" stroke="#ffffff" stroke-width="1.1"/>`
+    + `<circle cx="12" cy="9" r="4.7" fill="#ffffff"/>` + glyph + `</svg>`;
+  return { url:'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(svg),
+           scaledSize:new google.maps.Size(W,H), anchor:new google.maps.Point(W/2, Math.round(H*0.92)) };
+}
+
 window.initEjMap = function(){
   map=new google.maps.Map($('ej-map'),{center:{lat:20.59,lng:-100.39},zoom:11,
     mapTypeControl:false,streetViewControl:false,fullscreenControl:true,
@@ -163,7 +187,7 @@ function buildBoundaries(){
 function buildObras(){
   mkObras = OBRAS.map(o=>{
     const mk=new google.maps.Marker({position:{lat:o.lat,lng:o.lng},title:o.n,
-      icon:{path:google.maps.SymbolPath.CIRCLE,scale:6,fillColor:estColor(o.s),fillOpacity:.85,strokeColor:'#fff',strokeWeight:1.2}});
+      icon:pinIcon(estColor(o.s),'obras',1)});
     mk.addListener('click',()=>{ info.setContent(
       `<div style="font-family:Montserrat,Arial;max-width:230px"><b style="color:#7a3315">${esc(o.n)}</b>
        <div style="font-size:12px;margin-top:3px">${esc(o.s||'')} · 💰 ${fmtMoney(o.e)}</div></div>`); info.open(map,mk); });
@@ -174,7 +198,7 @@ function buildObras(){
 function buildAreas(){
   mkAreas = AREAS.map(a=>{
     const mk=new google.maps.Marker({position:{lat:a.lat,lng:a.lng},title:a.n,
-      icon:{path:google.maps.SymbolPath.CIRCLE,scale:4.5,fillColor:'#2e9e5b',fillOpacity:.9,strokeColor:'#fff',strokeWeight:1}});
+      icon:pinIcon('#2e9e5b','areas',0.82)});
     mk.addListener('click',()=>{ info.setContent(
       `<div style="font-family:Montserrat,Arial;max-width:220px"><b style="color:#155d34">${esc(a.n)}</b>
        <div style="font-size:12px;margin-top:2px">🌳 ${esc(a.d||'')}</div></div>`); info.open(map,mk); });
@@ -185,9 +209,9 @@ function buildAreas(){
 /* Estaciones Qrobici (marcadores, tamaño = viajes) */
 function buildEstaciones(){
   mkEst = ESTACIONES.map(e=>{
-    const r = 5 + Math.sqrt((e.v||0)/maxViajes)*14;
+    const mag = 0.8 + Math.sqrt((e.v||0)/maxViajes)*0.9;   // tamaño del pin ~ viajes
     const mk=new google.maps.Marker({position:{lat:e.lat,lng:e.lng},title:e.n,
-      icon:{path:google.maps.SymbolPath.CIRCLE,scale:r,fillColor:'#e0872b',fillOpacity:.8,strokeColor:'#7a4a12',strokeWeight:1.2}});
+      icon:pinIcon('#e0872b','bici',mag)});
     mk.addListener('click',()=>{ info.setContent(
       `<div style="font-family:Montserrat,Arial;max-width:220px"><b style="color:#7a4a12">🚲 ${esc(e.n)}</b>
        <div style="font-size:12px;margin-top:3px">${(e.v||0).toLocaleString()} viajes origen</div>
@@ -242,7 +266,7 @@ function buildWaze(j){
   j.alerts.forEach(a=>{
     const arr=wazeMk[a.cat]; if(!arr) return;
     const mk=new google.maps.Marker({position:{lat:a.lat,lng:a.lng},
-      icon:{path:google.maps.SymbolPath.CIRCLE,scale:5,fillColor:WZ_COLOR[a.cat],fillOpacity:.9,strokeColor:'#fff',strokeWeight:1}});
+      icon:pinIcon(WZ_COLOR[a.cat], a.cat, 0.82)});
     mk.addListener('click',()=>{ info.setContent(
       `<div style="font-family:Montserrat,Arial;max-width:220px"><b>${WZ_LABEL[a.cat]||'Waze'}</b>
        <div style="font-size:12px;margin-top:2px">${esc(a.street||'—')}</div>
