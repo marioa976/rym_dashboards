@@ -12,7 +12,11 @@ Módulos (carpeta `modules/<clave>/`):
 - **qrobici** — movilidad (BD remota propia).
 - **electoral** — resultados IEEQ por sección (etiqueta VISIBLE = "Seccional"; la clave interna sigue siendo `electoral`).
 - **qrobus** — beneficiarios "Unidos" (BD remota `iqt`): geocodificador + KPIs + mapa.
-- **bloque** — edificio de innovación (cursos/actividades): KPIs + por delegación.
+- **bloque** — edificio de innovación (eventos/sesiones/asistencia): esquema NUEVO
+  `bloque_usuario`/`bloque_evento`/`bloque_sesion`/`bloque_invitado`/`bloque_evento_invitado`.
+  Tablero (KPIs + demografía por CURP + por delegación + asistencia por día) y eventos
+  (ocupación). No es geográfico (los eventos están todos en el mismo edificio). Las
+  tablas viejas (usuarios_bloque/asistencias/actividades) quedaron deprecadas.
 - **areasverdes** — áreas verdes municipales (listado oficial con coordenadas, sin
   geocodificar): reporte geográfico = mapa de marcadores por delegación + KPIs + tabla.
   Usa `delegaciones_geo` (límites oficiales del KMZ) para colorear/validar por geometría.

@@ -65,7 +65,7 @@ function ej_kpis(PDO $pdo): array {
     $av  = $q("SELECT COUNT(*) n FROM areas_verdes WHERE activo=1");
     $dif = $q("SELECT COUNT(*) n, SUM(latitud IS NOT NULL AND latitud<>0) geo FROM padron");
     $zd  = $q("SELECT COUNT(*) n, SUM(latitud IS NOT NULL AND latitud<>0) geo FROM tickets");
-    $bl  = $q("SELECT COUNT(*) n FROM usuarios_bloque");
+    $bl  = $q("SELECT COUNT(*) n FROM bloque_usuario");
     return [
         'obras'      => ['n'=>(int)($ob['n']??0), 'inv'=>(float)($ob['inv']??0), 'term'=>(int)($ob['term']??0)],
         'areas'      => ['n'=>(int)($av['n']??0)],
@@ -101,7 +101,7 @@ function ej_matriz(PDO $pdo): array {
         function($r) use ($add){ $add($r['d'],'dif',(int)$r['n']); });
     $try("SELECT c.nombre d, COUNT(*) n FROM tickets t LEFT JOIN cat_delegacion c ON c.id=t.delegacion_id GROUP BY c.nombre",
         function($r) use ($add){ $add($r['d'],'tickets',(int)$r['n']); });
-    $try("SELECT delegacion d, COUNT(*) n FROM usuarios_bloque GROUP BY delegacion",
+    $try("SELECT sDelegacion d, COUNT(*) n FROM bloque_usuario GROUP BY sDelegacion",
         function($r) use ($add){ $add($r['d'],'bloque',(int)$r['n']); });
     return $filas;
 }

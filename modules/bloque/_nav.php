@@ -12,7 +12,7 @@ include __DIR__ . '/../_portalbar.php';
 .bl-nav a.active{background:#fff;color:#005ab2}
 </style>
 <div class="bl-nav">
-  <a href="index.php" class="<?= $navActive==='home'?'active':'' ?>">🏠 Inicio</a>
-  <a href="kpis.php" class="<?= $navActive==='kpis'?'active':'' ?>">📊 KPIs</a>
-  <a href="delegaciones.php" class="<?= $navActive==='deleg'?'active':'' ?>">🏙 Por delegación</a>
+  <a href="index.php" class="<?= $navActive==='home'?'active':'' ?>">📊 Tablero</a>
+  <a href="eventos.php" class="<?= $navActive==='eventos'?'active':'' ?>">🎫 Eventos</a>
+  <a href="mapa.php" class="<?= $navActive==='mapa'?'active':'' ?>">🗺 Procedencia</a>
 </div>
