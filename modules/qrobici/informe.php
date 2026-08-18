@@ -100,71 +100,50 @@ $prioridad_alta = count(array_filter($recos, fn($r) => $r['prioridad'] === 'alta
 $ktTitle  = 'QroBici · Informe ejecutivo';
 $ktActive = 'qrobici';
 require __DIR__ . '/../../views/layout/kt_top.php';
-?><link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap">
-<style>
+?><style>
 :root {
-  --azul:#005ab2;
-  --azul-d:#254185;
-  --azul-l:#e8f0ff;
-  --azul-ll:#f4f8ff;
-  --tinta:#0a1b3d;
-  --tinta-2:#3c4a6e;
-  --tinta-3:#7287ac;
-  --verde:#188a5b;
-  --ambar:#d99000;
-  --rojo:#ce3a2b;
-  --rosa:#5b667a;
-  --gris:#e6ecf5;
-  --gris-2:#f4f6fb;
-  --blanco:#ffffff;
+  --azul:var(--primary); --azul-d:#254185; --azul-l:#e8f1fb; --azul-ll:transparent;
+  --tinta:var(--foreground); --tinta-2:var(--muted-foreground); --tinta-3:var(--muted-foreground);
+  --verde:#047857; --ambar:#b45309; --rojo:#b91c1c; --rosa:#5b667a;
+  --gris:var(--border); --gris-2:var(--muted); --blanco:var(--card);
 }
 * { box-sizing:border-box; margin:0; padding:0; }
-html, body { height:100%; }
-html {
-  scroll-snap-type:y mandatory;
-  scroll-behavior:smooth;
-  overflow-y:scroll;
-  overflow-x:hidden;
-  background:var(--azul-ll);
-}
+html { scroll-behavior:smooth; }
 body {
   font-family:'Montserrat', system-ui, sans-serif;
-  color:var(--tinta);
+  color:var(--foreground);
   -webkit-font-smoothing:antialiased;
   text-rendering:optimizeLegibility;
 }
 
 /* ====== SLIDES ====== */
 .slide {
-  height:100vh;
-  scroll-snap-align:start;
-  scroll-snap-stop:always;
+  height:auto;
   display:flex;
-  align-items:center;
+  align-items:flex-start;
   justify-content:center;
   position:relative;
   overflow:hidden;
-  padding:64px 8vw;
+  padding:28px 0;
+  border-bottom:1px solid var(--border);
 }
 .slide-inner {
   width:100%;
-  max-width:1240px;
+  max-width:none;
   position:relative;
   z-index:2;
 }
 .slide-num {
   position:absolute;
   top:34px; right:48px;
-  font-family:'Space Mono', monospace;
+  font-family:'Montserrat', monospace;
   font-size:11px; letter-spacing:2px;
   color:var(--tinta-3);
   text-transform:uppercase;
 }
 .slide-tag {
   display:inline-block;
-  font-family:'Space Mono', monospace;
+  font-family:'Montserrat', monospace;
   font-size:11px; letter-spacing:2.5px;
   color:var(--azul);
   text-transform:uppercase;
@@ -174,32 +153,32 @@ body {
   border-radius:999px;
 }
 .slide h1 {
-  font-family:'Archivo', sans-serif; font-weight:900;
-  font-size:clamp(40px, 5vw, 76px);
+  font-family:'Montserrat', sans-serif; font-weight:700;
+  font-size:24px;
   line-height:1.05;
   letter-spacing:-1.2px;
   color:var(--tinta);
 }
 .slide h2 {
-  font-family:'Archivo', sans-serif; font-weight:900;
-  font-size:clamp(32px, 3.8vw, 56px);
+  font-family:'Montserrat', sans-serif; font-weight:700;
+  font-size:20px;
   line-height:1.08;
   letter-spacing:-.8px;
   color:var(--tinta);
 }
 .slide h3 {
-  font-family:'Archivo', sans-serif; font-weight:800;
-  font-size:clamp(20px, 1.7vw, 26px);
+  font-family:'Montserrat', sans-serif; font-weight:600;
+  font-size:16px;
   letter-spacing:-.2px;
   color:var(--tinta);
 }
 .slide p {
-  font-size:clamp(15px, 1.1vw, 17px);
+  font-size:14px;
   line-height:1.65; color:var(--tinta-2);
   max-width:60ch;
 }
 .lead {
-  font-size:clamp(18px, 1.4vw, 22px) !important;
+  font-size:15px !important;
   color:var(--tinta-2) !important;
   max-width:62ch;
   margin-top:18px;
@@ -229,29 +208,29 @@ body {
 
 /* ====== SLIDE 1 — PORTADA ====== */
 .cover {
-  background:linear-gradient(135deg, #ffffff 0%, var(--azul-l) 100%);
+  background:transparent;
 }
 .cover .logo {
   width:72px; height:72px;
   border-radius:18px;
-  background:linear-gradient(135deg, var(--azul), var(--azul-d));
+  background:var(--primary);
   display:flex; align-items:center; justify-content:center;
-  font-family:'Archivo', sans-serif; font-weight:900; color:#fff;
+  font-family:'Montserrat', sans-serif; font-weight:900; color:#fff;
   font-size:36px; letter-spacing:-1.5px;
   box-shadow:0 18px 50px rgba(0,87,255,.25);
   margin-bottom:36px;
 }
 .cover .ttl {
-  font-family:'Archivo', sans-serif; font-weight:900;
-  font-size:clamp(56px, 8vw, 120px);
+  font-family:'Montserrat', sans-serif; font-weight:700;
+  font-size:28px;
   line-height:.96;
   letter-spacing:-3px;
-  background:linear-gradient(135deg, var(--tinta) 0%, var(--azul) 100%);
-  -webkit-background-clip:text; background-clip:text; color:transparent;
+  background:none;
+  -webkit-background-clip:border-box; background-clip:border-box; color:var(--foreground);
 }
 .cover .sub {
-  font-family:'Archivo', sans-serif; font-weight:800;
-  font-size:clamp(22px, 2.4vw, 36px);
+  font-family:'Montserrat', sans-serif; font-weight:800;
+  font-size:16px;
   color:var(--tinta-2); margin-top:18px;
   max-width:18ch;
 }
@@ -261,20 +240,21 @@ body {
   flex-wrap:wrap;
 }
 .cover .meta div .lbl {
-  font-family:'Space Mono', monospace; font-size:11px;
+  font-family:'Montserrat', monospace; font-size:11px;
   letter-spacing:2.5px; text-transform:uppercase;
   color:var(--tinta-3); margin-bottom:8px;
 }
 .cover .meta div .val {
-  font-family:'Space Mono', monospace; font-size:16px;
+  font-family:'Montserrat', monospace; font-size:16px;
   color:var(--tinta); font-weight:700;
 }
 .scroll-hint {
+  display:none;
   position:absolute;
   bottom:36px; left:50%; transform:translateX(-50%);
-  font-family:'Space Mono', monospace; font-size:11px;
+  font-family:'Montserrat', monospace; font-size:11px;
   letter-spacing:2px; color:var(--tinta-3); text-transform:uppercase;
-  display:flex; flex-direction:column; align-items:center; gap:10px;
+  flex-direction:column; align-items:center; gap:10px;
   animation:bob 2s ease-in-out infinite;
 }
 .scroll-hint .arrow { font-size:18px; color:var(--azul); }
@@ -282,11 +262,11 @@ body {
 
 /* ====== BIG STAT ====== */
 .big-stat {
-  font-family:'Archivo', sans-serif; font-weight:900;
-  font-size:clamp(80px, 12vw, 200px);
+  font-family:'Montserrat', sans-serif; font-weight:900;
+  font-size:44px;
   line-height:.92;
   letter-spacing:-5px;
-  color:var(--azul);
+  color:var(--primary);
   font-variant-numeric:tabular-nums;
 }
 .big-stat .unit {
@@ -301,7 +281,7 @@ body {
 }
 .delta-pill {
   display:inline-flex; align-items:center; gap:6px;
-  font-family:'Space Mono', monospace; font-size:14px; font-weight:700;
+  font-family:'Montserrat', monospace; font-size:14px; font-weight:700;
   padding:7px 14px; border-radius:999px;
   letter-spacing:.5px;
 }
@@ -329,7 +309,7 @@ body {
   margin-top:40px;
 }
 .stat-card {
-  background:#fff;
+  background:var(--card);
   border-radius:18px;
   padding:24px 24px 22px;
   border:1px solid var(--gris);
@@ -338,13 +318,13 @@ body {
   overflow:hidden;
 }
 .stat-card .lbl {
-  font-family:'Space Mono', monospace;
+  font-family:'Montserrat', monospace;
   font-size:10px; letter-spacing:2px;
   text-transform:uppercase;
   color:var(--tinta-3);
 }
 .stat-card .val {
-  font-family:'Archivo', sans-serif; font-weight:900;
+  font-family:'Montserrat', sans-serif; font-weight:900;
   font-size:38px; line-height:1;
   margin-top:8px;
   color:var(--tinta);
@@ -352,13 +332,13 @@ body {
 }
 .stat-card .val .unit {
   font-size:14px; color:var(--tinta-3);
-  font-family:'Space Mono', monospace; font-weight:400;
+  font-family:'Montserrat', monospace; font-weight:400;
   margin-left:6px;
 }
 .stat-card .ctx {
   font-size:12px; color:var(--tinta-3);
   margin-top:10px;
-  font-family:'Space Mono', monospace;
+  font-family:'Montserrat', monospace;
 }
 .stat-card.accent-blue { border-left:4px solid var(--azul); }
 .stat-card.accent-green { border-left:4px solid var(--verde); }
@@ -373,7 +353,7 @@ body {
 }
 .hbar-row .nm {
   flex:0 0 130px;
-  font-family:'Space Mono', monospace;
+  font-family:'Montserrat', monospace;
   font-size:12px; color:var(--tinta-2);
   text-align:right;
 }
@@ -392,7 +372,7 @@ body {
 .hbar-row.is-in .br > div { width:var(--w); }
 .hbar-row .vl {
   flex:0 0 50px;
-  font-family:'Space Mono', monospace;
+  font-family:'Montserrat', monospace;
   font-size:12px; color:var(--tinta); font-weight:700;
   text-align:right;
 }
@@ -418,11 +398,11 @@ body {
 .donut .legends { display:flex; flex-direction:column; gap:12px; }
 .donut .lg-row {
   display:flex; align-items:center; gap:10px;
-  font-family:'Space Mono', monospace;
+  font-family:'Montserrat', monospace;
   font-size:12px; letter-spacing:.5px;
 }
 .donut .lg-row b {
-  font-family:'Archivo', sans-serif; font-weight:900;
+  font-family:'Montserrat', sans-serif; font-weight:900;
   font-size:22px; color:var(--tinta);
 }
 .donut .lg-dot {
@@ -437,7 +417,7 @@ body {
   margin-top:32px;
 }
 .reco {
-  background:#fff;
+  background:var(--card);
   border-radius:18px;
   padding:24px 26px;
   border:1px solid var(--gris);
@@ -457,7 +437,7 @@ body {
   gap:12px; margin-bottom:12px;
 }
 .reco-prio {
-  font-family:'Space Mono', monospace;
+  font-family:'Montserrat', monospace;
   font-size:10px; letter-spacing:2px;
   text-transform:uppercase; font-weight:700;
   padding:5px 10px; border-radius:6px;
@@ -467,7 +447,7 @@ body {
 .reco-prio.media { color:var(--ambar); background:rgba(255,149,0,.1); }
 .reco-prio.baja  { color:var(--verde); background:rgba(0,184,124,.1); }
 .reco-titulo {
-  font-family:'Archivo', sans-serif; font-weight:900;
+  font-family:'Montserrat', sans-serif; font-weight:900;
   font-size:18px; line-height:1.25; color:var(--tinta);
 }
 .reco-accion {
@@ -475,7 +455,7 @@ body {
   margin-top:6px;
 }
 .reco-metrica {
-  font-family:'Space Mono', monospace;
+  font-family:'Montserrat', monospace;
   font-size:11px; letter-spacing:.5px;
   color:var(--azul);
   margin-top:12px; padding-top:12px;
@@ -484,11 +464,11 @@ body {
 
 /* ====== CIERRE ====== */
 .outro {
-  background:linear-gradient(135deg, var(--tinta) 0%, var(--azul-d) 100%);
+  background:linear-gradient(135deg, var(--azul-d) 0%, var(--primary) 100%);
   color:#fff;
 }
 .outro .ttl {
-  font-family:'Archivo', sans-serif; font-weight:900;
+  font-family:'Montserrat', sans-serif; font-weight:900;
   font-size:clamp(40px, 6vw, 84px);
   line-height:1.02; letter-spacing:-2px;
   max-width:18ch;
@@ -500,7 +480,7 @@ body {
   display:inline-flex; align-items:center; gap:8px;
   padding:14px 22px;
   border-radius:12px;
-  font-family:'Space Mono', monospace;
+  font-family:'Montserrat', monospace;
   font-size:12px; font-weight:700; letter-spacing:1px;
   text-transform:uppercase; text-decoration:none;
   transition:all .2s ease;
@@ -522,7 +502,7 @@ body {
 }
 .outro .sig {
   margin-top:80px;
-  font-family:'Space Mono', monospace;
+  font-family:'Montserrat', monospace;
   font-size:11px; color:rgba(255,255,255,.5);
   letter-spacing:2px; text-transform:uppercase;
 }
@@ -556,7 +536,7 @@ body {
 }
 .nav-arrows button {
   width:42px; height:42px; border-radius:12px;
-  background:#fff; border:1px solid var(--gris);
+  background:var(--card); border:1px solid var(--gris);
   color:var(--tinta);
   cursor:pointer;
   font-size:18px; font-weight:700;
@@ -572,7 +552,7 @@ body {
 .nav-arrows button:disabled {
   opacity:.35; cursor:not-allowed;
   transform:none !important;
-  background:#fff !important; color:var(--tinta) !important;
+  background:var(--card) !important; color:var(--tinta) !important;
 }
 .progress-bar {
   position:fixed; top:0; left:0;
@@ -608,7 +588,7 @@ body {
 
 /* ====== EMPTY STATE ====== */
 .empty-state {
-  background:#fff;
+  background:var(--card);
   padding:64px;
   border-radius:24px;
   border:1px solid var(--gris);
@@ -667,7 +647,7 @@ body {
     <div class="big-row reveal" style="margin-top:24px">
       <div class="big-stat" data-count="<?= (int)($k['total_viajes'] ?? 0) ?>"><?= inf_fmt((int)($k['total_viajes'] ?? 0)) ?></div>
       <div>
-        <div style="font-family:'Space Mono',monospace;font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--tinta-3)">viajes totales</div>
+        <div style="font-family:'Montserrat',monospace;font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--tinta-3)">viajes totales</div>
         <?php if (!empty($deltas['disponible']) && $deltas['d_viajes'] !== null): ?>
           <span class="delta-pill <?= inf_delta_class($deltas['d_viajes']) ?>" style="margin-top:10px;display:inline-flex">
             <?= inf_delta_str($deltas['d_viajes']) ?> vs. periodo anterior
@@ -842,7 +822,7 @@ body {
           <circle cx="<?= round($p[0], 1) ?>" cy="<?= round($p[1], 1) ?>" r="<?= $is_peak ? 8 : 4 ?>"
                   class="curve-dot<?= $is_peak ? ' peak' : '' ?>"/>
           <text x="<?= round($p[0], 1) ?>" y="<?= $H + 18 ?>" text-anchor="middle"
-                style="font-family:'Space Mono',monospace;font-size:10px;fill:#7287ac"><?= $p[2] ?></text>
+                style="font-family:'Montserrat',monospace;font-size:10px;fill:#7287ac"><?= $p[2] ?></text>
         <?php endforeach; ?>
       </svg>
     </div>

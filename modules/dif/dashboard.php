@@ -123,6 +123,7 @@ function generarSimulados(): array {
 ?><?php
 $ktTitle  = 'Padrón DIF — Dashboard';
 $ktActive = 'dif';
+$ktFluid = true;
 require __DIR__ . '/../../views/layout/kt_top.php';
 ?>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
@@ -230,7 +231,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
 
   @media (max-width: 980px){
     .geo-grid{grid-template-columns:1fr;height:auto}
-    #map{height:500px}
+    #map{height:clamp(520px,calc(100vh - 250px),880px)}
     .chart-card.wide{grid-column:span 1}
   }
   .leaflet-popup-content{font-size:12px;line-height:1.6}

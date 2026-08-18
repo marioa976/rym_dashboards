@@ -123,37 +123,37 @@ header('Content-Type: text/html; charset=utf-8');
 ?><?php
 $ktTitle  = 'Reporte de Movilidad · QroBici';
 $ktActive = 'qrobici';
+$ktFluid = true;
 require __DIR__ . '/../../views/layout/kt_top.php';
-?><link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap">
-<style>
+?><style>
 :root{
-  --azul:#005ab2; --azul-d:#254185; --azul-l:#e8f0ff; --azul-ll:#f4f8ff;
-  --cielo:#2a9eda; --tinta:#0a1b3d; --gris:#5b6b8c; --gris-l:#9aa7c0;
-  --linea:#e3e9f5; --bg:#fbfcfe; --blanco:#ffffff;
-  --verde:#188a5b; --ambar:#d99000; --rojo:#ce3a2b; --rosa:#5b667a;
+  /* Homologado: las variables del reporte se mapean a los tokens Metronic
+     del portal, así toda la página hereda el tema unificado. */
+  --azul:var(--primary); --azul-d:#254185; --azul-l:#e8f1fb; --azul-ll:transparent;
+  --cielo:#2a9eda; --tinta:var(--foreground); --gris:var(--muted-foreground); --gris-l:var(--muted-foreground);
+  --linea:var(--border); --bd:var(--border); --bg:transparent; --blanco:var(--card);
+  --verde:#047857; --ambar:#b45309; --rojo:#b91c1c; --rosa:#5b667a;
   --sombra:0 1px 3px rgba(10,27,61,.04),0 8px 24px rgba(10,27,61,.06);
   --sombra-h:0 4px 12px rgba(10,27,61,.08),0 16px 40px rgba(10,27,61,.10);
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--tinta);line-height:1.5;-webkit-font-smoothing:antialiased}
-.wrap{max-width:1280px;margin:0 auto;padding:0 28px}
+.wrap{max-width:none;margin:0;padding:0}
 
-header{background:linear-gradient(150deg,#254185 0%,#1a2f63 60%,#13234d 100%);color:#fff;padding:48px 0 130px;position:relative;overflow:hidden}
-header::before{content:"";position:absolute;inset:0;background-image:radial-gradient(circle at 1px 1px,rgba(255,255,255,.12) 1px,transparent 0);background-size:28px 28px;opacity:.6}
+header{background:transparent;color:var(--foreground);padding:4px 0 0;position:relative;overflow:visible}
+header::before{display:none}
 header .wrap{position:relative;z-index:2}
-.brand{display:flex;align-items:center;justify-content:space-between;margin-bottom:40px}
-.brand .name{display:flex;align-items:center;gap:11px;font-family:'Archivo',sans-serif;font-weight:900;font-size:19px;letter-spacing:-.02em}
-.brand .name .dot{width:32px;height:32px;border-radius:9px;background:#fff;color:var(--azul);display:flex;align-items:center;justify-content:center;font-size:17px}
-.brand .meta{font-family:'Space Mono',monospace;font-size:12px;opacity:.7;text-align:right}
-.htitle{font-family:'Archivo',sans-serif;font-size:clamp(34px,5vw,58px);font-weight:900;letter-spacing:-.04em;line-height:1.02;max-width:760px}
-.htitle em{font-style:normal;color:#9bbfe6}
-.hsub{font-size:16px;opacity:.82;margin-top:16px;max-width:560px}
-.hbadges{display:flex;gap:10px;margin-top:26px;flex-wrap:wrap}
-.hbadge{background:rgba(255,255,255,.13);backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,.18);padding:8px 14px;border-radius:100px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:7px}
-.hbadge b{font-family:'Space Mono',monospace;font-weight:700}
+.brand{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.brand .name{display:flex;align-items:center;gap:11px;font-family:'Montserrat',sans-serif;font-weight:700;font-size:16px;letter-spacing:-.01em;color:var(--foreground)}
+.brand .name .dot{width:30px;height:30px;border-radius:9px;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px}
+.brand .meta{font-family:'Montserrat',sans-serif;font-size:12px;color:var(--muted-foreground);text-align:right}
+.htitle{font-family:'Montserrat',sans-serif;font-size:22px;font-weight:700;letter-spacing:-.01em;line-height:1.2;max-width:none;color:var(--foreground)}
+.htitle em{font-style:normal;color:var(--primary)}
+.hsub{font-size:14px;color:var(--muted-foreground);margin-top:6px;max-width:72ch}
+.hbadges{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+.hbadge{background:var(--muted);border:1px solid var(--border);color:var(--foreground);padding:6px 12px;border-radius:100px;font-size:12px;font-weight:500;display:flex;align-items:center;gap:7px}
+.hbadge b{font-family:'Montserrat',sans-serif;font-weight:700}
 .live-dot{width:8px;height:8px;border-radius:50%;background:#00ff95;box-shadow:0 0 10px #00ff95;animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 
@@ -161,10 +161,10 @@ header .wrap{position:relative;z-index:2}
 .kpi{background:var(--blanco);border-radius:18px;padding:22px 22px 20px;box-shadow:var(--sombra);border:1px solid var(--linea);transition:.25s;position:relative;overflow:hidden}
 .kpi:hover{transform:translateY(-3px);box-shadow:var(--sombra-h)}
 .kpi .ico{width:38px;height:38px;border-radius:11px;background:var(--azul-l);color:var(--azul);display:flex;align-items:center;justify-content:center;font-size:19px;margin-bottom:14px}
-.kpi .val{font-family:'Archivo',sans-serif;font-size:34px;font-weight:800;letter-spacing:-.03em;line-height:1}
+.kpi .val{font-family:'Montserrat',sans-serif;font-size:34px;font-weight:800;letter-spacing:-.03em;line-height:1}
 .kpi .val .u{font-size:15px;color:var(--gris-l);font-weight:600;margin-left:3px}
 .kpi .lbl{font-size:13px;color:var(--gris);margin-top:6px;font-weight:500}
-.kpi .sub{font-size:11.5px;color:var(--gris-l);margin-top:9px;font-family:'Space Mono',monospace}
+.kpi .sub{font-size:11.5px;color:var(--gris-l);margin-top:9px;font-family:'Montserrat',monospace}
 .kpi.accent{background:linear-gradient(155deg,var(--azul),var(--azul-d));border-color:transparent}
 .kpi.accent .ico{background:rgba(255,255,255,.18);color:#fff}
 .kpi.accent .val,.kpi.accent .lbl{color:#fff}
@@ -173,7 +173,7 @@ header .wrap{position:relative;z-index:2}
 section{padding:54px 0 0}
 
 /* ===== PANEL DE FILTROS ===== */
-.filters{margin:-92px 0 0;position:relative;z-index:6}
+.filters{margin:18px 0 0;position:relative;z-index:6}
 .filters details{
   background:#fff;border:1px solid var(--bd);border-radius:14px;
   overflow:hidden;transition:box-shadow .2s ease;
@@ -189,11 +189,11 @@ section{padding:54px 0 0}
 .filters summary::-webkit-details-marker{display:none}
 .filters-icon{font-size:18px;color:var(--azul)}
 .filters-title{
-  font-family:'Archivo',sans-serif;font-weight:800;
+  font-family:'Montserrat',sans-serif;font-weight:800;
   font-size:14px;letter-spacing:-.01em;color:var(--tinta);
 }
 .filters-badge{
-  font-family:'Space Mono',monospace;
+  font-family:'Montserrat',monospace;
   font-size:11px;font-weight:700;letter-spacing:.3px;
   padding:4px 10px;border-radius:6px;
   background:rgba(255,149,0,.12);color:var(--ambar);
@@ -208,7 +208,7 @@ section{padding:54px 0 0}
 .filters details[open] .filters-chev{transform:rotate(180deg)}
 .filters-body{padding:6px 20px 20px;border-top:1px solid var(--bd)}
 .filters-section-title{
-  font-family:'Space Mono',monospace;
+  font-family:'Montserrat',monospace;
   font-size:10px;letter-spacing:1.5px;text-transform:uppercase;
   color:var(--gris);font-weight:700;
   margin:18px 0 8px;
@@ -233,7 +233,7 @@ section{padding:54px 0 0}
   cursor:default;
 }
 .filters-grid label.filt .lbl{
-  font-family:'Space Mono',monospace;
+  font-family:'Montserrat',monospace;
   font-size:10.5px;letter-spacing:1.2px;text-transform:uppercase;
   color:var(--gris);font-weight:700;
   display:flex;align-items:center;gap:8px;
@@ -243,13 +243,13 @@ section{padding:54px 0 0}
   letter-spacing:0;font-weight:400;
 }
 .filters-grid label.filt .lbl-aside{
-  font-family:'Space Mono',monospace;
+  font-family:'Montserrat',monospace;
   font-size:11px;color:var(--gris-l);
   padding:9px 0;
 }
 .filters-grid label.filt input[type=date],
 .filters-grid label.filt input[type=number]{
-  font-family:'Space Mono',monospace;
+  font-family:'Montserrat',monospace;
   font-size:13px;font-weight:700;color:var(--tinta);
   padding:8px 11px;border:1px solid var(--bd);
   border-radius:7px;background:#fff;
@@ -294,7 +294,7 @@ section{padding:54px 0 0}
   margin-top:14px;
   padding:10px 12px;
   background:var(--gris-2);border-radius:8px;
-  font-family:'Space Mono',monospace;
+  font-family:'Montserrat',monospace;
   font-size:11px;color:var(--gris);
 }
 .filters-breakdown .bd-item{
@@ -308,7 +308,7 @@ section{padding:54px 0 0}
 .btn-apply,.btn-reset,.btn-clear{
   display:inline-flex;align-items:center;gap:6px;
   padding:10px 16px;border-radius:8px;
-  font-family:'Space Mono',monospace;
+  font-family:'Montserrat',monospace;
   font-size:11px;font-weight:700;letter-spacing:1px;
   text-transform:uppercase;cursor:pointer;
   text-decoration:none;border:none;
@@ -331,9 +331,9 @@ section{padding:54px 0 0}
 }
 .shead{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:24px;gap:20px}
 .shead .l{display:flex;flex-direction:column;gap:5px}
-.skicker{font-family:'Space Mono',monospace;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:var(--azul);display:flex;align-items:center;gap:8px}
+.skicker{font-family:'Montserrat',monospace;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:var(--azul);display:flex;align-items:center;gap:8px}
 .skicker::before{content:"";width:22px;height:2px;background:var(--azul);display:inline-block}
-.shead h2{font-family:'Archivo',sans-serif;font-size:27px;font-weight:800;letter-spacing:-.03em}
+.shead h2{font-family:'Montserrat',sans-serif;font-size:27px;font-weight:800;letter-spacing:-.03em}
 .shead .desc{font-size:14px;color:var(--gris);max-width:420px;text-align:right}
 
 .grid{display:grid;gap:16px}
@@ -345,8 +345,8 @@ section{padding:54px 0 0}
 
 .card{background:var(--blanco);border:1px solid var(--linea);border-radius:18px;padding:24px;box-shadow:var(--sombra)}
 .card.pad0{padding:0;overflow:hidden}
-.ctitle{font-family:'Archivo',sans-serif;font-size:16px;font-weight:700;letter-spacing:-.02em;display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
-.ctitle .tag{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;background:var(--azul-ll);color:var(--azul-d);padding:3px 9px;border-radius:6px;letter-spacing:0}
+.ctitle{font-family:'Montserrat',sans-serif;font-size:16px;font-weight:700;letter-spacing:-.02em;display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.ctitle .tag{font-family:'Montserrat',monospace;font-size:11px;font-weight:700;background:var(--azul-ll);color:var(--azul-d);padding:3px 9px;border-radius:6px;letter-spacing:0}
 .cdesc{font-size:12.5px;color:var(--gris-l);margin-bottom:18px}
 
 .chart{width:100%}
@@ -354,7 +354,7 @@ section{padding:54px 0 0}
 .bar-row:last-child{margin-bottom:0}
 .bar-label{font-size:12.5px;color:var(--gris);width:120px;flex-shrink:0;text-align:right;font-weight:500}
 .bar-track{flex:1;height:26px;background:var(--azul-ll);border-radius:7px;position:relative;overflow:hidden}
-.bar-fill{height:100%;background:linear-gradient(90deg,var(--cielo),var(--azul));border-radius:7px;display:flex;align-items:center;justify-content:flex-end;padding-right:9px;color:#fff;font-size:11.5px;font-weight:700;font-family:'Space Mono',monospace;min-width:32px;transition:width 1s cubic-bezier(.4,0,.2,1)}
+.bar-fill{height:100%;background:linear-gradient(90deg,var(--cielo),var(--azul));border-radius:7px;display:flex;align-items:center;justify-content:flex-end;padding-right:9px;color:#fff;font-size:11.5px;font-weight:700;font-family:'Montserrat',monospace;min-width:32px;transition:width 1s cubic-bezier(.4,0,.2,1)}
 
 .legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:16px;padding-top:14px;border-top:1px solid var(--linea)}
 .legend .it{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--gris)}
@@ -363,18 +363,18 @@ section{padding:54px 0 0}
 svg .gridline{stroke:var(--linea);stroke-width:1;stroke-dasharray:3 4}
 svg text{font-family:'Montserrat',sans-serif}
 svg .axlbl{font-size:10.5px;fill:var(--gris-l)}
-svg .vlbl{font-size:11px;fill:var(--tinta);font-weight:700;font-family:'Space Mono',monospace}
+svg .vlbl{font-size:11px;fill:var(--tinta);font-weight:700;font-family:'Montserrat',monospace}
 
 .heatgrid{display:grid;grid-template-columns:34px repeat(17,1fr);gap:3px;margin-top:8px}
-.heatcell{aspect-ratio:1;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:9px;font-family:'Space Mono',monospace;color:transparent;transition:.15s;cursor:default}
+.heatcell{aspect-ratio:1;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:9px;font-family:'Montserrat',monospace;color:transparent;transition:.15s;cursor:default}
 .heatcell:hover{transform:scale(1.25);z-index:3;color:#fff;box-shadow:0 2px 8px rgba(10,27,61,.3)}
 .heatcell.lbl{background:none!important;color:var(--gris-l);font-size:10px;font-weight:700}
 .heatcell.hr{background:none!important;color:var(--gris-l);font-size:9px}
 
-#map{width:100%;height:560px;background:var(--azul-ll)}
+#map{width:100%;height:clamp(520px,calc(100vh - 250px),880px);background:var(--azul-ll)}
 .map-wrap{position:relative}
 .map-ctrls{position:absolute;top:16px;left:16px;z-index:10;background:var(--blanco);border-radius:14px;padding:14px;box-shadow:var(--sombra-h);max-width:240px}
-.map-ctrls .t{font-family:'Archivo',sans-serif;font-weight:700;font-size:13px;margin-bottom:10px}
+.map-ctrls .t{font-family:'Montserrat',sans-serif;font-weight:700;font-size:13px;margin-bottom:10px}
 .mtoggle{display:flex;align-items:center;gap:9px;padding:7px 0;cursor:pointer;font-size:13px;color:var(--gris)}
 .mtoggle input{accent-color:var(--azul);width:15px;height:15px;cursor:pointer}
 .mtoggle .sw{width:22px;height:4px;border-radius:2px;flex-shrink:0}
@@ -382,17 +382,17 @@ svg .vlbl{font-size:11px;fill:var(--tinta);font-weight:700;font-family:'Space Mo
 .map-legend .it{display:flex;align-items:center;gap:8px;margin:4px 0;color:var(--gris)}
 .map-nokey{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:var(--azul-ll);color:var(--gris);text-align:center;padding:40px}
 .map-nokey .big{font-size:46px}
-.map-nokey h3{font-family:'Archivo',sans-serif;font-size:19px;color:var(--tinta)}
+.map-nokey h3{font-family:'Montserrat',sans-serif;font-size:19px;color:var(--tinta)}
 
 .tbl{width:100%;border-collapse:collapse;font-size:13px}
 .tbl th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--gris-l);font-weight:700;padding:0 12px 12px;border-bottom:1px solid var(--linea)}
 .tbl td{padding:13px 12px;border-bottom:1px solid var(--azul-ll);color:var(--tinta)}
 .tbl tr:last-child td{border-bottom:none}
 .tbl tr:hover td{background:var(--azul-ll)}
-.tbl .num{font-family:'Space Mono',monospace;font-weight:700}
-.tbl .rank{width:28px;height:28px;border-radius:8px;background:var(--azul-l);color:var(--azul-d);display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-weight:700;font-size:12px}
+.tbl .num{font-family:'Montserrat',monospace;font-weight:700}
+.tbl .rank{width:28px;height:28px;border-radius:8px;background:var(--azul-l);color:var(--azul-d);display:flex;align-items:center;justify-content:center;font-family:'Montserrat',monospace;font-weight:700;font-size:12px}
 .tbl .rank.top{background:var(--azul);color:#fff}
-.pill{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:100px;font-size:11px;font-weight:600;font-family:'Space Mono',monospace}
+.pill{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:100px;font-size:11px;font-weight:600;font-family:'Montserrat',monospace}
 .pill.elec{background:#fff4e0;color:#b56a00}
 .pill.meca{background:var(--azul-l);color:var(--azul-d)}
 .pill.circ{background:#e0f7ef;color:#007a52}
@@ -400,7 +400,7 @@ svg .vlbl{font-size:11px;fill:var(--tinta);font-weight:700;font-family:'Space Mo
 .pill.ok{background:#e0f7ef;color:#007a52}
 .pill.bad{background:#ffe4e8;color:#c4234d}
 .pill.warn{background:#fff4d6;color:#8a5a00}
-.bal{font-family:'Space Mono',monospace;font-weight:700;font-size:12px}
+.bal{font-family:'Montserrat',monospace;font-weight:700;font-size:12px}
 
 /* ===== Comparativa elec vs mec ===== */
 .comp-head{
@@ -410,7 +410,7 @@ svg .vlbl{font-size:11px;fill:var(--tinta);font-weight:700;font-family:'Space Mo
   border-bottom:1px solid var(--bd);
 }
 .comp-side-h{
-  font-family:'Archivo',sans-serif;font-weight:800;
+  font-family:'Montserrat',sans-serif;font-weight:800;
   font-size:14px;letter-spacing:-.01em;
   display:flex;align-items:center;gap:8px;
 }
@@ -424,7 +424,7 @@ svg .vlbl{font-size:11px;fill:var(--tinta);font-weight:700;font-family:'Space Mo
 .comp-row:last-child{border-bottom:none}
 .comp-label{
   text-align:center;
-  font-family:'Space Mono',monospace;
+  font-family:'Montserrat',monospace;
   font-size:11px;color:var(--gris);
   text-transform:uppercase;letter-spacing:.8px;
   font-weight:700;
@@ -437,7 +437,7 @@ svg .vlbl{font-size:11px;fill:var(--tinta);font-weight:700;font-family:'Space Mo
 .comp-side.mec  { justify-content:flex-end }
 .comp-side.elec { justify-content:flex-start }
 .comp-val{
-  font-family:'Space Mono',monospace;
+  font-family:'Montserrat',monospace;
   font-size:13px;font-weight:700;color:var(--tinta);
   font-variant-numeric:tabular-nums;
   flex-shrink:0;
@@ -479,8 +479,8 @@ svg .vlbl{font-size:11px;fill:var(--tinta);font-weight:700;font-family:'Space Mo
 .donut-legend .it{display:flex;align-items:center;gap:10px;font-size:13px}
 .donut-legend .sw{width:13px;height:13px;border-radius:4px;flex-shrink:0}
 .donut-legend .nm{color:var(--gris);flex:1}
-.donut-legend .vl{font-family:'Space Mono',monospace;font-weight:700;font-size:13px}
-.donut-legend .pc{font-family:'Space Mono',monospace;font-size:11px;color:var(--gris-l);width:42px;text-align:right}
+.donut-legend .vl{font-family:'Montserrat',monospace;font-weight:700;font-size:13px}
+.donut-legend .pc{font-family:'Montserrat',monospace;font-size:11px;color:var(--gris-l);width:42px;text-align:right}
 
 .insight{background:linear-gradient(155deg,var(--azul-ll),var(--azul-l));border:1px solid #d4e3ff;border-radius:16px;padding:20px;display:flex;gap:14px;align-items:flex-start}
 .insight .ico{font-size:22px;flex-shrink:0}
@@ -491,13 +491,13 @@ svg .vlbl{font-size:11px;fill:var(--tinta);font-weight:700;font-family:'Space Mo
 
 .minigrid{display:grid;grid-template-columns:repeat(2,1fr);gap:13px}
 .mini{background:var(--azul-ll);border-radius:13px;padding:16px}
-.mini .v{font-family:'Archivo',sans-serif;font-size:26px;font-weight:800;letter-spacing:-.03em;color:var(--azul-d)}
+.mini .v{font-family:'Montserrat',sans-serif;font-size:26px;font-weight:800;letter-spacing:-.03em;color:var(--azul-d)}
 .mini .l{font-size:12px;color:var(--gris);margin-top:3px}
 
 footer{margin-top:64px;padding:38px 0;border-top:1px solid var(--linea);display:flex;align-items:center;justify-content:space-between;color:var(--gris-l);font-size:12.5px}
-footer .name{display:flex;align-items:center;gap:9px;font-family:'Archivo',sans-serif;font-weight:800;color:var(--tinta);font-size:15px}
+footer .name{display:flex;align-items:center;gap:9px;font-family:'Montserrat',sans-serif;font-weight:800;color:var(--tinta);font-size:15px}
 footer .name .dot{width:26px;height:26px;border-radius:7px;background:var(--azul);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px}
-footer .meta{font-family:'Space Mono',monospace;text-align:right;line-height:1.7}
+footer .meta{font-family:'Montserrat',monospace;text-align:right;line-height:1.7}
 
 .reveal{opacity:0;transform:translateY(16px);transition:opacity .6s,transform .6s}
 .reveal.in{opacity:1;transform:none}
@@ -523,7 +523,7 @@ footer .meta{font-family:'Space Mono',monospace;text-align:right;line-height:1.7
         <span id="genfecha"><?= date('d M Y · H:i') ?></span>
       </div>
     </div>
-    <div class="skicker" style="color:#9bbfe6;margin-bottom:14px">Inteligencia de movilidad · Sistema de bicicleta pública</div>
+    <div class="skicker" style="color:var(--muted-foreground);margin-bottom:10px;font-size:12px;text-transform:uppercase;letter-spacing:.05em;font-weight:600">Inteligencia de movilidad · Sistema de bicicleta pública</div>
     <h1 class="htitle"><?= $TITULO ?></h1>
     <p class="hsub"><?= $SUBTITULO ?></p>
     <div class="hbadges" id="hbadges"></div>
@@ -999,8 +999,8 @@ function donut(elId, items, opts={}){
   });
   const legend=items.map(it=>`<div class="it"><span class="sw" style="background:${it.color}"></span><span class="nm">${it.label}</span><span class="vl">${fmt(it.v)}</span><span class="pc">${(it.v/total*100).toFixed(1)}%</span></div>`).join('');
   $(elId).innerHTML=`<svg viewBox="0 0 140 140" style="width:140px;height:140px;flex-shrink:0">${segs}
-    <text x="70" y="66" text-anchor="middle" style="font-family:'Archivo';font-weight:800;font-size:22px;fill:var(--tinta)">${fmt(total)}</text>
-    <text x="70" y="82" text-anchor="middle" style="font-size:9px;fill:var(--gris-l);font-family:'Space Mono'">${opts.unit||'TOTAL'}</text>
+    <text x="70" y="66" text-anchor="middle" style="font-family:'Montserrat';font-weight:800;font-size:22px;fill:var(--tinta)">${fmt(total)}</text>
+    <text x="70" y="82" text-anchor="middle" style="font-size:9px;fill:var(--gris-l);font-family:'Montserrat'">${opts.unit||'TOTAL'}</text>
   </svg><div class="donut-legend">${legend}</div>`;
 }
 
@@ -1142,7 +1142,7 @@ function renderHeatmap(){
   // mostramos un placeholder en vez de tronar el resto del JS.
   if (!Array.isArray(DATA.heat) || DATA.heat.length === 0) {
     $('heatgrid').innerHTML =
-      '<div style="grid-column:1/-1;padding:30px;text-align:center;color:var(--gris-l);font-family:Space Mono,monospace;font-size:12px">' +
+      '<div style="grid-column:1/-1;padding:30px;text-align:center;color:var(--gris-l);font-family:Montserrat,sans-serif;font-size:12px">' +
       'Sin datos del mapa de calor en el dataset actual.<br>' +
       'Si tienes filtros activos, prueba con "Quitar todo (datos crudos)" o borra <code>/tmp/qrobici_cache_*.json</code>.' +
       '</div>';
@@ -1220,11 +1220,11 @@ function renderRutasDestacadas(){
     return `<div class="card" style="padding:18px" title="dist=${r.dist} m · dur=${r.dur} s">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
         <span class="pill ${r.tipo==='Eléctrica'?'elec':'meca'}">${r.tipo==='Eléctrica'?'⚡':'🚲'} ${r.tipo}</span>
-        <span style="font-family:'Space Mono';font-size:11px;color:var(--gris-l)">${r.folio}</span>
+        <span style="font-family:'Montserrat';font-size:11px;color:var(--gris-l)">${r.folio}</span>
       </div>
-      <div style="font-family:'Archivo';font-weight:800;font-size:21px;color:var(--azul-d)">${kmStr} km</div>
+      <div style="font-family:'Montserrat';font-weight:800;font-size:21px;color:var(--azul-d)">${kmStr} km</div>
       <div style="font-size:12.5px;color:var(--gris);margin-top:3px">${r.origen} → ${r.destino}</div>
-      <div style="font-size:11.5px;color:var(--gris-l);margin-top:8px;font-family:'Space Mono'">⏱ ${durStr} min · ${kmh.toFixed(2)} km/h prom.</div>
+      <div style="font-size:11.5px;color:var(--gris-l);margin-top:8px;font-family:'Montserrat'">⏱ ${durStr} min · ${kmh.toFixed(2)} km/h prom.</div>
     </div>`;
   }).join('');
 }
@@ -1338,7 +1338,7 @@ function renderPlanes(){
     const iw = W - padL - padR;
     const rowH = (H - padT - padB) / filas.length;
     const FONT_SANS = "font-family:'Montserrat',sans-serif";
-    const FONT_MONO = "font-family:'Space Mono',monospace";
+    const FONT_MONO = "font-family:'Montserrat',monospace";
     let svg = '';
     filas.forEach((r, i) => {
       const y = padT + i * rowH + rowH * 0.18;
@@ -1405,9 +1405,9 @@ function drawRoutes(){
     const iw=new google.maps.InfoWindow();
     pl.addListener('click',e=>{
       iw.setContent(`<div style="font-family:'Montserrat',sans-serif;font-size:12.5px;padding:2px 4px">
-        <b style="font-family:'Archivo'">${r.origen} → ${r.destino}</b><br>
+        <b style="font-family:'Montserrat'">${r.origen} → ${r.destino}</b><br>
         ${r.tipo} · ${fmt1(r.dist/1000)} km · ${Math.round(r.dur/60)} min<br>
-        <span style="color:#5b6b8c;font-family:'Space Mono';font-size:11px">${r.folio}</span></div>`);
+        <span style="color:#5b6b8c;font-family:'Montserrat';font-size:11px">${r.folio}</span></div>`);
       iw.setPosition(e.latLng); iw.open(mapObj);
     });
     routePolylines.push(pl);

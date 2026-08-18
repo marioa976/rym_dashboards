@@ -6,6 +6,9 @@
  */
 $ktActive = $ktActive ?? '';
 $ktTitle  = $ktTitle  ?? 'Portal';
+// Las páginas de reporte/mapa pueden pedir ancho completo con $ktFluid = true
+// (mapas y tablas anchas). El resto usa el contenedor con ancho máximo cómodo.
+$__container = !empty($ktFluid) ? 'kt-container-fluid' : 'kt-container-fixed';
 $__user   = Auth::user() ?? ['nombre' => 'usuario'];
 $__mods   = $_SESSION['modulos'] ?? [];
 $__admin  = !empty($__user['es_admin']);
@@ -69,6 +72,13 @@ function kt_menu_item(string $href, string $icon, string $label, bool $active): 
 <link href="<?= e(url('assets/metronic/vendors/keenicons/styles.bundle.css')) ?>" rel="stylesheet">
 <link href="<?= e(url('assets/css/qro.css')) ?>" rel="stylesheet"><!-- compat: variables --qro-* y clases heredadas de los módulos -->
 <link href="<?= e(url('assets/metronic/css/styles.css')) ?>" rel="stylesheet">
+<style>
+  /* Sidebar colapsado (solo iconos): oculta la sub-navegación y los
+     encabezados de sección para que no queden textos partidos ni puntos
+     sueltos. Las sub-páginas siguen accesibles al expandir el sidebar. */
+  body.kt-sidebar-collapse .kt-submenu-group,
+  body.kt-sidebar-collapse .kt-heading-item { display: none !important; }
+</style>
 <?php if (!empty($ktHead)) echo $ktHead; ?>
 </head>
 <body class="antialiased flex h-full text-base text-foreground bg-background demo1 kt-sidebar-fixed kt-header-fixed">
@@ -92,7 +102,7 @@ function kt_menu_item(string $href, string $icon, string $label, bool $active): 
          data-kt-scrollable-offset="0px" data-kt-scrollable-wrappers="#sidebar_content" id="sidebar_scrollable">
       <div class="kt-menu flex flex-col grow gap-1" data-kt-menu="true" id="sidebar_menu">
         <?= kt_menu_item(url('index.php'), 'home-2', 'Inicio', $ktActive === 'home') ?>
-        <div class="kt-menu-item pt-3 pb-1">
+        <div class="kt-heading-item kt-menu-item pt-3 pb-1">
           <span class="kt-menu-heading uppercase text-2xs font-medium text-muted-foreground ps-[10px]">Módulos</span>
         </div>
         <?php foreach ($__mods as $m):
@@ -102,7 +112,7 @@ function kt_menu_item(string $href, string $icon, string $label, bool $active): 
             // Sub-páginas del módulo activo (navegación interna)
             if ($esActivo && !empty($__subpages[$m['clave']])):
                 $dir = trim(dirname($m['ruta']), '/');   // p.ej. modules/ejecutivo
-                echo '<div class="flex flex-col gap-0.5 mt-0.5 mb-1">';
+                echo '<div class="kt-submenu-group flex flex-col gap-0.5 mt-0.5 mb-1">';
                 foreach ($__subpages[$m['clave']] as $sp):
                     if (!empty($sp[2]) && !(function_exists('puede_editar') && puede_editar($m['clave']))) continue;
                     echo kt_sublink(url($dir . '/' . $sp[1]), $sp[0], $__page === $sp[1]);
@@ -111,14 +121,14 @@ function kt_menu_item(string $href, string $icon, string $label, bool $active): 
             endif;
         endforeach; ?>
         <?php if ($__admin): ?>
-          <div class="kt-menu-item pt-3 pb-1">
+          <div class="kt-heading-item kt-menu-item pt-3 pb-1">
             <span class="kt-menu-heading uppercase text-2xs font-medium text-muted-foreground ps-[10px]">Administración</span>
           </div>
           <?= kt_menu_item(url('admin/index.php'), 'badge', 'Administración', $ktActive === 'admin') ?>
           <?php if ($ktActive === 'admin'):
             $__adm = ['index'=>'Panel','usuarios'=>'Usuarios','modulos'=>'Módulos','sesiones'=>'Sesiones'];
             $__aa  = $ktAdminActive ?? 'index';
-            echo '<div class="flex flex-col gap-0.5 mt-0.5 mb-1">';
+            echo '<div class="kt-submenu-group flex flex-col gap-0.5 mt-0.5 mb-1">';
             foreach ($__adm as $af => $al) echo kt_sublink(url('admin/' . $af . '.php'), $al, $__aa === $af);
             echo '</div>';
           endif; ?>
@@ -133,7 +143,7 @@ function kt_menu_item(string $href, string $icon, string $label, bool $active): 
   <!-- Header -->
   <header class="kt-header fixed top-0 z-10 start-0 end-0 flex items-stretch shrink-0 bg-background border-b border-border"
           data-kt-sticky="true" data-kt-sticky-name="header" id="header">
-    <div class="kt-container-fixed flex justify-between items-center grow gap-4">
+    <div class="<?= $__container ?> flex justify-between items-center grow gap-4">
       <div class="flex items-center gap-2.5 min-w-0">
         <button class="kt-btn kt-btn-outline kt-btn-icon size-9 lg:hidden" data-kt-drawer-toggle="#sidebar">
           <i class="ki-filled ki-menu"></i>
@@ -151,4 +161,4 @@ function kt_menu_item(string $href, string $icon, string $label, bool $active): 
 
   <!-- Content -->
   <main class="grow pt-5 pb-10" id="content" role="content">
-    <div class="kt-container-fixed">
+    <div class="<?= $__container ?>">

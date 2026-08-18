@@ -136,6 +136,7 @@ if (!is_array($payload)) {
 ?><?php
 $ktTitle  = 'Qrobus · Mapa seccional';
 $ktActive = 'qrobus';
+$ktFluid = true;
 require __DIR__ . '/../../views/layout/kt_top.php';
 ?>
   <script src="https://unpkg.com/deck.gl@8.9.35/dist.min.js"></script>
@@ -144,10 +145,10 @@ require __DIR__ . '/../../views/layout/kt_top.php';
     .m-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:12px}
     .m-kpi{background:#fff;border:1px solid var(--qro-border);border-radius:12px;padding:12px 14px}
     .m-kpi .v{font-size:22px;font-weight:800;color:var(--qro-blue-dark)}.m-kpi .l{font-size:12px;color:var(--qro-text-secondary);font-weight:600}
-    #m-map{height:620px;border-radius:12px;border:1px solid var(--qro-border);overflow:hidden}
+    #m-map{height:clamp(520px,calc(100vh - 250px),880px);border-radius:12px;border:1px solid var(--qro-border);overflow:hidden}
     .m-legend{display:flex;gap:10px;align-items:center;font-size:11px;color:var(--qro-text-secondary);margin:8px 0;flex-wrap:wrap}
     .m-legend i{width:16px;height:12px;border-radius:3px;display:inline-block;margin-right:3px;vertical-align:middle}
-    .m-side{background:#fff;border:1px solid var(--qro-border);border-radius:12px;padding:14px 16px;max-height:620px;overflow:auto}
+    .m-side{background:#fff;border:1px solid var(--qro-border);border-radius:12px;padding:14px 16px;max-height:clamp(520px,calc(100vh - 250px),880px);overflow:auto}
     .m-wrap{display:grid;grid-template-columns:1fr 330px;gap:16px}
     @media(max-width:1000px){.m-wrap{grid-template-columns:1fr}}
     .switchbtn{padding:6px 12px;border-radius:999px;border:1px solid var(--qro-border);background:#fff;cursor:pointer;font-size:12px;font-weight:700;color:var(--qro-text-secondary)}

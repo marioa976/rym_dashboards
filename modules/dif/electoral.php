@@ -203,6 +203,7 @@ function getSectionDetail(PDO $pdo, int $id, array $f): array
 ?><?php
 $ktTitle  = 'Reporte Electoral DIF — Querétaro';
 $ktActive = 'dif';
+$ktFluid = true;
 require __DIR__ . '/../../views/layout/kt_top.php';
 ?>
 <style>
@@ -278,7 +279,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
 
   @media (max-width: 1100px){
     .layout{grid-template-columns:1fr;height:auto}
-    #map{height:560px}
+    #map{height:clamp(520px,calc(100vh - 250px),880px)}
   }
 </style>
 

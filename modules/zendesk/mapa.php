@@ -145,6 +145,7 @@ $pintados = count($markers);
 <?php
 $ktTitle  = 'Mapa de reportes · Querétaro';
 $ktActive = 'zendesk';
+$ktFluid = true;
 require __DIR__ . '/../../views/layout/kt_top.php';
 ?>
 <meta name="viewport" content="width=device-width, initial-scale=1">

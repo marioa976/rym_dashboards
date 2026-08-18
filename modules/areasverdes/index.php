@@ -30,6 +30,7 @@ $topDel  = $porDeleg[0] ?? null;
 ?><?php
 $ktTitle  = 'Áreas Verdes';
 $ktActive = 'areasverdes';
+$ktFluid = true;
 require __DIR__ . '/../../views/layout/kt_top.php';
 ?>
 <style>
@@ -39,7 +40,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
     .av-kpi .l{font-size:12px;color:var(--qro-text-secondary);font-weight:600;margin-top:2px}
     .av-tools{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
     .av-tools .input{max-width:280px}
-    #av-map{height:600px;border-radius:12px;border:1px solid var(--qro-border);overflow:hidden}
+    #av-map{height:clamp(520px,calc(100vh - 250px),880px);border-radius:12px;border:1px solid var(--qro-border);overflow:hidden}
     .av-legend{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
     .av-chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;
       border:1px solid var(--qro-border);background:#fff;border-radius:999px;padding:5px 11px;cursor:pointer;

@@ -166,6 +166,7 @@ if ($ok) {
 ?><?php
 $ktTitle  = 'Tickets por sección — Zendesk · Querétaro';
 $ktActive = 'zendesk';
+$ktFluid = true;
 require __DIR__ . '/../../views/layout/kt_top.php';
 ?>
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -216,7 +217,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
   .legend .sw{width:18px;height:10px;border:1px solid #999;border-radius:2px}
   .err-banner{background:var(--err);color:#fff;padding:14px 24px;font-size:13px;border-radius:8px;margin:0 24px}
   .small{font-size:11.5px;color:var(--mut)}
-  @media (max-width:1100px){ .layout{grid-template-columns:1fr;height:auto} #map{height:520px} }
+  @media (max-width:1100px){ .layout{grid-template-columns:1fr;height:auto} #map{height:clamp(520px,calc(100vh - 250px),880px)} }
 </style>
 
 <div class="crumb"><a href="dashboard.php">Dashboard</a> &rarr; Tickets por sección</div>

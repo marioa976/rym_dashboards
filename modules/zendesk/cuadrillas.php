@@ -533,6 +533,7 @@ $payload_save = ['params'=>$params_save, 'plan'=>$plan, 'stats_pool'=>$stats_poo
 <?php
 $ktTitle  = 'Planificador de cuadrillas';
 $ktActive = 'zendesk';
+$ktFluid = true;
 require __DIR__ . '/../../views/layout/kt_top.php';
 ?>
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -670,7 +671,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
   .draw-hint{display:flex;align-items:center;gap:12px;background:#eff6ff;border:1px solid #bfdbfe;border-left:3px solid var(--primary);border-radius:8px;padding:12px 16px;margin-bottom:14px;font-size:13px;flex-wrap:wrap}
   .draw-hint b{font-weight:600}
   .draw-toolbar{display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
-  #drawmap{height:620px;border-radius:12px;overflow:hidden;border:1px solid var(--border);background:#eef0f3}
+  #drawmap{height:clamp(520px,calc(100vh - 250px),880px);border-radius:12px;overflow:hidden;border:1px solid var(--border);background:#eef0f3}
   .legend-dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:middle}
   .count-badge{display:inline-flex;align-items:center;gap:6px;background:var(--primary);color:#fff;font-weight:600;font-size:13px;padding:8px 14px;border-radius:8px}
 </style>
