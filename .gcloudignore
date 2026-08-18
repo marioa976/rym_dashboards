@@ -1,0 +1,40 @@
+# .gcloudignore — qué NO subir al contexto de build de Cloud Build / gcloud.
+#
+# IMPORTANTE: si este archivo NO existe, gcloud usa .gitignore por defecto, y como
+# .gitignore excluye assets/metronic/ (tema Metronic, licencia comercial), el build
+# quedaría SIN esos assets y el sitio se rompe (styles.css 404). Este archivo existe
+# justo para que gcloud NO herede .gitignore y SÍ suba assets/metronic/ (que vive en
+# disco, aunque esté gitignored) al construir la imagen.
+
+.git
+.gitignore
+.gcloudignore
+
+# Secretos / entorno local
+.env
+.env.local
+.env.*.local
+
+# Sistema / temporales
+.DS_Store
+Thumbs.db
+*.log
+*.cache
+
+# Dependencias y editores
+/vendor/
+/node_modules/
+.vscode/
+.idea/
+nbproject/
+
+# Docs y datos sueltos (no hacen falta en la imagen)
+DESPLIEGUE.md
+README*.md
+*.csv
+
+# Subidas de usuarios
+modules/*/uploads/
+uploads/
+
+# NOTA: assets/metronic/ NO se excluye a propósito — se necesita en la imagen.
