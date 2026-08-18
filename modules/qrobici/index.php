@@ -84,24 +84,24 @@ require __DIR__ . '/../../views/layout/kt_top.php';
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap">
 <style>
 :root {
-  --azul:#254185;
-  --azul-d:#1a2f63;
+  --azul:#005ab2;        /* azul QRO (homologado con --primary del portal) */
+  --azul-d:#254185;
   --azul-l:#e8f0ff;
   --azul-ll:#f4f8ff;
-  --tinta:#0a1b3d;
-  --tinta-2:#3c4a6e;
+  --tinta:#0f172a;
+  --tinta-2:#475569;
   --tinta-3:#7287ac;
   --verde:#188a5b;
   --ambar:#d99000;
   --rojo:#ce3a2b;
   --rosa:#5b667a;
-  --gris:#e6ecf5;
-  --gris-2:#f4f6fb;
+  --gris:#e2e8f0;
+  --gris-2:#f5f7fb;
 }
 * { box-sizing:border-box; margin:0; padding:0; }
 html, body { height:100%; }
 body {
-  font-family:'Space Grotesk', system-ui, sans-serif;
+  font-family:'Montserrat', system-ui, sans-serif;
   color:var(--tinta);
   -webkit-font-smoothing:antialiased;
   text-rendering:optimizeLegibility;
