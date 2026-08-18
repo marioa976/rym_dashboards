@@ -311,60 +311,54 @@ require __DIR__ . '/../../views/layout/kt_top.php';
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --bg:#fafafa;--surface:#fff;--border:#ececec;--border-strong:#e0e0e0;
-    --text:#1a1a1a;--text-muted:#6b7280;--text-faint:#9ca3af;
-    --accent:#254185;--positive:#188a5b;--warning:#d99000;--negative:#ce3a2b;--neutral:#005ab2;
-  }
-  *{box-sizing:border-box;-webkit-font-smoothing:antialiased}
-  body{margin:0;font-family:'Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5}
-  .container{max-width:1400px;margin:0 auto;padding:48px 32px 80px}
-  header{margin-bottom:48px;display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:16px}
-  header h1{font-size:24px;font-weight:600;letter-spacing:-.02em;margin:0 0 6px}
-  header .meta{color:var(--text-muted);font-size:13px}
-  header .meta b{color:var(--text);font-weight:500}
+  :root{ --positive:#188a5b;--warning:#d99000;--negative:#ce3a2b;--neutral:#005ab2; }
+  .container{padding:0}
+  header{margin-bottom:24px;display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:16px}
+  header h1{font-size:22px;font-weight:600;letter-spacing:-.02em;margin:0 0 6px;color:var(--foreground)}
+  header .meta{color:var(--muted-foreground);font-size:13px}
+  header .meta b{color:var(--foreground);font-weight:500}
   .nav{display:flex;gap:8px}
-  .nav a{font-size:12px;padding:8px 14px;border:1px solid var(--border);border-radius:8px;color:var(--text);text-decoration:none;background:#fff;font-weight:500}
-  .nav a:hover{background:#f9fafb}
-  .nav a.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
-  .section{margin-top:56px}.section:first-child{margin-top:0}
-  .section-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text-faint);margin:0 0 16px}
+  .nav a{font-size:12px;padding:8px 14px;border:1px solid var(--border);border-radius:.5rem;color:var(--foreground);text-decoration:none;background:var(--card);font-weight:500}
+  .nav a:hover{background:var(--accent)}
+  .nav a.primary{background:var(--primary);color:var(--primary-foreground);border-color:var(--primary)}
+  .section{margin-top:32px}.section:first-child{margin-top:0}
+  .section-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted-foreground);margin:0 0 16px}
   .grid{display:grid;gap:16px}
   .kpi-grid{grid-template-columns:repeat(4,1fr)}.row-2{grid-template-columns:1fr 1fr}.row-3{grid-template-columns:repeat(3,1fr)}
   @media(max-width:1100px){.kpi-grid{grid-template-columns:repeat(2,1fr)}.row-3{grid-template-columns:1fr 1fr}}
-  @media(max-width:720px){.kpi-grid,.row-2,.row-3{grid-template-columns:1fr}.container{padding:32px 20px}}
-  .card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px}
+  @media(max-width:720px){.kpi-grid,.row-2,.row-3{grid-template-columns:1fr}}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
   .card-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:16px}
-  .card-title{font-size:13px;font-weight:600;margin:0}
-  .card-sub{font-size:12px;color:var(--text-faint)}
-  .kpi .label{font-size:12px;color:var(--text-muted);font-weight:500;margin-bottom:8px}
-  .kpi .value{font-size:30px;font-weight:600;letter-spacing:-.02em;line-height:1;color:var(--text)}
-  .kpi .value .unit{font-size:14px;font-weight:500;color:var(--text-muted);margin-left:4px}
-  .kpi .meta{font-size:12px;color:var(--text-muted);margin-top:10px;line-height:1.4}
-  .kpi .meta b{color:var(--text);font-weight:500}
+  .card-title{font-size:13px;font-weight:600;margin:0;color:var(--foreground)}
+  .card-sub{font-size:12px;color:var(--muted-foreground)}
+  .kpi .label{font-size:12px;color:var(--muted-foreground);font-weight:500;margin-bottom:8px}
+  .kpi .value{font-size:30px;font-weight:600;letter-spacing:-.02em;line-height:1;color:var(--primary)}
+  .kpi .value .unit{font-size:14px;font-weight:500;color:var(--muted-foreground);margin-left:4px}
+  .kpi .meta{font-size:12px;color:var(--muted-foreground);margin-top:10px;line-height:1.4}
+  .kpi .meta b{color:var(--foreground);font-weight:500}
   .kpi.positive .value{color:var(--positive)}
   .kpi.warning .value{color:var(--warning)}
   .kpi.negative .value{color:var(--negative)}
-  .insight{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:6px;padding:14px 18px;font-size:13px;line-height:1.6;margin-top:16px}
-  .insight.warning{border-left-color:var(--warning)}.insight.negative{border-left-color:var(--negative)}.insight.positive{border-left-color:var(--positive)}
+  .insight{background:var(--card);border:1px solid var(--border);border-inline-start:3px solid var(--primary);border-radius:.5rem;padding:14px 18px;font-size:13px;line-height:1.6;margin-top:16px;color:var(--foreground)}
+  .insight.warning{border-inline-start-color:var(--warning)}.insight.negative{border-inline-start-color:var(--negative)}.insight.positive{border-inline-start-color:var(--positive)}
   .insight b{font-weight:600}
   .chart-wrap{position:relative;height:280px}.chart-wrap.tall{height:360px}.chart-wrap.xtall{height:440px}
   table{width:100%;border-collapse:collapse;font-size:13px}
-  thead th{text-align:left;font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--text-faint);padding:10px 12px;border-bottom:1px solid var(--border-strong)}
-  tbody td{padding:12px;border-bottom:1px solid var(--border)}
+  thead th{text-align:left;font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted-foreground);padding:10px 12px;border-bottom:1px solid var(--border)}
+  tbody td{padding:12px;border-bottom:1px solid var(--border);color:var(--foreground)}
   tbody tr:last-child td{border-bottom:none}
   td.num{text-align:right;font-variant-numeric:tabular-nums}
-  .progress{height:4px;background:#f3f4f6;border-radius:2px;overflow:hidden;margin-top:2px}
-  .progress>span{display:block;height:100%;border-radius:2px;background:var(--accent)}
+  .progress{height:4px;background:var(--muted);border-radius:2px;overflow:hidden;margin-top:2px}
+  .progress>span{display:block;height:100%;border-radius:2px;background:var(--primary)}
   .heatmap{display:grid;gap:3px;font-size:11px}
   .heatmap .cell{padding:10px 6px;text-align:center;border-radius:4px;font-weight:500}
-  .heatmap .label{color:var(--text-muted);font-size:12px;display:flex;align-items:center;padding:6px 0}
-  .heatmap .label.col{justify-content:center;text-align:center;font-size:10px;line-height:1.3;color:var(--text-faint);padding:6px 4px}
+  .heatmap .label{color:var(--muted-foreground);font-size:12px;display:flex;align-items:center;padding:6px 0}
+  .heatmap .label.col{justify-content:center;text-align:center;font-size:10px;line-height:1.3;color:var(--muted-foreground);padding:6px 4px}
   .pill{display:inline-block;font-size:11px;padding:2px 8px;border-radius:999px;font-weight:500}
   .pill.positive{background:#ecfdf5;color:#047857}
   .pill.warning{background:#fffbeb;color:#b45309}
   .pill.negative{background:#fef2f2;color:#b91c1c}
-  footer{margin-top:48px;padding-top:24px;border-top:1px solid var(--border);font-size:12px;color:var(--text-faint)}
+  footer{margin-top:32px;padding-top:24px;border-top:1px solid var(--border);font-size:12px;color:var(--muted-foreground)}
 </style>
 
 <div class="container">
@@ -384,14 +378,14 @@ require __DIR__ . '/../../views/layout/kt_top.php';
   </header>
 
 <form method="get" style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin:-28px 0 28px">
-  <div><label style="font-size:11px;color:var(--text-muted);font-weight:600;display:block;margin-bottom:4px">Desde</label>
+  <div><label style="font-size:11px;color:var(--muted-foreground);font-weight:600;display:block;margin-bottom:4px">Desde</label>
     <input type="date" name="from" value="<?= htmlspecialchars($from) ?>" style="border:1px solid var(--border);border-radius:8px;padding:8px 10px;font:inherit;font-size:13px"></div>
-  <div><label style="font-size:11px;color:var(--text-muted);font-weight:600;display:block;margin-bottom:4px">Hasta</label>
+  <div><label style="font-size:11px;color:var(--muted-foreground);font-weight:600;display:block;margin-bottom:4px">Hasta</label>
     <input type="date" name="to" value="<?= htmlspecialchars($to) ?>" style="border:1px solid var(--border);border-radius:8px;padding:8px 10px;font:inherit;font-size:13px"></div>
-  <div><label style="font-size:11px;color:var(--text-muted);font-weight:600;display:block;margin-bottom:4px">Formulario</label>
+  <div><label style="font-size:11px;color:var(--muted-foreground);font-weight:600;display:block;margin-bottom:4px">Formulario</label>
     <?= zd_form_select('style="border:1px solid var(--border);border-radius:8px;padding:8px 10px;font:inherit;font-size:13px"') ?></div>
-  <button type="submit" style="background:var(--accent);color:#fff;border:0;border-radius:8px;padding:9px 16px;font:inherit;font-weight:600;font-size:13px;cursor:pointer">Aplicar</button>
-  <a href="dashboard.php" style="font-size:12px;color:var(--text-muted);align-self:center;text-decoration:none">últimos 30 días</a>
+  <button type="submit" style="background:var(--primary);color:var(--primary-foreground);border:0;border-radius:8px;padding:9px 16px;font:inherit;font-weight:600;font-size:13px;cursor:pointer">Aplicar</button>
+  <a href="dashboard.php" style="font-size:12px;color:var(--muted-foreground);align-self:center;text-decoration:none">últimos 30 días</a>
   <span class="card-sub" style="align-self:center;margin-left:auto">Periodo: <b><?= htmlspecialchars($from) ?> → <?= htmlspecialchars($to) ?></b> · <b><?= htmlspecialchars(zd_form_nombre()) ?></b></span>
 </form>
 
