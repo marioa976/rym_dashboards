@@ -540,14 +540,14 @@ require __DIR__ . '/../../views/layout/kt_top.php';
 <style>
   :root{--bg:#fafafa;--surface:#fff;--border:#ececec;--border-strong:#e0e0e0;
     --text:#1a1a1a;--text-muted:#6b7280;--text-faint:#9ca3af;
-    --accent:#254185;--positive:#188a5b;--warning:#d99000;--negative:#ce3a2b;--neutral:#005ab2}
+    --positive:#188a5b;--warning:#d99000;--negative:#ce3a2b;--neutral:#005ab2}
   *{box-sizing:border-box;-webkit-font-smoothing:antialiased}
   body{margin:0;font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5}
   .container{max-width:1400px;margin:0 auto;padding:24px 32px 80px}
   header{margin-bottom:24px;display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:16px}
   header h1{font-size:22px;font-weight:600;letter-spacing:-.02em;margin:0 0 6px}
   header .crumb{color:var(--text-muted);font-size:13px}
-  header .crumb a{color:var(--accent);text-decoration:none}
+  header .crumb a{color:var(--primary);text-decoration:none}
   .nav{display:flex;gap:8px;flex-wrap:wrap}
   .nav a{font-size:12px;padding:7px 12px;border:1px solid var(--border);border-radius:7px;color:var(--text);text-decoration:none;background:#fff;font-weight:500}
   .nav a.active{background:var(--text);color:#fff;border-color:var(--text)}
@@ -563,7 +563,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
   label{display:block;font-size:11px;color:var(--text-muted);font-weight:500;margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em}
   select,input[type=text],input[type=number],input[type=date]{width:100%;padding:9px 11px;border:1px solid var(--border);border-radius:7px;font:inherit;font-size:13px;background:#fff;color:var(--text)}
   .btn-row{display:flex;justify-content:flex-end;gap:8px;margin-top:8px}
-  button.primary{background:var(--accent);color:#fff;border:0;padding:10px 18px;border-radius:7px;font:inherit;font-weight:500;cursor:pointer;font-size:13px}
+  button.primary{background:var(--primary);color:#fff;border:0;padding:10px 18px;border-radius:7px;font:inherit;font-weight:500;cursor:pointer;font-size:13px}
   button.primary:hover{filter:brightness(1.05)}
   a.btn{padding:10px 16px;border:1px solid var(--border);border-radius:7px;color:var(--text);text-decoration:none;background:#fff;font-size:13px;font-weight:500}
 
@@ -597,7 +597,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
   .map-wrap{height:560px;border-radius:10px;overflow:hidden;border:1px solid var(--border);background:#eef0f3;margin-top:16px}
   .map-wrap.empty{display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:13px;padding:30px}
   .help{font-size:11px;color:var(--text-faint);margin-top:6px;line-height:1.45}
-  .insight{background:#eff6ff;border:1px solid #bfdbfe;border-left:3px solid var(--accent);border-radius:6px;padding:12px 16px;font-size:13px;line-height:1.55;margin:14px 0}
+  .insight{background:#eff6ff;border:1px solid #bfdbfe;border-left:3px solid var(--primary);border-radius:6px;padding:12px 16px;font-size:13px;line-height:1.55;margin:14px 0}
   .insight b{font-weight:600}
   details summary{cursor:pointer;padding:8px 0;color:var(--text-muted);font-size:12px;font-weight:500;list-style:none}
   details summary::-webkit-details-marker{display:none}
@@ -611,7 +611,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
   .step .txt{display:flex;flex-direction:column;line-height:1.2;min-width:0}
   .step .txt b{font-size:13px;font-weight:600;color:var(--text-faint)}
   .step .txt span{font-size:11px;color:var(--text-faint)}
-  .step.active .num{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 0 0 4px rgba(37,65,133,.12)}
+  .step.active .num{background:var(--primary);color:#fff;border-color:var(--primary);box-shadow:0 0 0 4px rgba(37,65,133,.12)}
   .step.active .txt b{color:var(--text)}
   .step.active .txt span{color:var(--text-muted)}
   .step.done .num{background:var(--positive);color:#fff;border-color:var(--positive)}
@@ -645,7 +645,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
   .plan-list td,.plan-list th{padding:13px 18px}
   .plan-list tr:hover td{background:#fafbfc}
   .plan-name{font-weight:600;color:var(--text);text-decoration:none}
-  .plan-name:hover{color:var(--accent)}
+  .plan-name:hover{color:var(--primary)}
   .mini-pill{display:inline-block;font-size:11px;padding:3px 9px;border-radius:999px;background:#eef1f6;color:#475569;font-weight:500}
   .empty-box{text-align:center;padding:60px 20px;color:var(--text-muted)}
   .empty-box .big{font-size:42px;margin-bottom:10px}
@@ -659,7 +659,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
   @media(max-width:600px){.metodo-tiles{grid-template-columns:1fr}}
   .tile{display:flex;align-items:center;gap:12px;padding:14px 16px;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;transition:.15s;background:#fff}
   .tile:hover{border-color:var(--border-strong)}
-  .tile.sel{border-color:var(--accent);background:#f5f8ff;box-shadow:0 0 0 3px rgba(37,65,133,.10)}
+  .tile.sel{border-color:var(--primary);background:#f5f8ff;box-shadow:0 0 0 3px rgba(37,65,133,.10)}
   .tile input{position:absolute;opacity:0;pointer-events:none}
   .tile-ico{font-size:24px;flex:none}
   .tile-txt{display:flex;flex-direction:column;line-height:1.25}
@@ -667,12 +667,12 @@ require __DIR__ . '/../../views/layout/kt_top.php';
   .tile-txt span{font-size:12px;color:var(--text-muted)}
 
   /* ===== Mapa de dibujo (paso 2 · selección) ===== */
-  .draw-hint{display:flex;align-items:center;gap:12px;background:#eff6ff;border:1px solid #bfdbfe;border-left:3px solid var(--accent);border-radius:8px;padding:12px 16px;margin-bottom:14px;font-size:13px;flex-wrap:wrap}
+  .draw-hint{display:flex;align-items:center;gap:12px;background:#eff6ff;border:1px solid #bfdbfe;border-left:3px solid var(--primary);border-radius:8px;padding:12px 16px;margin-bottom:14px;font-size:13px;flex-wrap:wrap}
   .draw-hint b{font-weight:600}
   .draw-toolbar{display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
   #drawmap{height:620px;border-radius:12px;overflow:hidden;border:1px solid var(--border);background:#eef0f3}
   .legend-dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:middle}
-  .count-badge{display:inline-flex;align-items:center;gap:6px;background:var(--accent);color:#fff;font-weight:600;font-size:13px;padding:8px 14px;border-radius:8px}
+  .count-badge{display:inline-flex;align-items:center;gap:6px;background:var(--primary);color:#fff;font-weight:600;font-size:13px;padding:8px 14px;border-radius:8px}
 </style>
 
 <div class="container">

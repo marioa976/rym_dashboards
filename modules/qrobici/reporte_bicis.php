@@ -61,8 +61,8 @@ require __DIR__ . '/../../views/layout/kt_top.php';
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap">
 <style>
 :root {
-  --azul:#254185;
-  --azul-d:#1a2f63;
+  --azul:#005ab2;
+  --azul-d:#254185;
   --azul-l:#e8f0ff;
   --azul-ll:#f4f8ff;
   --cielo:#5b8fd0;
@@ -81,7 +81,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
 * { box-sizing:border-box; margin:0; padding:0; }
 html, body { width:100%; }
 body {
-  font-family:'Space Grotesk', system-ui, sans-serif;
+  font-family:'Montserrat', system-ui, sans-serif;
   background:var(--bg);
   color:var(--tinta);
   line-height:1.5;
@@ -296,7 +296,7 @@ section { padding:52px 0 0; }
 .bar-label {
   flex:0 0 130px;
   font-size:12.5px; color:var(--tinta-2);
-  font-family:'Space Grotesk', sans-serif; font-weight:500;
+  font-family:'Montserrat', sans-serif; font-weight:500;
 }
 .bar-track {
   flex:1; height:14px;
@@ -360,7 +360,7 @@ section { padding:52px 0 0; }
 
 /* ===== SVG charts ===== */
 .chart { width:100%; height:auto; display:block; }
-svg text { font-family:'Space Grotesk', sans-serif; }
+svg text { font-family:'Montserrat', sans-serif; }
 svg .axlbl { font-size:10.5px; fill:var(--gris-l); }
 svg .vlbl  { font-size:11px;   fill:var(--tinta); font-weight:700; font-family:'Space Mono', monospace; }
 svg .gridline { stroke:var(--bd); stroke-width:1; stroke-dasharray:2,4; }
