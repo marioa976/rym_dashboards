@@ -139,165 +139,126 @@ require __DIR__ . '/../../views/layout/kt_top.php';
   });
 </script>
 <style>
+  /* Paleta de gráficas (Chart.js) y semáforos de calidad — se conservan */
   :root{
-    --bg:#f5f7fa; --panel:#ffffff; --bd:#e2e8f0; --fg:#0f172a; --mut:#64748b;
-    --accent:#254185; --accent2:#005ab2;
-    --ok:#188a5b; --warn:#d99000; --err:#ce3a2b; --info:#2a9eda;
-    --chart1:#254185; --chart2:#005ab2; --chart3:#188a5b; --chart4:#d99000;
-    --chart5:#2a9eda; --chart6:#ce3a2b; --chart7:#1a2f63; --chart8:#5b667a;
-    --shadow:0 1px 3px rgba(15,23,42,.05), 0 1px 2px rgba(15,23,42,.05);
+    --chart1:#254185;--chart2:#005ab2;--chart3:#188a5b;--chart4:#d99000;
+    --chart5:#2a9eda;--chart6:#ce3a2b;--chart7:#1a2f63;--chart8:#5b667a;
+    --ok:#188a5b;--warn:#d99000;--err:#ce3a2b;--info:#2a9eda;
   }
-  *{box-sizing:border-box}
-  html,body{margin:0;background:var(--bg);color:var(--fg);
-            font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Inter',sans-serif;
-            font-size:14px;line-height:1.5}
-  a{color:var(--accent);text-decoration:none}
 
-  /* Top bar */
-  .topbar{background:#254185;color:#fff;padding:14px 24px;
-          display:flex;align-items:center;gap:16px;flex-wrap:wrap;
-          box-shadow:0 2px 8px rgba(0,0,0,.1)}
-  .topbar h1{margin:0;font-size:17px;font-weight:600;letter-spacing:.3px}
-  .topbar .subtitle{font-size:12px;color:#94a3b8}
-  .topbar .spacer{flex:1}
-  .tabs{display:flex;gap:4px;background:#1e293b;padding:4px;border-radius:8px}
-  .tab{padding:8px 16px;border-radius:6px;cursor:pointer;color:#cbd5e1;
-       font-size:13px;font-weight:500;transition:all .15s}
-  .tab:hover{background:#334155}
-  .tab.active{background:#fff;color:#0f172a}
-  .badge-demo{background:#d99000;color:#fff;padding:3px 8px;border-radius:4px;
-              font-size:11px;font-weight:600;letter-spacing:.3px}
+  /* Tab control (Ejecutivo / Geográfico) — segmentado Metronic */
+  .topbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+  .badge-demo{background:var(--warn);color:#fff;padding:3px 9px;border-radius:999px;font-size:11px;font-weight:600}
+  .tabs{display:inline-flex;gap:4px;background:var(--muted);padding:4px;border-radius:.625rem}
+  .tab{padding:7px 14px;border-radius:.5rem;cursor:pointer;color:var(--muted-foreground);font-size:13px;font-weight:600;transition:.15s}
+  .tab:hover{color:var(--foreground)}
+  .tab.active{background:var(--card);color:var(--primary);box-shadow:0 1px 2px rgba(0,0,0,.08)}
 
   /* Filtros */
-  .filtros{background:var(--panel);padding:16px 24px;border-bottom:1px solid var(--bd);
-           box-shadow:var(--shadow)}
-  .filtros-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
-                gap:10px}
-  .filtros-grid .field{display:flex;flex-direction:column;gap:3px}
-  .filtros-grid label{font-size:11px;color:var(--mut);text-transform:uppercase;
-                      letter-spacing:.3px;font-weight:600}
-  .filtros-grid input,.filtros-grid select{
-    background:#fff;border:1px solid var(--bd);border-radius:6px;padding:7px 10px;
-    font-size:13px;color:var(--fg);width:100%}
-  .filtros-grid input:focus,.filtros-grid select:focus{
-    outline:none;border-color:var(--accent2);box-shadow:0 0 0 2px rgba(59,130,246,.15)}
-  .filtros-actions{margin-top:12px;display:flex;gap:8px;flex-wrap:wrap}
-  .btn{background:var(--accent);color:#fff;border:0;border-radius:6px;
-       padding:8px 14px;font-size:13px;font-weight:500;cursor:pointer;
-       display:inline-flex;align-items:center;gap:6px;transition:all .15s}
-  .btn:hover{background:var(--accent2)}
-  .btn.secondary{background:#fff;color:var(--fg);border:1px solid var(--bd)}
-  .btn.secondary:hover{background:#f1f5f9}
-  .btn.ghost{background:transparent;color:var(--mut);border:1px solid var(--bd)}
-  .btn.ghost:hover{background:#f1f5f9;color:var(--fg)}
+  .filtros{background:var(--card);padding:16px 18px;border:1px solid var(--border);border-radius:var(--radius);margin-bottom:20px}
+  .filtros-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
+  .filtros-grid .field{display:flex;flex-direction:column;gap:4px}
+  .filtros-grid label{font-size:11px;color:var(--muted-foreground);text-transform:uppercase;letter-spacing:.3px;font-weight:600}
+  .filtros-grid input,.filtros-grid select{background:var(--background);border:1px solid var(--input);border-radius:.5rem;padding:8px 10px;font-size:13px;color:var(--foreground);width:100%}
+  .filtros-grid input:focus,.filtros-grid select:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px color-mix(in oklab, var(--primary) 18%, transparent)}
+  .filtros-actions{margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .btn{background:var(--primary);color:var(--primary-foreground);border:0;border-radius:.5rem;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:.15s}
+  .btn:hover{filter:brightness(.94)}
+  .btn.secondary{background:var(--card);color:var(--foreground);border:1px solid var(--border)}
+  .btn.secondary:hover{background:var(--accent)}
+  .btn.ghost{background:transparent;color:var(--muted-foreground);border:1px solid var(--border)}
+  .btn.ghost:hover{background:var(--accent);color:var(--foreground)}
 
   /* Layout */
-  .container{padding:20px 24px}
+  .container{padding:0}
   .section{display:none}
   .section.active{display:block}
-  h2.title{font-size:13px;color:var(--mut);text-transform:uppercase;
-           letter-spacing:.5px;font-weight:600;margin:24px 0 12px;
-           padding-bottom:6px;border-bottom:1px solid var(--bd)}
+  h2.title{font-size:12px;color:var(--muted-foreground);text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin:22px 0 12px}
   h2.title:first-child{margin-top:0}
 
   /* KPI cards */
-  .kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
-  .kpi{background:var(--panel);border:1px solid var(--bd);border-radius:8px;
-       padding:16px;box-shadow:var(--shadow);transition:transform .15s}
-  .kpi:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(15,23,42,.08)}
-  .kpi .lbl{font-size:11px;color:var(--mut);text-transform:uppercase;
-            letter-spacing:.3px;font-weight:600}
-  .kpi .val{font-size:26px;font-weight:700;margin-top:6px;color:var(--fg)}
-  .kpi .val.ok{color:var(--ok)} .kpi .val.warn{color:var(--warn)} .kpi .val.err{color:var(--err)}
-  .kpi .sub{font-size:12px;color:var(--mut);margin-top:4px}
-  .kpi .icon{float:right;font-size:20px;opacity:.5}
+  .kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:16px}
+  .kpi{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;transition:box-shadow .15s}
+  .kpi:hover{box-shadow:0 4px 14px rgba(15,23,42,.07)}
+  .kpi .lbl{font-size:11px;color:var(--muted-foreground);text-transform:uppercase;letter-spacing:.3px;font-weight:600}
+  .kpi .val{font-size:26px;font-weight:700;margin-top:6px;color:var(--primary)}
+  .kpi .val.ok{color:var(--ok)}.kpi .val.warn{color:var(--warn)}.kpi .val.err{color:var(--err)}
+  .kpi .sub{font-size:12px;color:var(--muted-foreground);margin-top:4px}
+  .kpi .icon{float:right;font-size:20px;opacity:.45}
 
   /* Charts grid */
-  .charts{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:14px}
-  .chart-card{background:var(--panel);border:1px solid var(--bd);border-radius:8px;
-              padding:14px;box-shadow:var(--shadow)}
-  .chart-card h3{margin:0 0 10px;font-size:13px;color:var(--mut);
-                 text-transform:uppercase;letter-spacing:.3px;font-weight:600}
+  .charts{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:16px}
+  .chart-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px}
+  .chart-card h3{margin:0 0 12px;font-size:13px;color:var(--foreground);font-weight:600}
   .chart-card.wide{grid-column:span 2}
   .chart-card .canvas-wrap{position:relative;height:260px}
 
   /* Calidad */
-  .calidad{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
-  .qbox{background:var(--panel);border:1px solid var(--bd);border-radius:8px;padding:14px;
-        border-left:4px solid var(--ok)}
-  .qbox.warn{border-left-color:var(--warn)}
-  .qbox.err{border-left-color:var(--err)}
-  .qbox .lbl{font-size:12px;color:var(--mut);font-weight:600}
-  .qbox .val{font-size:20px;font-weight:700;margin-top:4px}
-  .qbox .pct{font-size:12px;color:var(--mut)}
+  .calidad{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+  .qbox{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px;border-inline-start:4px solid var(--ok)}
+  .qbox.warn{border-inline-start-color:var(--warn)}
+  .qbox.err{border-inline-start-color:var(--err)}
+  .qbox .lbl{font-size:12px;color:var(--muted-foreground);font-weight:600}
+  .qbox .val{font-size:20px;font-weight:700;margin-top:4px;color:var(--foreground)}
+  .qbox .pct{font-size:12px;color:var(--muted-foreground)}
   .qbox.semaforo{padding:10px 14px}
-  .qbox .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ok);
-             margin-right:6px;vertical-align:middle}
-  .qbox.warn .dot{background:var(--warn)} .qbox.err .dot{background:var(--err)}
+  .qbox .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ok);margin-right:6px;vertical-align:middle}
+  .qbox.warn .dot{background:var(--warn)}.qbox.err .dot{background:var(--err)}
 
   /* Tablas */
-  .table-wrap{background:var(--panel);border:1px solid var(--bd);border-radius:8px;
-              overflow:hidden;box-shadow:var(--shadow)}
+  .table-wrap{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
   table{width:100%;border-collapse:collapse;font-size:13px}
-  thead{background:#f8fafc}
-  th{text-align:left;padding:10px 12px;font-size:11px;text-transform:uppercase;
-     letter-spacing:.3px;color:var(--mut);font-weight:600;border-bottom:1px solid var(--bd)}
-  td{padding:9px 12px;border-bottom:1px solid var(--bd)}
-  tbody tr:hover{background:#f8fafc}
+  thead{background:var(--secondary)}
+  th{text-align:left;padding:10px 12px;font-size:11px;text-transform:uppercase;letter-spacing:.3px;color:var(--muted-foreground);font-weight:600;border-bottom:1px solid var(--border)}
+  td{padding:9px 12px;border-bottom:1px solid var(--border);color:var(--foreground)}
+  tbody tr:hover{background:var(--accent)}
   .table-wrap.scroll{max-height:420px;overflow:auto}
 
   /* Geo */
-  .geo-grid{display:grid;grid-template-columns:300px 1fr 280px;gap:14px;height:calc(100vh - 240px)}
-  .geo-side{background:var(--panel);border:1px solid var(--bd);border-radius:8px;
-            padding:14px;overflow:auto;box-shadow:var(--shadow)}
-  #map{border:1px solid var(--bd);border-radius:8px;overflow:hidden;height:100%}
+  .geo-grid{display:grid;grid-template-columns:300px 1fr 280px;gap:16px;height:calc(100vh - 220px)}
+  .geo-side{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px;overflow:auto}
+  #map{border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;height:100%}
   .geo-kpis{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
   .geo-kpis .kpi{padding:10px}
   .geo-kpis .kpi .val{font-size:18px}
   .ranking{font-size:12px}
-  .ranking .row{display:flex;justify-content:space-between;padding:5px 0;
-                border-bottom:1px dashed var(--bd)}
+  .ranking .row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed var(--border)}
   .ranking .row:last-child{border:0}
-  .ranking strong{color:var(--accent)}
+  .ranking strong{color:var(--primary)}
   .layer-ctrl{margin-top:12px;display:flex;gap:6px;flex-wrap:wrap}
-  .layer-ctrl label{font-size:12px;display:flex;align-items:center;gap:4px}
+  .layer-ctrl label{font-size:12px;display:flex;align-items:center;gap:4px;color:var(--foreground)}
 
   @media (max-width: 980px){
     .geo-grid{grid-template-columns:1fr;height:auto}
     #map{height:500px}
     .chart-card.wide{grid-column:span 1}
-    .topbar{padding:12px 14px}
-    .container{padding:14px}
   }
   .leaflet-popup-content{font-size:12px;line-height:1.6}
-  .leaflet-popup-content b{color:var(--accent)}
+  .leaflet-popup-content b{color:var(--primary)}
 
   /* Tarjetas clickeables (duplicados) */
   .kpi.clickable,.qbox.clickable{cursor:pointer}
-  .kpi.clickable:hover{border-color:var(--accent);box-shadow:0 6px 16px rgba(37,65,133,.16)}
-  .qbox.clickable:hover{border-color:var(--accent)}
+  .kpi.clickable:hover{border-color:var(--primary);box-shadow:0 6px 16px rgba(37,65,133,.14)}
+  .qbox.clickable:hover{border-color:var(--primary)}
   /* Overlay de detalle de duplicados */
   .dup-overlay{position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:2000;
                display:none;align-items:flex-start;justify-content:center;padding:36px 18px;overflow:auto}
   .dup-overlay.open{display:flex}
-  .dup-modal{background:#fff;border-radius:12px;max-width:1080px;width:100%;
+  .dup-modal{background:var(--card);border-radius:12px;max-width:1080px;width:100%;
              box-shadow:0 24px 64px rgba(0,0,0,.32);padding:22px 24px}
-  .dup-modal h2{margin:0;color:var(--accent);font-size:20px}
-  .dup-grp{border:1px solid var(--bd);border-radius:8px;margin-bottom:12px;overflow:hidden}
-  .dup-grp .grp-head{background:#eef5fc;padding:8px 12px;font-size:12.5px;font-weight:700;color:var(--accent)}
+  .dup-modal h2{margin:0;color:var(--primary);font-size:20px}
+  .dup-grp{border:1px solid var(--border);border-radius:.5rem;margin-bottom:12px;overflow:hidden}
+  .dup-grp .grp-head{background:var(--secondary);padding:8px 12px;font-size:12.5px;font-weight:700;color:var(--primary)}
   .dup-grp table{font-size:12px}
   .dup-grp td,.dup-grp th{padding:7px 10px}
 </style>
 
 <div class="topbar">
-  <h1>📊 Dashboard</h1>
-  <span class="subtitle">Ejecutivo &amp; geográfico</span>
-  <?php if ($modoFallback): ?><span class="badge-demo">MODO DEMO (datos simulados)</span><?php endif; ?>
-  <div class="spacer"></div>
   <div class="tabs">
     <div class="tab active" data-tab="ejecutivo">📊 Ejecutivo</div>
     <div class="tab" data-tab="geo">🗺️ Geográfico</div>
   </div>
+  <?php if ($modoFallback): ?><span class="badge-demo">MODO DEMO (datos simulados)</span><?php endif; ?>
 </div>
 
 <!-- Filtros globales -->
@@ -339,7 +300,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
     <button class="btn" onclick="aplicarFiltros()">🔎 Aplicar filtros</button>
     <button class="btn ghost" onclick="limpiarFiltros()">🧹 Limpiar</button>
     <button class="btn secondary" onclick="exportCSV()">⤓ Exportar CSV</button>
-    <span style="margin-left:auto;font-size:12px;color:var(--mut);align-self:center"
+    <span style="margin-left:auto;font-size:12px;color:var(--muted-foreground);align-self:center"
           id="contador-filtrados"></span>
   </div>
 </div>
@@ -394,7 +355,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
     <div class="geo-side">
       <div class="geo-kpis" id="geo-kpis"></div>
 
-      <div style="font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.3px;
+      <div style="font-size:11px;color:var(--muted-foreground);text-transform:uppercase;letter-spacing:.3px;
                   font-weight:600;margin-bottom:6px">Modo del mapa</div>
       <div class="layer-ctrl" style="flex-direction:column;align-items:flex-start;gap:8px">
         <label style="display:flex;align-items:center;gap:6px">
@@ -403,16 +364,16 @@ require __DIR__ . '/../../views/layout/kt_top.php';
         <label style="display:flex;align-items:center;gap:6px">
           <input type="radio" name="ly-mode" value="heatmap"> 🔥 Heatmap (densidad)
         </label>
-        <label id="ly-color-wrap" style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--mut);margin-top:4px">
+        <label id="ly-color-wrap" style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted-foreground);margin-top:4px">
           <input type="checkbox" id="ly-color" checked> Color por programa (sólo cluster)
         </label>
       </div>
 
-      <div style="margin-top:14px;font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.3px;
+      <div style="margin-top:14px;font-size:11px;color:var(--muted-foreground);text-transform:uppercase;letter-spacing:.3px;
                   font-weight:600;margin-bottom:6px">Top 10 colonias</div>
       <div class="ranking" id="rank-colonias"></div>
 
-      <div style="margin-top:14px;font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.3px;
+      <div style="margin-top:14px;font-size:11px;color:var(--muted-foreground);text-transform:uppercase;letter-spacing:.3px;
                   font-weight:600;margin-bottom:6px">Top 10 delegaciones</div>
       <div class="ranking" id="rank-delegaciones"></div>
     </div>
@@ -422,7 +383,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
 
     <!-- RIGHT: tabla filtrada -->
     <div class="geo-side">
-      <div style="font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.3px;
+      <div style="font-size:11px;color:var(--muted-foreground);text-transform:uppercase;letter-spacing:.3px;
                   font-weight:600;margin-bottom:6px">Registros (primeros 200)</div>
       <table style="font-size:11.5px">
         <thead><tr><th>Programa</th><th>Colonia</th><th style="text-align:right">Cant.</th></tr></thead>
@@ -442,7 +403,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
       <h2>Posibles duplicados</h2>
       <button class="btn ghost" onclick="cerrarDuplicados()">✕ Cerrar</button>
     </div>
-    <p style="color:var(--mut);font-size:13px;margin:6px 0 12px" id="dup-sub"></p>
+    <p style="color:var(--muted-foreground);font-size:13px;margin:6px 0 12px" id="dup-sub"></p>
     <div style="margin-bottom:14px">
       <a class="btn secondary" href="dedupe.php">🧹 Ir a la herramienta de deduplicación</a>
     </div>
@@ -897,7 +858,7 @@ function verDuplicados(){
         </table>
       </div>`;
     }).join('') + (grupos.length > MAX
-      ? `<p style="color:var(--mut)">Mostrando ${MAX} de ${fmt(grupos.length)} grupos. Acota con los filtros para ver el resto.</p>` : '');
+      ? `<p style="color:var(--muted-foreground)">Mostrando ${MAX} de ${fmt(grupos.length)} grupos. Acota con los filtros para ver el resto.</p>` : '');
   }
   document.getElementById('dup-overlay').classList.add('open');
 }
