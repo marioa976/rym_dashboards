@@ -112,13 +112,11 @@ if ($action !== '') {
 /* ------------------------------ HTML ------------------------------ */
 $stats = null; $dbError = null;
 try { $stats = qb_stats(qb_pdo()); } catch (Throwable $e) { $dbError = $e->getMessage(); }
-?><!doctype html>
-<html lang="es">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Qrobus · Geocodificar</title>
-  <link rel="stylesheet" href="../../assets/css/qro.css">
+?><?php
+$ktTitle  = 'Qrobus · Geocodificar';
+$ktActive = 'qrobus';
+require __DIR__ . '/../../views/layout/kt_top.php';
+?>
   <style>
     .qb-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
     @media(max-width:900px){.qb-grid{grid-template-columns:1fr}}
@@ -130,11 +128,7 @@ try { $stats = qb_stats(qb_pdo()); } catch (Throwable $e) { $dbError = $e->getMe
     .qb-log{font-family:Menlo,Consolas,monospace;font-size:11px;max-height:220px;overflow:auto;margin-top:10px;color:#475569;background:#f8fafc;border:1px solid var(--qro-border);border-radius:8px;padding:8px}
     .badge-ok{color:#188a5b;font-weight:700}.badge-bad{color:#ce3a2b;font-weight:700}
   </style>
-</head>
-<body>
-<?php $portalModulo = 'Qrobus'; $navActive = 'geocode'; include __DIR__ . '/_nav.php'; ?>
 
-<main class="content" style="padding:28px 32px">
   <div class="page-head"><h1>Geocodificador</h1><p class="text-secondary">Convierte direcciones en coordenadas para los beneficiarios de <strong>Unidos</strong>.</p></div>
 
   <?php if ($dbError): ?>
@@ -186,7 +180,6 @@ try { $stats = qb_stats(qb_pdo()); } catch (Throwable $e) { $dbError = $e->getMe
       <div id="qb-log" class="qb-log" style="display:none"></div>
     </div>
   </div>
-</main>
 
 <script>
 const HASKEY = <?= $apiKey ? 'true' : 'false' ?>;
@@ -335,5 +328,4 @@ if(!HASKEY){ if($('qb-map')) $('qb-map').innerHTML='<div style="padding:20px;col
 <?php if ($apiKey): ?>
 <script async src="https://maps.googleapis.com/maps/api/js?key=<?= urlencode($apiKey) ?>&callback=initQbMap&loading=async&v=weekly"></script>
 <?php endif; ?>
-</body>
-</html>
+<?php require __DIR__ . '/../../views/layout/kt_bottom.php'; ?>

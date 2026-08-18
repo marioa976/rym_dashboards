@@ -163,11 +163,11 @@ if ($ok) {
     if (!empty($ini['ok'])) $initialCounts = $ini['counts'];
     else $spatialError = $ini['error'] ?? '';
 }
-?><!doctype html>
-<html lang="es">
-<head>
-<meta charset="utf-8">
-<title>Tickets por sección — Zendesk · Querétaro</title>
+?><?php
+$ktTitle  = 'Tickets por sección — Zendesk · Querétaro';
+$ktActive = 'zendesk';
+require __DIR__ . '/../../views/layout/kt_top.php';
+?>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
   :root{
@@ -218,13 +218,8 @@ if ($ok) {
   .small{font-size:11.5px;color:var(--mut)}
   @media (max-width:1100px){ .layout{grid-template-columns:1fr;height:auto} #map{height:520px} }
 </style>
-</head>
-<body>
-<?php $portalModulo = 'Zendesk'; include __DIR__ . '/../_portalbar.php'; ?>
 
 <div class="crumb"><a href="dashboard.php">Dashboard</a> &rarr; Tickets por sección</div>
-<?php include __DIR__ . '/_navzendesk.php'; ?>
-
 <?php if (!$ok): ?>
   <div class="err-banner">
     ⚠️ Faltan tablas IEEQ en <strong><?= htmlspecialchars($db_name) ?></strong>: <?= implode(', ', $missing) ?>.
@@ -556,5 +551,4 @@ function limpiar(){
 function escapeHtml(s){ return String(s||'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 </script>
 <?php endif; ?>
-</body>
-</html>
+<?php require __DIR__ . '/../../views/layout/kt_bottom.php'; ?>

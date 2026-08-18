@@ -53,14 +53,12 @@ foreach ($degs as $d) {
 }
 $estLabels = array_map(fn($r)=>$r['estatus'], $estatus);
 $estData   = array_map(fn($r)=>(int)$r['n'], $estatus);
-?><!doctype html>
-<html lang="es">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Ejecutivo · Tablero</title>
-  <link rel="stylesheet" href="../../assets/css/qro.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+?><?php
+$ktTitle  = 'Tablero Ejecutivo';
+$ktActive = 'ejecutivo';
+require __DIR__ . '/../../views/layout/kt_top.php';
+?>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
   <style>
     .ej-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-bottom:20px}
     .ej-tile{background:#fff;border:1px solid var(--qro-border);border-radius:14px;padding:16px 18px;
@@ -83,11 +81,6 @@ $estData   = array_map(fn($r)=>(int)$r['n'], $estatus);
     table.ej-mtx tfoot td{font-weight:800;border-top:2px solid var(--qro-border);background:#fafbfe}
     .ej-scroll{overflow:auto;border:1px solid var(--qro-border);border-radius:14px}
   </style>
-</head>
-<body>
-<?php $portalModulo = 'Ejecutivo'; $navActive = 'home'; include __DIR__ . '/_nav.php'; ?>
-
-<main class="content" style="padding:28px 32px">
   <div style="background:linear-gradient(120deg,#14224a,#254185);color:#fff;border-radius:16px;padding:22px 26px;margin-bottom:20px">
     <h1 style="color:#fff;margin:0 0 4px;font-size:23px">📊 Tablero Ejecutivo</h1>
     <p style="margin:0;opacity:.92;font-size:14px">Hola, <?= $nombre ?>. Indicadores cruzados de todos los módulos, por delegación.</p>
@@ -151,8 +144,6 @@ $estData   = array_map(fn($r)=>(int)$r['n'], $estatus);
       </table>
     </div>
   </div>
-</main>
-
 <script>
 const CH = <?= json_encode($chart, JSON_UNESCAPED_UNICODE) ?>;
 const EST = {labels: <?= json_encode($estLabels, JSON_UNESCAPED_UNICODE) ?>, data: <?= json_encode($estData) ?>};
@@ -173,5 +164,4 @@ new Chart(document.getElementById('c-est'), {type:'doughnut',
   data:{labels:EST.labels,datasets:[{data:EST.data,backgroundColor:EST.labels.map(s=>EST_COLOR[s]||'#757575')}]},
   options:{...baseOpts,plugins:{legend:{display:true,position:'bottom',labels:{font:{size:11}}}}}});
 </script>
-</body>
-</html>
+<?php require __DIR__ . '/../../views/layout/kt_bottom.php'; ?>

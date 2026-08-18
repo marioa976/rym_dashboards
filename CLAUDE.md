@@ -53,7 +53,19 @@ Módulos (carpeta `modules/<clave>/`):
 - **Módulo nuevo**: `modules/<clave>/config.php` (shim que hace `require_module('<clave>')` salvo en CLI
   y devuelve la config), un `lib.php` con la conexión, páginas, y registrar en la tabla `modulos` vía
   `sql/<clave>.sql` (idempotente, `ON DUPLICATE KEY UPDATE`). Chrome con `_portalbar.php` + un `_nav.php`.
-- **Tema visual**: `assets/css/qro.css` (paleta azul QRO, Montserrat). Reutilízalo; no inventes estilos nuevos.
+- **Tema visual**: **Metronic v9 (Tailwind CSS v4, demo1)** en `assets/metronic/`. Shell
+  compartido `views/layout/kt_top.php` + `kt_bottom.php` (sidebar armado desde
+  `$_SESSION['modulos']` + `$__subpages`; topbar con usuario/logout). Cada página de
+  módulo hace `$ktTitle=..; $ktActive='<clave>'; require kt_top;` … contenido … `require kt_bottom;`.
+  Marca QRO = override `--primary:#005ab2` + Montserrat. `assets/css/qro.css` se mantiene
+  **solo como compat** (variables `--qro-*` y clases heredadas de los módulos). `admin/`
+  usa `_head.php`/`_foot.php` (incluyen el shell); `modules/electoral/public/` usa
+  `partials/layout_top.php`/`layout_bottom.php` (shell autocontenido, su propio `auth_user()`).
+- **Build del CSS (Tailwind)**: el entry vive en el paquete Metronic descargado
+  (`.../metronic-tailwind-html-demos/src/css/portal.css`, con `@source` a los `.php` del
+  portal). Tras cambiar markup, recompilar y **comitear** el resultado (Docker NO compila):
+  `npx @tailwindcss/cli -i src/css/portal.css -o <portal>/assets/metronic/css/styles.css --minify`.
+  Requiere el binding nativo `@tailwindcss/oxide-<plataforma>` (bug de deps opcionales de npm).
 - **Permisos** (`core/guard.php`): `require_module('x')` = ver; `require_editor('x')` = escribir;
   `require_admin()` = admin. Niveles en `usuario_modulo` (`lector`/`editor`/`admin`). Los admin
   (`usuarios.es_admin=1`) ven TODOS los módulos. **Regla dura: un lector NO puede cargar ni limpiar datos**

@@ -14,18 +14,12 @@ $stats = null; $dbError = null;
 try { $stats = qb_stats(qb_pdo()); }
 catch (Throwable $e) { $dbError = $e->getMessage(); }
 $pct = ($stats && $stats['total'] > 0) ? round($stats['con_coords'] / $stats['total'] * 100) : 0;
-?><!doctype html>
-<html lang="es">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Qrobus · Inicio</title>
-  <link rel="stylesheet" href="../../assets/css/qro.css">
-</head>
-<body>
-<?php $portalModulo = 'Qrobus'; $navActive = 'home'; include __DIR__ . '/_nav.php'; ?>
+?><?php
+$ktTitle  = 'Qrobus · Inicio';
+$ktActive = 'qrobus';
+require __DIR__ . '/../../views/layout/kt_top.php';
+?>
 
-<main class="content" style="padding:28px 32px">
   <div style="background:linear-gradient(120deg,var(--qro-blue-dark),var(--qro-blue));color:#fff;border-radius:16px;padding:24px 26px;margin-bottom:22px">
     <h1 style="color:#fff;margin:0 0 4px;font-size:24px">Hola, <?= $nombre ?></h1>
     <p style="margin:0;opacity:.9;font-size:14px">Beneficiarios <strong>Unidos</strong> · geocodificación y análisis territorial.</p>
@@ -61,6 +55,4 @@ $pct = ($stats && $stats['total'] > 0) ? round($stats['con_coords'] / $stats['to
     </a>
     <?php endif; ?>
   </div>
-</main>
-</body>
-</html>
+<?php require __DIR__ . '/../../views/layout/kt_bottom.php'; ?>

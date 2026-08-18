@@ -177,11 +177,11 @@ if ($f_delegacion) foreach ($cat_delegaciones as $d) if ($d['id']==$f_delegacion
 if ($f_canal)      foreach ($cat_canales as $c)      if ($c['id']==$f_canal)      $filtros[] = 'Canal: ' . $c['nombre'];
 if ($f_estado)     $filtros[] = 'Estado: ' . $f_estado;
 ?>
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<title>Visor de tickets · Zendesk</title>
+<?php
+$ktTitle  = 'Visor de tickets · Zendesk';
+$ktActive = 'zendesk';
+require __DIR__ . '/../../views/layout/kt_top.php';
+?>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -256,9 +256,7 @@ if ($f_estado)     $filtros[] = 'Estado: ' . $f_estado;
   .draw pre{background:#0f172a;color:#e2e8f0;border-radius:8px;padding:14px;overflow:auto;font-size:11px;line-height:1.5;max-height:380px;margin-top:10px}
   .loading{padding:40px;text-align:center;color:var(--text-muted)}
 </style>
-</head>
-<body>
-<?php $portalModulo='Zendesk'; @include __DIR__.'/../_portalbar.php'; ?>
+
 <div class="container">
 
 <header>
@@ -266,8 +264,7 @@ if ($f_estado)     $filtros[] = 'Estado: ' . $f_estado;
     <h1>Visor de tickets</h1>
     <div class="crumb"><a href="dashboard.php">Dashboard</a> → Tickets · filtra, abre y revisa el detalle completo</div>
   </div>
-  <?php include __DIR__ . '/_navzendesk.php'; ?>
-</header>
+  </header>
 
 <!-- ============= FILTROS ============= -->
 <form class="filter-bar" method="get">
@@ -411,5 +408,4 @@ if ($f_estado)     $filtros[] = 'Estado: ' . $f_estado;
   function cerrar(){ ov.classList.remove('open'); panel.classList.remove('open'); }
   document.addEventListener('keydown', e => { if (e.key === 'Escape') cerrar(); });
 </script>
-</body>
-</html>
+<?php require __DIR__ . '/../../views/layout/kt_bottom.php'; ?>

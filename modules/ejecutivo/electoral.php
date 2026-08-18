@@ -20,13 +20,11 @@ try {
     $limites = ej_limites($pdo);
 } catch (Throwable $e) { $dbError = $e->getMessage(); }
 $k = $el['kpis'];
-?><!doctype html>
-<html lang="es">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Ejecutivo · Electoral seccional</title>
-  <link rel="stylesheet" href="../../assets/css/qro.css">
+?><?php
+$ktTitle  = 'Ejecutivo · Electoral seccional';
+$ktActive = 'ejecutivo';
+require __DIR__ . '/../../views/layout/kt_top.php';
+?>
   <style>
     .el-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:14px}
     .el-kpi{background:#fff;border:1px solid var(--qro-border);border-radius:12px;padding:13px 15px}
@@ -43,11 +41,7 @@ $k = $el['kpis'];
     .el-legend i{width:16px;height:12px;border-radius:3px;display:inline-block;margin-right:3px;vertical-align:middle}
     .el-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px dashed #eef0f2;font-size:13px}
   </style>
-</head>
-<body>
-<?php $portalModulo = 'Ejecutivo'; $navActive = 'electoral'; include __DIR__ . '/_nav.php'; ?>
 
-<main class="content" style="padding:28px 32px">
   <div class="page-head"><h1>Electoral seccional · Ayuntamiento 2024</h1>
     <p class="text-secondary">Resultado por sección de la elección de ayuntamiento (proceso local 2023-2024).</p></div>
 
@@ -79,7 +73,6 @@ $k = $el['kpis'];
       <div id="el-detail" style="margin-top:8px"><p class="text-secondary" style="font-size:13px">Haz clic en una sección para ver su resultado.</p></div>
     </div>
   </div>
-</main>
 
 <script>
 const EL = <?= json_encode($el, JSON_UNESCAPED_UNICODE) ?>;
@@ -167,5 +160,4 @@ if(!HASKEY){ $('el-map').innerHTML='<div style="padding:20px;color:#991B1B">Goog
 <?php if ($apiKey): ?>
 <script async src="https://maps.googleapis.com/maps/api/js?key=<?= urlencode($apiKey) ?>&callback=initElMap&loading=async&v=weekly"></script>
 <?php endif; ?>
-</body>
-</html>
+<?php require __DIR__ . '/../../views/layout/kt_bottom.php'; ?>

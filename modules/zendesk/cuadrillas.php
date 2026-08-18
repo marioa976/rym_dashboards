@@ -530,11 +530,11 @@ foreach ($param_keys as $k) if (isset($_GET[$k])) $params_save[$k] = $_GET[$k];
 $params_save['lat'] = $p_lat; $params_save['lng'] = $p_lng;
 $payload_save = ['params'=>$params_save, 'plan'=>$plan, 'stats_pool'=>$stats_pool, 'poligono'=>$poligono];
 ?>
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<title>Planificador de cuadrillas</title>
+<?php
+$ktTitle  = 'Planificador de cuadrillas';
+$ktActive = 'zendesk';
+require __DIR__ . '/../../views/layout/kt_top.php';
+?>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -674,9 +674,7 @@ $payload_save = ['params'=>$params_save, 'plan'=>$plan, 'stats_pool'=>$stats_poo
   .legend-dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:middle}
   .count-badge{display:inline-flex;align-items:center;gap:6px;background:var(--accent);color:#fff;font-weight:600;font-size:13px;padding:8px 14px;border-radius:8px}
 </style>
-</head>
-<body>
-<?php $portalModulo='Zendesk'; @include __DIR__.'/../_portalbar.php'; ?>
+
 <div class="container">
 
 <header>
@@ -684,8 +682,7 @@ $payload_save = ['params'=>$params_save, 'plan'=>$plan, 'stats_pool'=>$stats_poo
     <h1>🚛 Planificador de cuadrillas</h1>
     <div class="crumb"><a href="dashboard.php">Dashboard</a> → Cuadrillas · genera rutas óptimas</div>
   </div>
-  <?php $navExtra = ['cuadrillas.php?planes=1' => '📋 Planes guardados']; include __DIR__ . '/_navzendesk.php'; ?>
-</header>
+  </header>
 
 <?php
   // Pasos: 1 Parámetros · 2 Ruta · 3 Guardar
@@ -1368,5 +1365,4 @@ function initMap() {
 <script async defer src="https://maps.googleapis.com/maps/api/js?key=<?= htmlspecialchars($api_key) ?>&callback=initMap"></script>
 <?php endif; ?>
 
-</body>
-</html>
+<?php require __DIR__ . '/../../views/layout/kt_bottom.php'; ?>

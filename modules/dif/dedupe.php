@@ -221,12 +221,11 @@ function purgeInactive(PDO $pdo): array {
     $n = $pdo->exec("DELETE FROM padron WHERE activo=0");
     return ['ok'=>true, 'eliminados'=>$n];
 }
-?><!doctype html>
-<html lang="es">
-<head>
-<meta charset="utf-8">
-<title>Deduplicación Padrón DIF</title>
-<style>
+?><?php
+$ktTitle  = 'Deduplicación Padrón DIF';
+$ktActive = 'dif';
+require __DIR__ . '/../../views/layout/kt_top.php';
+?><style>
   :root{--bg:#0f172a;--card:#1e293b;--bd:#334155;--mut:#94a3b8;--fg:#e2e8f0;
        --ok:#10b981;--warn:#f59e0b;--err:#ef4444;--accent:#005ab2}
   *{box-sizing:border-box}
@@ -264,11 +263,6 @@ function purgeInactive(PDO $pdo): array {
   .pill{font-family:monospace;background:#334155;padding:1px 5px;border-radius:3px;font-size:11px}
   .ok-tag{color:var(--ok);font-weight:700}
 </style>
-</head>
-<body>
-
-<?php $portalModulo='DIF'; @include __DIR__.'/../_portalbar.php'; ?>
-<?php $navActive = 'dedupe'; include __DIR__ . '/_nav.php'; ?>
 
 <header>
   <h1>🧹 Deduplicación Padrón DIF</h1>
@@ -434,5 +428,4 @@ async function purge(){
   loadStats();
 }
 </script>
-</body>
-</html>
+<?php require __DIR__ . '/../../views/layout/kt_bottom.php'; ?>

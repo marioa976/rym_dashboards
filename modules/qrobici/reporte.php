@@ -120,13 +120,11 @@ $TITULO    = htmlspecialchars($cfg['titulo'],    ENT_QUOTES, 'UTF-8');
 $SUBTITULO = htmlspecialchars($cfg['subtitulo'], ENT_QUOTES, 'UTF-8');
 
 header('Content-Type: text/html; charset=utf-8');
-?><!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Reporte de Movilidad · QroBici</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
+?><?php
+$ktTitle  = 'Reporte de Movilidad · QroBici';
+$ktActive = 'qrobici';
+require __DIR__ . '/../../views/layout/kt_top.php';
+?><link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap">
 <style>
@@ -515,9 +513,6 @@ footer .meta{font-family:'Space Mono',monospace;text-align:right;line-height:1.7
   .donut-wrap{flex-direction:column} .bar-label{width:88px}
 }
 </style>
-</head>
-<body>
-<?php $portalModulo='Qrobici'; @include __DIR__.'/../_portalbar.php'; ?>
 
 <header>
   <div class="wrap">
@@ -1641,5 +1636,4 @@ if(GMAPS_KEY && GMAPS_KEY.length>10 && GMAPS_KEY!=='AIzaSy...PEGAR_AQUI...'){
   $('mapnokey').style.display='flex';
 }
 </script>
-</body>
-</html>
+<?php require __DIR__ . '/../../views/layout/kt_bottom.php'; ?>

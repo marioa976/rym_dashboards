@@ -48,12 +48,11 @@ try {
 
 $pct = ($D && $D['total']>0) ? round($D['geocod']/$D['total']*100) : 0;
 $topTipo = ($D && $D['tipo']) ? $D['tipo'][0] : null;
-?><!doctype html>
-<html lang="es">
-<head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Qrobus · KPIs</title>
-  <link rel="stylesheet" href="../../assets/css/qro.css">
+?><?php
+$ktTitle  = 'Qrobus · KPIs';
+$ktActive = 'qrobus';
+require __DIR__ . '/../../views/layout/kt_top.php';
+?>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
   <style>
     .k-hero{background:linear-gradient(120deg,var(--qro-blue-dark),var(--qro-blue));color:#fff;border-radius:16px;padding:22px 26px;margin-bottom:18px}
@@ -71,11 +70,7 @@ $topTipo = ($D && $D['tipo']) ? $D['tipo'][0] : null;
     .k-panel .box{height:300px}
     .k-wide{grid-column:1/-1}
   </style>
-</head>
-<body>
-<?php $portalModulo='Qrobus'; $navActive='kpis'; include __DIR__ . '/_nav.php'; ?>
 
-<main class="content" style="padding:28px 32px">
   <?php if ($dbError): ?>
     <div class="alert alert-danger">No se pudo consultar la BD de Qrobus.<br><span style="font-size:12px"><?= htmlspecialchars($dbError) ?></span></div>
   <?php else: ?>
@@ -105,7 +100,6 @@ $topTipo = ($D && $D['tipo']) ? $D['tipo'][0] : null;
       <div class="k-panel k-wide"><h3>Registros por mes</h3><div class="box"><canvas id="c-mes"></canvas></div></div>
     </div>
   <?php endif; ?>
-</main>
 
 <?php if ($D): ?>
 <script>
@@ -158,5 +152,4 @@ bars('c-edu', D.educativo.map(r=>r.k), D.educativo.map(r=>+r.n), '#188a5b', true
     options:{plugins:{legend:{display:false}},maintainAspectRatio:false,scales:{x:{grid:{display:false}},y:{grid:{color:'#eef2f6'},beginAtZero:true}}}}); })();
 </script>
 <?php endif; ?>
-</body>
-</html>
+<?php require __DIR__ . '/../../views/layout/kt_bottom.php'; ?>

@@ -120,12 +120,11 @@ function generarSimulados(): array {
     }
     return $out;
 }
-?><!doctype html>
-<html lang="es">
-<head>
-<meta charset="utf-8">
-<title>Padrón DIF — Dashboard</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+?><?php
+$ktTitle  = 'Padrón DIF — Dashboard';
+$ktActive = 'dif';
+require __DIR__ . '/../../views/layout/kt_top.php';
+?>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <script src="https://unpkg.com/@googlemaps/markerclusterer@2.5.3/dist/index.min.js"></script>
 <!-- deck.gl: reemplazo del HeatmapLayer (removido de Google Maps en v3.65) -->
@@ -289,11 +288,6 @@ function generarSimulados(): array {
   .dup-grp table{font-size:12px}
   .dup-grp td,.dup-grp th{padding:7px 10px}
 </style>
-</head>
-<body>
-
-<?php $portalModulo='DIF'; @include __DIR__.'/../_portalbar.php'; ?>
-<?php $navActive = 'dashboard'; include __DIR__ . '/_nav.php'; ?>
 
 <div class="topbar">
   <h1>📊 Dashboard</h1>
@@ -1159,5 +1153,4 @@ function renderAll(){
 aplicarFiltros();
 </script>
 
-</body>
-</html>
+<?php require __DIR__ . '/../../views/layout/kt_bottom.php'; ?>
