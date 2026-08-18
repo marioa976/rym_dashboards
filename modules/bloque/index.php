@@ -24,42 +24,35 @@ $ktActive = 'bloque';
 require __DIR__ . '/../../views/layout/kt_top.php';
 ?>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
-  <style>
-    .bl-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:20px}
-    .bl-kpi{background:#fff;border:1px solid var(--qro-border);border-radius:12px;padding:14px 16px}
-    .bl-kpi .v{font-size:24px;font-weight:800;color:#005ab2;line-height:1.1}
-    .bl-kpi .l{font-size:12px;color:var(--qro-text-secondary);font-weight:600;margin-top:2px}
-    .bl-charts{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
-    @media(max-width:900px){.bl-charts{grid-template-columns:1fr}}
-    .bl-card{background:#fff;border:1px solid var(--qro-border);border-radius:14px;padding:16px 18px}
-    .bl-card h3{margin:0 0 10px;font-size:14px}
-    .bl-wrap{position:relative;height:250px}
-  </style>
-
-  <div style="background:linear-gradient(120deg,var(--qro-blue-dark),var(--qro-blue));color:#fff;border-radius:16px;padding:22px 26px;margin-bottom:20px">
-    <h1 style="color:#fff;margin:0 0 4px;font-size:23px">💡 Bloque · Innovación y tecnología</h1>
-    <p style="margin:0;opacity:.92;font-size:14px">Hola, <?= $nombre ?>. Usuarios, eventos y asistencia del edificio Bloque.</p>
+  <div class="rounded-xl p-6 mb-5 text-white" style="background:linear-gradient(120deg,var(--qro-blue-dark),var(--qro-blue))">
+    <h1 class="text-2xl font-bold text-white">💡 Bloque · Innovación y tecnología</h1>
+    <p class="text-sm opacity-90 mt-1">Hola, <?= $nombre ?>. Usuarios, eventos y asistencia del edificio Bloque.</p>
   </div>
 
-  <?php if ($dbError): ?><div class="alert alert-danger">No se pudieron cargar los datos.<br><span style="font-size:12px"><?= htmlspecialchars($dbError) ?></span></div><?php endif; ?>
+  <?php if ($dbError): ?>
+    <div class="rounded-lg border border-destructive/30 bg-destructive/10 text-destructive px-4 py-3 mb-5 text-sm">No se pudieron cargar los datos.<br><span class="text-xs opacity-80"><?= htmlspecialchars($dbError) ?></span></div>
+  <?php endif; ?>
 
-  <div class="bl-kpis">
-    <div class="bl-kpi"><div class="v"><?= number_format($k['usuarios']) ?></div><div class="l">Usuarios registrados</div></div>
-    <div class="bl-kpi"><div class="v"><?= number_format($k['eventos']) ?></div><div class="l">Eventos</div></div>
-    <div class="bl-kpi"><div class="v"><?= number_format($k['sesiones']) ?></div><div class="l">Sesiones</div></div>
-    <div class="bl-kpi"><div class="v"><?= number_format($k['asistentes']) ?></div><div class="l">Asistentes únicos</div></div>
-    <div class="bl-kpi"><div class="v"><?= number_format($k['registros']) ?></div><div class="l">Registros de asistencia</div></div>
-    <div class="bl-kpi"><div class="v"><?= number_format($k['cupo_total']) ?></div><div class="l">Cupo total ofertado</div></div>
+  <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-5">
+    <?php foreach ([
+      ['Usuarios registrados', $k['usuarios']], ['Eventos', $k['eventos']], ['Sesiones', $k['sesiones']],
+      ['Asistentes únicos', $k['asistentes']], ['Registros de asistencia', $k['registros']], ['Cupo total ofertado', $k['cupo_total']],
+    ] as [$l, $v]): ?>
+      <div class="kt-card"><div class="kt-card-content p-4 flex flex-col gap-0.5">
+        <span class="text-2xl font-bold text-primary leading-tight"><?= number_format($v) ?></span>
+        <span class="text-xs text-secondary-foreground font-semibold"><?= $l ?></span>
+      </div></div>
+    <?php endforeach; ?>
   </div>
 
-  <div class="bl-charts">
-    <div class="bl-card"><h3>Sexo</h3><div class="bl-wrap"><canvas id="c-sexo"></canvas></div></div>
-    <div class="bl-card"><h3>Edad<?= $demo['edad_prom']!==null?' · promedio '.$demo['edad_prom'].' años':'' ?></h3><div class="bl-wrap"><canvas id="c-edad"></canvas></div></div>
-    <div class="bl-card" style="grid-column:1/-1"><h3>Asistencia por día (últimos meses)</h3><div class="bl-wrap"><canvas id="c-serie"></canvas></div></div>
-    <div class="bl-card" style="grid-column:1/-1"><h3>Usuarios por delegación / municipio (top 10)</h3><div class="bl-wrap" style="height:300px"><canvas id="c-deleg"></canvas></div></div>
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-5">
+    <div class="kt-card"><div class="kt-card-header"><h3 class="kt-card-title">Sexo</h3></div><div class="kt-card-content"><div class="relative h-[250px]"><canvas id="c-sexo"></canvas></div></div></div>
+    <div class="kt-card"><div class="kt-card-header"><h3 class="kt-card-title">Edad<?= $demo['edad_prom']!==null?' · promedio '.$demo['edad_prom'].' años':'' ?></h3></div><div class="kt-card-content"><div class="relative h-[250px]"><canvas id="c-edad"></canvas></div></div></div>
+    <div class="kt-card lg:col-span-2"><div class="kt-card-header"><h3 class="kt-card-title">Asistencia por día (últimos meses)</h3></div><div class="kt-card-content"><div class="relative h-[250px]"><canvas id="c-serie"></canvas></div></div></div>
+    <div class="kt-card lg:col-span-2"><div class="kt-card-header"><h3 class="kt-card-title">Usuarios por delegación / municipio (top 10)</h3></div><div class="kt-card-content"><div class="relative h-[300px]"><canvas id="c-deleg"></canvas></div></div></div>
   </div>
 
-  <a class="btn btn-primary" href="eventos.php">Ver eventos y ocupación →</a>
+  <a class="kt-btn kt-btn-primary" href="eventos.php">Ver eventos y ocupación →</a>
 
 <script>
 const SEXO = <?= json_encode($demo['sexo'], JSON_UNESCAPED_UNICODE) ?>;
