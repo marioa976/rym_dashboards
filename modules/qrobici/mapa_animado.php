@@ -88,6 +88,7 @@ function qrb_fecha_corta(string $dia): string {
 ?><?php
 $ktTitle  = 'QroBici — Flujo de la ciudad';
 $ktActive = 'qrobici';
+$ktFluid = true;
 require __DIR__ . '/../../views/layout/kt_top.php';
 ?><link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -108,9 +109,15 @@ require __DIR__ . '/../../views/layout/kt_top.php';
   --green:#33ffb0;
   --grid:rgba(120,160,255,.06);
 }
-* { box-sizing:border-box; margin:0; padding:0; }
-html, body { height:100%; overflow:hidden; }
-body {
+/* El "stage" es un lienzo oscuro autocontenido DENTRO del shell claro del
+   portal (no toca <body>). Da altura real al mapa y ancla el HUD. */
+.qrb-stage * { box-sizing:border-box; }
+.qrb-stage {
+  position:relative;
+  height:calc(100vh - 130px);
+  min-height:560px;
+  display:flex; flex-direction:column;
+  border-radius:14px; overflow:hidden;
   font-family:'Space Grotesk', system-ui, sans-serif;
   color:var(--txt);
   background:
@@ -118,8 +125,8 @@ body {
     radial-gradient(900px 700px at 110% 110%, #1a0830 0%, transparent 55%),
     linear-gradient(180deg, var(--bg-grad-a), var(--bg-grad-b));
   -webkit-font-smoothing:antialiased;
-  text-rendering:optimizeLegibility;
-  display:flex; flex-direction:column;
+  box-shadow:0 12px 40px rgba(2,4,12,.28);
+  border:1px solid var(--panel-bd);
 }
 
 /* ===== TOPBAR (header sólido arriba) ===== */
@@ -158,7 +165,7 @@ body {
 
 /* ===== OVERLAY HUD ===== */
 .hud {
-  position:fixed;
+  position:absolute;
   z-index:5;
   pointer-events:none;
 }
@@ -430,7 +437,7 @@ body {
 
 /* Splash / loader inicial */
 .splash {
-  position:fixed; inset:0; z-index:50;
+  position:absolute; inset:0; z-index:50;
   display:flex; flex-direction:column; align-items:center; justify-content:center;
   background:radial-gradient(ellipse at center, #0a1230 0%, #02030a 70%);
   transition:opacity .6s ease;
@@ -461,7 +468,7 @@ body {
 
 /* Mensaje sin datos */
 .empty {
-  position:fixed; inset:0;
+  position:absolute; inset:0;
   display:flex; align-items:center; justify-content:center;
   flex-direction:column;
   background:radial-gradient(ellipse at center, #0a1230 0%, #02030a 70%);
@@ -499,6 +506,7 @@ body {
 </style>
 
 <?php if (!empty($data['vacio'])): ?>
+  <div class="qrb-stage">
   <div class="empty">
     <h1>SIN DATOS GPS</h1>
     <p><?= htmlspecialchars($data['mensaje'] ?? 'No hay viajes con recorrido disponible para animar.', ENT_QUOTES, 'UTF-8') ?></p>
@@ -506,8 +514,10 @@ body {
       <a href="reporte.php" style="color:var(--cyan);text-decoration:none;border-bottom:1px solid var(--cyan)">← Volver al reporte</a>
     </p>
   </div>
+  </div>
 <?php else: ?>
 
+  <div class="qrb-stage">
   <div class="splash" id="splash">
     <div class="logo">Q</div>
     <div class="ttl">QroBici · Flujo</div>
@@ -602,8 +612,8 @@ body {
     <a href="reporte.php">← Reporte completo</a>
   </div>
 
-  <!-- panel diagnóstico: se quita con ?debug=0 -->
-  <?php $dbg = !isset($_GET['debug']) || $_GET['debug'] !== '0'; ?>
+  <!-- panel diagnóstico: oculto por defecto, se muestra con ?debug=1 -->
+  <?php $dbg = isset($_GET['debug']) && $_GET['debug'] === '1'; ?>
   <?php if ($dbg): ?>
   <div class="hud" id="debug" style="
        top:90px; right:18px;
@@ -643,6 +653,7 @@ body {
     </div>
   </div>
   <?php endif; ?>
+  </div><!-- /.qrb-stage -->
 
 <script id="payload" type="application/json"><?= $json ?></script>
 <script>

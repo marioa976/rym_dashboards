@@ -153,6 +153,7 @@ $json = str_replace(['</', "\u{2028}", "\u{2029}"], ['<\/', ' ', ' '], $json);
 ?><?php
 $ktTitle  = 'QroBici · Mapa de riesgos';
 $ktActive = 'qrobici';
+$ktFluid = true;
 require __DIR__ . '/../../views/layout/kt_top.php';
 ?><link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -173,14 +174,21 @@ require __DIR__ . '/../../views/layout/kt_top.php';
   --rosa:#5b667a;
   --pol:#7fb1ff;
 }
-* { box-sizing:border-box; margin:0; padding:0; }
-html, body { height:100%; overflow:hidden; }
-body {
+/* Lienzo oscuro autocontenido DENTRO del shell claro del portal (no toca
+   <body>). Da altura real al mapa y ancla los overlays. */
+.qrb-shell * { box-sizing:border-box; }
+.qrb-shell {
+  position:relative;
+  height:calc(100vh - 130px);
+  min-height:560px;
+  display:flex; flex-direction:column;
+  border-radius:14px; overflow:hidden;
   font-family:'Space Grotesk', system-ui, sans-serif;
   color:var(--txt);
   background:linear-gradient(180deg,#06091a,#020308);
   -webkit-font-smoothing:antialiased;
-  display:flex; flex-direction:column;
+  border:1px solid var(--panel-bd);
+  box-shadow:0 12px 40px rgba(2,4,12,.28);
 }
 
 /* ===== TOPBAR ===== */
@@ -275,7 +283,7 @@ body {
 .btn-refresh:disabled { opacity:.4; cursor:wait; }
 
 /* ===== MAPA + SIDEBAR ===== */
-.stage { flex:1 1 auto; display:flex; min-height:0; }
+.stage { flex:1 1 auto; display:flex; min-height:0; position:relative; }
 #map { flex:1 1 auto; background:var(--bg); position:relative; }
 
 .sidebar {
@@ -489,7 +497,7 @@ body {
 
 /* splash */
 .splash {
-  position:fixed; inset:0; z-index:40;
+  position:absolute; inset:0; z-index:40;
   display:flex; align-items:center; justify-content:center;
   flex-direction:column;
   background:radial-gradient(ellipse at center, #0a1230 0%, #02030a 70%);
@@ -521,6 +529,7 @@ body {
 .gm-style .gm-style-iw { color:#0a1024; }
 </style>
 
+<div class="qrb-shell">
 <header class="topbar">
   <div class="brand">
     <div class="logo">!</div>
@@ -597,6 +606,7 @@ body {
   <div class="ttl">Riesgos</div>
   <div class="sub">cargando feed waze · trazando ciclopistas</div>
 </div>
+</div><!-- /.qrb-shell -->
 
 <script id="payload" type="application/json"><?= $json ?></script>
 <script>

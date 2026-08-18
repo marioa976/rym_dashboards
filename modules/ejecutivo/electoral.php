@@ -23,6 +23,7 @@ $k = $el['kpis'];
 ?><?php
 $ktTitle  = 'Ejecutivo · Electoral seccional';
 $ktActive = 'ejecutivo';
+$ktFluid = true;
 require __DIR__ . '/../../views/layout/kt_top.php';
 ?>
   <style>
@@ -35,8 +36,8 @@ require __DIR__ . '/../../views/layout/kt_top.php';
     .switchbtn.on{background:#1b2f5e;color:#fff;border-color:#1b2f5e}
     .el-wrap{display:grid;grid-template-columns:1fr 320px;gap:16px}
     @media(max-width:1000px){.el-wrap{grid-template-columns:1fr}}
-    #el-map{height:620px;border-radius:12px;border:1px solid var(--qro-border);overflow:hidden}
-    .el-side{background:#fff;border:1px solid var(--qro-border);border-radius:12px;padding:14px 16px;max-height:620px;overflow:auto}
+    #el-map{height:clamp(520px,calc(100vh - 250px),880px);border-radius:12px;border:1px solid var(--qro-border);overflow:hidden}
+    .el-side{background:#fff;border:1px solid var(--qro-border);border-radius:12px;padding:14px 16px;max-height:clamp(520px,calc(100vh - 250px),880px);overflow:auto}
     .el-legend{display:flex;gap:10px;align-items:center;font-size:11px;color:var(--qro-text-secondary);margin:8px 0;flex-wrap:wrap}
     .el-legend i{width:16px;height:12px;border-radius:3px;display:inline-block;margin-right:3px;vertical-align:middle}
     .el-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px dashed #eef0f2;font-size:13px}

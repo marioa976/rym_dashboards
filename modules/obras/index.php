@@ -30,6 +30,7 @@ $pctTerm = $kpis['total'] > 0 ? round($kpis['terminadas'] / $kpis['total'] * 100
 ?><?php
 $ktTitle  = 'Obras · POA 2024-2026';
 $ktActive = 'obras';
+$ktFluid = true;
 require __DIR__ . '/../../views/layout/kt_top.php';
 ?>
 <style>
@@ -38,7 +39,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
     .ob-kpi .v{font-size:23px;font-weight:800;color:#a8481f;line-height:1.1}
     .ob-kpi .l{font-size:12px;color:var(--qro-text-secondary);font-weight:600;margin-top:2px}
     .ob-tools{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:12px}
-    #ob-map{height:600px;border-radius:12px;border:1px solid var(--qro-border);overflow:hidden}
+    #ob-map{height:clamp(520px,calc(100vh - 250px),880px);border-radius:12px;border:1px solid var(--qro-border);overflow:hidden}
     .ob-legend{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
     .ob-chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;
       border:1px solid var(--qro-border);background:#fff;border-radius:999px;padding:5px 11px;cursor:pointer;

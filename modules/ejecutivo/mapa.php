@@ -27,13 +27,14 @@ try {
 ?><?php
 $ktTitle  = 'Ejecutivo · Mapa por capas';
 $ktActive = 'ejecutivo';
+$ktFluid = true;
 require __DIR__ . '/../../views/layout/kt_top.php';
 ?>
   <script src="https://unpkg.com/deck.gl@8.9.35/dist.min.js"></script>
   <style>
     .ej-map-wrap{display:grid;grid-template-columns:280px 1fr;gap:16px}
     @media(max-width:900px){.ej-map-wrap{grid-template-columns:1fr}}
-    #ej-map{height:640px;border-radius:12px;border:1px solid var(--qro-border);overflow:hidden}
+    #ej-map{height:clamp(520px,calc(100vh - 250px),880px);border-radius:12px;border:1px solid var(--qro-border);overflow:hidden}
     .ej-panel{background:#fff;border:1px solid var(--qro-border);border-radius:12px;padding:14px 16px;align-self:start}
     .ej-panel h3{margin:0 0 6px;font-size:14px}
     .ej-layer{display:flex;align-items:flex-start;gap:9px;padding:10px 0;border-bottom:1px dashed #eef0f2}

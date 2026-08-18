@@ -20,6 +20,7 @@ $pct = $gs['total'] > 0 ? round($gs['geo'] / $gs['total'] * 100) : 0;
 ?><?php
 $ktTitle  = 'Bloque · Mapa de procedencia';
 $ktActive = 'bloque';
+$ktFluid = true;
 require __DIR__ . '/../../views/layout/kt_top.php';
 ?>
   <script src="https://unpkg.com/deck.gl@8.9.35/dist.min.js"></script>
@@ -28,7 +29,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
     .bl-kpi{background:#fff;border:1px solid var(--qro-border);border-radius:12px;padding:13px 15px}
     .bl-kpi .v{font-size:22px;font-weight:800;color:#005ab2;line-height:1.1}
     .bl-kpi .l{font-size:12px;color:var(--qro-text-secondary);font-weight:600;margin-top:2px}
-    #bl-map{height:620px;border-radius:12px;border:1px solid var(--qro-border);overflow:hidden}
+    #bl-map{height:clamp(520px,calc(100vh - 250px),880px);border-radius:12px;border:1px solid var(--qro-border);overflow:hidden}
     .bl-ctrl{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
     .bl-ctrl label{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--qro-text-secondary);cursor:pointer}
   </style>
