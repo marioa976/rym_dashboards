@@ -3,6 +3,11 @@
 .env.local
 .env.*.local
 
+# ===== Tema Metronic (LICENCIA COMERCIAL — no versionar) =====
+# Los assets compilados de Metronic v9 (KeenThemes) NO se suben al repo por
+# licencia. Se proveen aparte al construir la imagen. Ver assets/METRONIC.md
+assets/metronic/
+
 # ===== Sistema operativo =====
 .DS_Store
 Thumbs.db
