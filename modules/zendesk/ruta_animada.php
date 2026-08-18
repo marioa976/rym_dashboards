@@ -277,13 +277,13 @@ require __DIR__ . '/../../views/layout/kt_top.php';
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#0f172a;--surface:#1e293b;--surface-2:#334155;--border:#334155;--text:#e2e8f0;--text-muted:#94a3b8;--text-faint:#5b667a;--accent:#3b82f6;--ok:#22c55e;--warn:#f59e0b;--err:#ef4444}
+:root{--bg:#0f172a;--surface:#1e293b;--surface-2:#334155;--border:#334155;--text:#e2e8f0;--text-muted:#94a3b8;--text-faint:#5b667a;--ok:#22c55e;--warn:#f59e0b;--err:#ef4444}
 *{box-sizing:border-box;-webkit-font-smoothing:antialiased}
 html,body{margin:0;height:100%;font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:14px}
 .app{display:grid;grid-template-rows:auto 1fr auto;height:100vh}
 .app-header{padding:12px 20px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px}
 .title{font-weight:600;font-size:15px}
-.title b{color:var(--accent)}
+.title b{color:var(--primary)}
 .meta-bar{display:flex;gap:18px;color:var(--text-muted);font-size:12px;flex-wrap:wrap}
 .meta-bar b{color:var(--text);font-weight:500}
 .back{font-size:12px;color:var(--text-muted);text-decoration:none;padding:6px 12px;border:1px solid var(--border);border-radius:6px}
@@ -296,7 +296,7 @@ html,body{margin:0;height:100%;font-family:'Inter',system-ui,sans-serif;backgrou
 .side h4{font-size:11px;color:var(--text-faint);text-transform:uppercase;letter-spacing:.08em;margin:0 0 10px}
 .tk{background:var(--surface-2);padding:10px;border-radius:8px;margin-bottom:8px;border-left:3px solid var(--border);transition:.15s}
 .tk.done{opacity:.5;border-left-color:var(--ok)}
-.tk.current{border-left-color:var(--accent);background:#1e3a8a;animation:pulse 1.2s ease-in-out infinite}
+.tk.current{border-left-color:var(--primary);background:#1e3a8a;animation:pulse 1.2s ease-in-out infinite}
 @keyframes pulse{50%{background:#1e40af}}
 .tk .hdr{display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted);margin-bottom:4px}
 .tk .hdr b{color:var(--text);font-family:ui-monospace,Menlo,monospace}
@@ -311,17 +311,17 @@ html,body{margin:0;height:100%;font-family:'Inter',system-ui,sans-serif;backgrou
 .controls{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
 .btn{background:var(--surface-2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:8px 14px;font:inherit;font-size:13px;cursor:pointer;font-weight:500}
 .btn:hover{background:#475569}
-.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary{background:var(--primary);border-color:var(--primary);color:#fff}
 .btn.primary:hover{background:#254185}
 .btn-play{font-size:18px;width:44px;height:44px;padding:0;border-radius:50%;display:flex;align-items:center;justify-content:center}
 .speed-pick{display:flex;gap:4px;background:var(--surface-2);border-radius:7px;padding:3px}
 .speed-pick button{background:transparent;border:0;color:var(--text-muted);padding:5px 9px;font:inherit;font-size:11px;font-weight:600;cursor:pointer;border-radius:5px}
-.speed-pick button.active{background:var(--accent);color:#fff}
+.speed-pick button.active{background:var(--primary);color:#fff}
 .clock{font-family:ui-monospace,Menlo,monospace;font-size:22px;font-weight:600;color:var(--text)}
 .clock-label{font-size:10px;color:var(--text-faint);text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:2px}
 .progress-wrap{flex:1;min-width:200px}
 .progress-bar{width:100%;height:8px;background:var(--surface-2);border-radius:4px;overflow:hidden;cursor:pointer;position:relative}
-.progress-bar > .fill{height:100%;background:var(--accent);width:0%;transition:width .15s linear}
+.progress-bar > .fill{height:100%;background:var(--primary);width:0%;transition:width .15s linear}
 .progress-meta{font-size:11px;color:var(--text-muted);margin-top:4px;display:flex;justify-content:space-between}
 .status-pill{display:inline-flex;align-items:center;gap:6px;background:var(--surface-2);padding:6px 11px;border-radius:7px;font-size:12px;font-weight:500}
 .status-pill .dot{width:8px;height:8px;border-radius:50%}
@@ -335,7 +335,7 @@ html,body{margin:0;height:100%;font-family:'Inter',system-ui,sans-serif;backgrou
 <div class="app-header">
   <div>
     <div class="title">▶ Simulación de ruta · <b>Cuadrilla <?= $cuadrilla_idx+1 ?></b> · Día <?= $dia_idx+1 ?></div>
-    <div style="font-size:11px;color:var(--text-faint);margin-top:2px"><a href="javascript:history.back()" class="back" style="border:0;padding:0;color:var(--accent)">← volver al planificador</a></div>
+    <div style="font-size:11px;color:var(--text-faint);margin-top:2px"><a href="javascript:history.back()" class="back" style="border:0;padding:0;color:var(--primary)">← volver al planificador</a></div>
   </div>
   <div class="meta-bar">
     <span><b><?= count($ruta_dia) ?></b> tickets</span>
@@ -353,7 +353,7 @@ html,body{margin:0;height:100%;font-family:'Inter',system-ui,sans-serif;backgrou
     <div style="position:relative;width:100%;height:100%;min-height:0">
       <div id="map" style="position:absolute;inset:0"></div>
       <div id="loading" style="position:absolute;inset:0;background:rgba(15,23,42,.9);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:50;font-size:13px;color:var(--text-muted)">
-        <div style="width:36px;height:36px;border:3px solid var(--surface-2);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite;margin-bottom:14px"></div>
+        <div style="width:36px;height:36px;border:3px solid var(--surface-2);border-top-color:var(--primary);border-radius:50%;animation:spin 1s linear infinite;margin-bottom:14px"></div>
         <div id="loading-text">Trazando rutas viales…</div>
         <div style="font-size:11px;color:var(--text-faint);margin-top:6px" id="loading-sub"></div>
       </div>

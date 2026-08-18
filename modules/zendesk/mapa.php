@@ -151,13 +151,13 @@ require __DIR__ . '/../../views/layout/kt_top.php';
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{--bg:#fafafa;--surface:#fff;--border:#ececec;--text:#1a1a1a;--text-muted:#6b7280;--text-faint:#9ca3af;
-    --accent:#254185;--positive:#188a5b;--warning:#d99000;--negative:#ce3a2b;--neutral:#005ab2}
+    --positive:#188a5b;--warning:#d99000;--negative:#ce3a2b;--neutral:#005ab2}
   *{box-sizing:border-box;-webkit-font-smoothing:antialiased}
   html,body{margin:0;height:100%;font-family:'Inter',system-ui,sans-serif;color:var(--text);font-size:14px;background:var(--bg)}
   .topbar{padding:14px 24px;background:#fff;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
   .topbar h1{font-size:17px;font-weight:600;margin:0;letter-spacing:-.01em}
   .topbar .crumb{color:var(--text-muted);font-size:12px;margin-top:2px}
-  .topbar .crumb a{color:var(--accent);text-decoration:none}
+  .topbar .crumb a{color:var(--primary);text-decoration:none}
   .nav{display:flex;gap:8px}
   .nav a{font-size:12px;padding:7px 12px;border:1px solid var(--border);border-radius:7px;color:var(--text);text-decoration:none;background:#fff;font-weight:500}
   .nav a.active{background:var(--text);color:#fff;border-color:var(--text)}
@@ -171,7 +171,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
   .panel select,.panel input{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font:inherit;font-size:13px;background:#fff;color:var(--text)}
   .panel .btn-row{display:flex;gap:8px;margin-top:14px}
   .panel button,.panel a.btn{flex:1;padding:9px 12px;border:1px solid var(--border);border-radius:6px;font:inherit;font-size:13px;font-weight:500;cursor:pointer;text-decoration:none;text-align:center;color:var(--text);background:#fff}
-  .panel button.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .panel button.primary{background:var(--primary);color:#fff;border-color:var(--primary)}
   .panel button.primary:hover{filter:brightness(1.05)}
   .panel .chip{display:inline-block;background:#eff6ff;color:#1d4ed8;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:500;margin:2px 4px 0 0}
 
