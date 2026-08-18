@@ -298,11 +298,11 @@ if ($f_estado) {
     $filtro_label[] = "Estado: <b>".($labels[$f_estado]??$f_estado)."</b>";
 }
 ?>
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<title>Análisis detallado · Reportes de Servicio</title>
+<?php
+$ktTitle  = 'Análisis detallado · Reportes de Servicio';
+$ktActive = 'zendesk';
+require __DIR__ . '/../../views/layout/kt_top.php';
+?>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -375,9 +375,7 @@ if ($f_estado) {
   .insight b{font-weight:600}
   footer{margin-top:48px;padding-top:24px;border-top:1px solid var(--border);font-size:12px;color:var(--text-faint)}
 </style>
-</head>
-<body>
-<?php $portalModulo='Zendesk'; @include __DIR__.'/../_portalbar.php'; ?>
+
 <div class="container">
 
 <header>
@@ -385,8 +383,7 @@ if ($f_estado) {
     <h1>Análisis detallado</h1>
     <div class="crumb"><a href="dashboard.php">Dashboard</a> → Análisis · explora con filtros y haz drill-down</div>
   </div>
-  <?php include __DIR__ . '/_navzendesk.php'; ?>
-</header>
+  </header>
 
 <!-- ============= FILTROS ============= -->
 <form class="filter-bar" method="get">
@@ -752,5 +749,4 @@ new Chart(document.getElementById('chAnt'),{type:'bar',
     backgroundColor:['#188a5b','#84cc16','#d99000','#f97316','#ce3a2b','#7f1d1d'],borderRadius:4,barThickness:36}]},
   options:{plugins:{legend:{display:false}},scales:{x:noGrid,y:baseGrid}}});
 </script>
-</body>
-</html>
+<?php require __DIR__ . '/../../views/layout/kt_bottom.php'; ?>

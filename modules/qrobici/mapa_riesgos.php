@@ -150,13 +150,11 @@ $payload = [
 $json = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 $json = str_replace(['</', "\u{2028}", "\u{2029}"], ['<\/', ' ', ' '], $json);
 
-?><!doctype html>
-<html lang="es">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>QroBici · Mapa de riesgos</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
+?><?php
+$ktTitle  = 'QroBici · Mapa de riesgos';
+$ktActive = 'qrobici';
+require __DIR__ . '/../../views/layout/kt_top.php';
+?><link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap">
 <style>
@@ -522,9 +520,6 @@ body {
 /* tooltip de marker */
 .gm-style .gm-style-iw { color:#0a1024; }
 </style>
-</head>
-<body>
-<?php $portalModulo='Qrobici'; @include __DIR__.'/../_portalbar.php'; ?>
 
 <header class="topbar">
   <div class="brand">
@@ -1113,5 +1108,4 @@ setInterval(() => {
 
 <script defer src="https://maps.googleapis.com/maps/api/js?key=<?= $api_key ?>&libraries=visualization&callback=initMap&v=quarterly"></script>
 
-</body>
-</html>
+<?php require __DIR__ . '/../../views/layout/kt_bottom.php'; ?>

@@ -52,13 +52,11 @@ if ($DATA === null) {
 $JSON = json_encode($DATA, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 $JSON = str_replace(['</', "\u{2028}", "\u{2029}"], ['<\/', ' ', ' '], $JSON);
 
-?><!doctype html>
-<html lang="es">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>QroBici · Performance bicicletas</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
+?><?php
+$ktTitle  = 'QroBici · Performance bicicletas';
+$ktActive = 'qrobici';
+require __DIR__ . '/../../views/layout/kt_top.php';
+?><link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap">
 <style>
@@ -398,9 +396,6 @@ footer {
   font-size:14px;
 }
 </style>
-</head>
-<body>
-<?php $portalModulo='Qrobici'; @include __DIR__.'/../_portalbar.php'; ?>
 
 <header class="top">
   <div class="row">
@@ -906,5 +901,4 @@ function renderAll(){
 renderAll();
 </script>
 
-</body>
-</html>
+<?php require __DIR__ . '/../../views/layout/kt_bottom.php'; ?>

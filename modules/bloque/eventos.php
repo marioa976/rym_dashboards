@@ -15,13 +15,11 @@ function bl_ocupColor($p): string {
     if ($p === null) return '#c9ced6';
     return $p >= 90 ? '#c0392b' : ($p >= 70 ? '#e0872b' : ($p >= 40 ? '#2a9eda' : '#7cb342'));
 }
-?><!doctype html>
-<html lang="es">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Bloque · Eventos</title>
-  <link rel="stylesheet" href="../../assets/css/qro.css">
+?><?php
+$ktTitle  = 'Bloque · Eventos';
+$ktActive = 'bloque';
+require __DIR__ . '/../../views/layout/kt_top.php';
+?>
   <style>
     table.bl-tbl{width:100%;border-collapse:collapse;font-size:13px;background:#fff}
     table.bl-tbl th,table.bl-tbl td{padding:9px 12px;border-bottom:1px solid #eef0f2;text-align:left;white-space:nowrap}
@@ -33,11 +31,7 @@ function bl_ocupColor($p): string {
     .bl-bar>span{display:block;height:100%}
     .bl-scroll{border:1px solid var(--qro-border);border-radius:12px;overflow:auto;max-height:70vh}
   </style>
-</head>
-<body>
-<?php $portalModulo = 'Bloque'; $navActive = 'eventos'; include __DIR__ . '/_nav.php'; ?>
 
-<main class="content" style="padding:28px 32px">
   <div class="page-head"><h1>Eventos y ocupación</h1>
     <p class="text-secondary"><?= count($eventos) ?> eventos · asistentes = invitados distintos con registro de asistencia.</p></div>
 
@@ -68,6 +62,4 @@ function bl_ocupColor($p): string {
       </tbody>
     </table>
   </div>
-</main>
-</body>
-</html>
+<?php require __DIR__ . '/../../views/layout/kt_bottom.php'; ?>

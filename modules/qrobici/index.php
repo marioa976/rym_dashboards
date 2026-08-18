@@ -75,13 +75,11 @@ function ix_fecha_es(?string $d): string {
     return (int)date('j', $ts) . ' de ' . $meses[(int)date('n', $ts)] . ' de ' . date('Y', $ts);
 }
 
-?><!doctype html>
-<html lang="es">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>QroBici Analytics</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
+?><?php
+$ktTitle  = 'QroBici Analytics';
+$ktActive = 'qrobici';
+require __DIR__ . '/../../views/layout/kt_top.php';
+?><link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap">
 <style>
@@ -407,9 +405,6 @@ footer a:hover { color:var(--azul); }
   header.topbar { padding:14px 20px; }
 }
 </style>
-</head>
-<body>
-<?php $portalModulo='Qrobici'; @include __DIR__.'/../_portalbar.php'; ?>
 
 <header class="topbar">
   <div class="brand-mini">
@@ -587,5 +582,4 @@ footer a:hover { color:var(--azul); }
   </div>
 </footer>
 
-</body>
-</html>
+<?php require __DIR__ . '/../../views/layout/kt_bottom.php'; ?>

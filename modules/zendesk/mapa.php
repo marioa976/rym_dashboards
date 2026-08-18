@@ -142,11 +142,11 @@ if ($f_estado) {
 
 $pintados = count($markers);
 ?>
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<title>Mapa de reportes · Querétaro</title>
+<?php
+$ktTitle  = 'Mapa de reportes · Querétaro';
+$ktActive = 'zendesk';
+require __DIR__ . '/../../views/layout/kt_top.php';
+?>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -203,17 +203,13 @@ $pintados = count($markers);
   .pill.negative{background:#fef2f2;color:#b91c1c}
   .pill.neutral{background:#f3f4f6;color:#374151}
 </style>
-</head>
-<body>
-<?php $portalModulo='Zendesk'; @include __DIR__.'/../_portalbar.php'; ?>
 
 <div class="topbar">
   <div>
     <h1>Mapa de reportes</h1>
     <div class="crumb"><a href="dashboard.php">Dashboard</a> → Mapa · <?= number_format($pintados) ?> tickets visibles</div>
   </div>
-  <?php include __DIR__ . '/_navzendesk.php'; ?>
-</div>
+  </div>
 
 <div class="layout">
   <!-- ============= PANEL LATERAL ============= -->
@@ -586,5 +582,4 @@ function activarModo(modo) {
 </script>
 <?php endif; ?>
 
-</body>
-</html>
+<?php require __DIR__ . '/../../views/layout/kt_bottom.php'; ?>
