@@ -81,11 +81,11 @@ require __DIR__ . '/../../views/layout/kt_top.php';
     </div>
   <?php endif; ?>
 
-  <div class="av-kpis">
-    <div class="av-kpi"><div class="v"><?= number_format($total) ?></div><div class="l">Áreas verdes mapeadas</div></div>
-    <div class="av-kpi"><div class="v"><?= number_format($nDeleg) ?></div><div class="l">Delegaciones</div></div>
-    <div class="av-kpi"><div class="v" style="font-size:16px;line-height:1.25"><?= $topDel ? htmlspecialchars($topDel['delegacion']) : '—' ?></div><div class="l">Delegación con más<?= $topDel ? ' · '.number_format((int)$topDel['n']).' áreas' : '' ?></div></div>
-    <div class="av-kpi"><div class="v" id="k-vista"><?= number_format($total) ?></div><div class="l">En vista (filtro actual)</div></div>
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="kt-card"><div class="kt-card-content p-4 flex flex-col gap-0.5"><span class="text-2xl font-bold text-primary leading-tight"><?= number_format($total) ?></span><span class="text-xs text-secondary-foreground font-semibold">Áreas verdes mapeadas</span></div></div>
+    <div class="kt-card"><div class="kt-card-content p-4 flex flex-col gap-0.5"><span class="text-2xl font-bold text-primary leading-tight"><?= number_format($nDeleg) ?></span><span class="text-xs text-secondary-foreground font-semibold">Delegaciones</span></div></div>
+    <div class="kt-card"><div class="kt-card-content p-4 flex flex-col gap-0.5"><span class="text-base font-bold text-primary leading-tight"><?= $topDel ? htmlspecialchars($topDel['delegacion']) : '—' ?></span><span class="text-xs text-secondary-foreground font-semibold">Delegación con más<?= $topDel ? ' · '.number_format((int)$topDel['n']).' áreas' : '' ?></span></div></div>
+    <div class="kt-card"><div class="kt-card-content p-4 flex flex-col gap-0.5"><span class="text-2xl font-bold text-primary leading-tight" id="k-vista"><?= number_format($total) ?></span><span class="text-xs text-secondary-foreground font-semibold">En vista (filtro actual)</span></div></div>
   </div>
 
   <div class="av-tools">

@@ -28,11 +28,11 @@ require __DIR__ . '/../../views/layout/kt_top.php';
   <?php if ($dbError): ?>
     <div class="alert alert-danger">No se pudo conectar a la base de datos de Qrobus. Revisa las variables <code>QROBUS_DB_*</code>.<br><span style="font-size:12px;opacity:.8"><?= htmlspecialchars($dbError) ?></span></div>
   <?php else: ?>
-    <div class="kpi-grid" style="margin-bottom:24px">
-      <div class="card"><div class="kpi"><div class="kpi-label">Beneficiarios</div><div class="kpi-value"><?= number_format($stats['total']) ?></div></div></div>
-      <div class="card"><div class="kpi"><div class="kpi-label">Con coordenadas</div><div class="kpi-value" style="color:var(--qro-success)"><?= number_format($stats['con_coords']) ?></div><div class="kpi-delta"><?= $pct ?>% geocodificado</div></div></div>
-      <div class="card"><div class="kpi"><div class="kpi-label">Sin coordenadas</div><div class="kpi-value" style="color:var(--qro-danger)"><?= number_format($stats['sin_coords']) ?></div></div></div>
-      <div class="card"><div class="kpi"><div class="kpi-label">Pendientes con dirección</div><div class="kpi-value" style="color:var(--qro-warning)"><?= number_format($stats['pendientes']) ?></div><div class="kpi-delta">geocodificables ahora</div></div></div>
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div class="kt-card"><div class="kt-card-content p-4 flex flex-col gap-0.5"><span class="text-xs text-secondary-foreground font-semibold">Beneficiarios</span><span class="text-2xl font-bold text-primary leading-tight"><?= number_format($stats['total']) ?></span></div></div>
+      <div class="kt-card"><div class="kt-card-content p-4 flex flex-col gap-0.5"><span class="text-xs text-secondary-foreground font-semibold">Con coordenadas</span><span class="text-2xl font-bold leading-tight" style="color:var(--qro-success)"><?= number_format($stats['con_coords']) ?></span><span class="text-xs text-muted-foreground"><?= $pct ?>% geocodificado</span></div></div>
+      <div class="kt-card"><div class="kt-card-content p-4 flex flex-col gap-0.5"><span class="text-xs text-secondary-foreground font-semibold">Sin coordenadas</span><span class="text-2xl font-bold leading-tight" style="color:var(--qro-danger)"><?= number_format($stats['sin_coords']) ?></span></div></div>
+      <div class="kt-card"><div class="kt-card-content p-4 flex flex-col gap-0.5"><span class="text-xs text-secondary-foreground font-semibold">Pendientes con dirección</span><span class="text-2xl font-bold leading-tight" style="color:var(--qro-warning)"><?= number_format($stats['pendientes']) ?></span><span class="text-xs text-muted-foreground">geocodificables ahora</span></div></div>
     </div>
   <?php endif; ?>
 
