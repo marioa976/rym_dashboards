@@ -27,14 +27,12 @@ try {
 
 $invMDP  = $kpis['inversion'] / 1e6;
 $pctTerm = $kpis['total'] > 0 ? round($kpis['terminadas'] / $kpis['total'] * 100) : 0;
-?><!doctype html>
-<html lang="es">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Obras · Reporte geográfico</title>
-  <link rel="stylesheet" href="../../assets/css/qro.css">
-  <style>
+?><?php
+$ktTitle  = 'Obras · POA 2024-2026';
+$ktActive = 'obras';
+require __DIR__ . '/../../views/layout/kt_top.php';
+?>
+<style>
     .ob-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:12px;margin-bottom:16px}
     .ob-kpi{background:#fff;border:1px solid var(--qro-border);border-radius:12px;padding:14px 16px}
     .ob-kpi .v{font-size:23px;font-weight:800;color:#a8481f;line-height:1.1}
@@ -63,11 +61,6 @@ $pctTerm = $kpis['total'] > 0 ? round($kpis['terminadas'] / $kpis['total'] * 100
     .ob-badge{font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;color:#fff;white-space:nowrap}
     .ob-empty{padding:24px;text-align:center;color:var(--qro-text-secondary);font-size:13px}
   </style>
-</head>
-<body>
-<?php $portalModulo = 'Obras'; $navActive = 'home'; include __DIR__ . '/_nav.php'; ?>
-
-<main class="content" style="padding:28px 32px">
   <div style="background:linear-gradient(120deg,#7a3315,#c85a2b);color:#fff;border-radius:16px;padding:22px 26px;margin-bottom:20px">
     <h1 style="color:#fff;margin:0 0 4px;font-size:23px">🏗 Obras · POA 2024–2026</h1>
     <p style="margin:0;opacity:.92;font-size:14px">Hola, <?= $nombre ?>. Reporte geográfico de obra pública municipal: ubicación, inversión y avance.</p>
@@ -118,8 +111,6 @@ $pctTerm = $kpis['total'] > 0 ? round($kpis['terminadas'] / $kpis['total'] * 100
       </div>
     </div>
   </div>
-</main>
-
 <script>
 const OBRAS   = <?= json_encode($obras, JSON_UNESCAPED_UNICODE) ?>;
 const LIMITES = <?= json_encode($limites, JSON_UNESCAPED_UNICODE) ?>;
@@ -268,5 +259,4 @@ if(!HASKEY){ $('ob-map').innerHTML='<div style="padding:20px;color:#991B1B">Goog
 <?php if ($apiKey): ?>
 <script async src="https://maps.googleapis.com/maps/api/js?key=<?= urlencode($apiKey) ?>&callback=initObMap&loading=async&v=weekly"></script>
 <?php endif; ?>
-</body>
-</html>
+<?php require __DIR__ . '/../../views/layout/kt_bottom.php'; ?>

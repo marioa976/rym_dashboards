@@ -6,29 +6,41 @@ require_login();
 
 $user    = Auth::user();
 $modulos = $_SESSION['modulos'] ?? [];
-$titulo  = 'Inicio';
-require __DIR__ . '/views/layout/header.php';
+$ktTitle = 'Inicio';
+$ktActive = 'home';
+require __DIR__ . '/views/layout/kt_top.php';
 ?>
-<div class="page-head">
-  <h1>Hola, <?= e($user['nombre']) ?></h1>
-  <p class="text-secondary">Selecciona un módulo de reporteo para comenzar.</p>
+<div class="mb-6">
+  <h2 class="text-xl font-semibold text-mono">Hola, <?= e($user['nombre']) ?></h2>
+  <p class="text-sm text-secondary-foreground mt-1">Selecciona un módulo de reporteo para comenzar.</p>
 </div>
 
 <?php if (empty($modulos)): ?>
-  <div class="card">
-    <p>No tienes módulos asignados todavía. Contacta al administrador.</p>
+  <div class="kt-card">
+    <div class="kt-card-content p-6 text-sm text-secondary-foreground">
+      No tienes módulos asignados todavía. Contacta al administrador.
+    </div>
   </div>
 <?php else: ?>
-  <div class="grid-cards">
-    <?php foreach ($modulos as $m): ?>
-      <a class="card card-modulo" href="<?= e(url($m['ruta'])) ?>"
-         style="--accent: <?= e($m['color'] ?: 'var(--qro-blue)') ?>">
-        <span class="card-modulo-dot"></span>
-        <h3><?= e($m['nombre']) ?></h3>
-        <p class="text-secondary"><?= e($m['descripcion']) ?></p>
-        <span class="badge badge-info"><?= e(ucfirst($m['nivel'])) ?></span>
+  <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+    <?php foreach ($modulos as $m):
+        $icon = $__icons[$m['clave']] ?? 'element-11'; ?>
+      <a class="kt-card hover:shadow-lg transition-shadow" href="<?= e(url($m['ruta'])) ?>">
+        <div class="kt-card-content p-5 flex items-start gap-4">
+          <div class="flex items-center justify-center size-12 rounded-lg bg-primary/10 text-primary shrink-0">
+            <i class="ki-filled ki-<?= e($icon) ?> text-2xl"></i>
+          </div>
+          <div class="min-w-0 grow">
+            <div class="flex items-center gap-2 flex-wrap">
+              <h3 class="text-base font-semibold text-mono"><?= e($m['nombre']) ?></h3>
+              <span class="kt-badge kt-badge-sm kt-badge-outline"><?= e(ucfirst($m['nivel'])) ?></span>
+            </div>
+            <p class="text-sm text-secondary-foreground mt-1"><?= e($m['descripcion']) ?></p>
+          </div>
+          <i class="ki-filled ki-black-right-line text-muted-foreground shrink-0 mt-1"></i>
+        </div>
       </a>
     <?php endforeach; ?>
   </div>
 <?php endif; ?>
-<?php require __DIR__ . '/views/layout/footer.php'; ?>
+<?php require __DIR__ . '/views/layout/kt_bottom.php'; ?>

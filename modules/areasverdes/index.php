@@ -27,14 +27,12 @@ try {
 $total   = count($areas);
 $nDeleg  = count($porDeleg);
 $topDel  = $porDeleg[0] ?? null;
-?><!doctype html>
-<html lang="es">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Áreas Verdes · Reporte geográfico</title>
-  <link rel="stylesheet" href="../../assets/css/qro.css">
-  <style>
+?><?php
+$ktTitle  = 'Áreas Verdes';
+$ktActive = 'areasverdes';
+require __DIR__ . '/../../views/layout/kt_top.php';
+?>
+<style>
     .av-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:16px}
     .av-kpi{background:#fff;border:1px solid var(--qro-border);border-radius:12px;padding:14px 16px}
     .av-kpi .v{font-size:24px;font-weight:800;color:#1f7a45;line-height:1.1}
@@ -64,11 +62,6 @@ $topDel  = $porDeleg[0] ?? null;
     .av-gm:hover{color:#1f7a45}
     .av-empty{padding:24px;text-align:center;color:var(--qro-text-secondary);font-size:13px}
   </style>
-</head>
-<body>
-<?php $portalModulo = 'Áreas Verdes'; $navActive = 'home'; include __DIR__ . '/_nav.php'; ?>
-
-<main class="content" style="padding:28px 32px">
   <div style="background:linear-gradient(120deg,#155d34,#2e9e5b);color:#fff;border-radius:16px;padding:22px 26px;margin-bottom:20px">
     <h1 style="color:#fff;margin:0 0 4px;font-size:23px">🌳 Áreas Verdes</h1>
     <p style="margin:0;opacity:.92;font-size:14px">Hola, <?= $nombre ?>. Reporte geográfico de las áreas verdes municipales por delegación.</p>
@@ -129,8 +122,6 @@ $topDel  = $porDeleg[0] ?? null;
       </div>
     </div>
   </div>
-</main>
-
 <script>
 const AREAS   = <?= json_encode($areas, JSON_UNESCAPED_UNICODE) ?>;
 const LIMITES = <?= json_encode($limites, JSON_UNESCAPED_UNICODE) ?>;
@@ -301,5 +292,4 @@ if(!HASKEY){ $('av-map').innerHTML='<div style="padding:20px;color:#991B1B">Goog
 <?php if ($apiKey): ?>
 <script async src="https://maps.googleapis.com/maps/api/js?key=<?= urlencode($apiKey) ?>&callback=initAvMap&loading=async&v=weekly"></script>
 <?php endif; ?>
-</body>
-</html>
+<?php require __DIR__ . '/../../views/layout/kt_bottom.php'; ?>

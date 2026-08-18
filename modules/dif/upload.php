@@ -136,12 +136,11 @@ function runImport(array $config): void
         @unlink($path);
     }
 }
-?><!doctype html>
-<html lang="es">
-<head>
-<meta charset="utf-8">
-<title>Importador Padrón DIF</title>
-<style>
+?><?php
+$ktTitle  = 'Importador Padrón DIF';
+$ktActive = 'dif';
+require __DIR__ . '/../../views/layout/kt_top.php';
+?><style>
   :root{--bg:#0f172a;--card:#1e293b;--bd:#334155;--mut:#94a3b8;--fg:#e2e8f0;
        --ok:#10b981;--warn:#f59e0b;--err:#ef4444;--accent:#005ab2}
   *{box-sizing:border-box}
@@ -188,11 +187,6 @@ function runImport(array $config): void
   .small{font-size:12px;color:var(--mut)}
   .pill{font-family:monospace;background:#334155;padding:1px 6px;border-radius:3px}
 </style>
-</head>
-<body>
-
-<?php $portalModulo='DIF'; @include __DIR__.'/../_portalbar.php'; ?>
-<?php $navActive = 'upload'; include __DIR__ . '/_nav.php'; ?>
 
 <header>
   <h1>📤 Importador Padrón DIF</h1>
@@ -398,5 +392,4 @@ function handleEvent(ev){
   }
 }
 </script>
-</body>
-</html>
+<?php require __DIR__ . '/../../views/layout/kt_bottom.php'; ?>

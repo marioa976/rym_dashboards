@@ -96,13 +96,11 @@ $recos    = $data['recos']       ?? [];
 $total_recos    = count($recos);
 $prioridad_alta = count(array_filter($recos, fn($r) => $r['prioridad'] === 'alta'));
 
-?><!doctype html>
-<html lang="es">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>QroBici · Informe ejecutivo</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
+?><?php
+$ktTitle  = 'QroBici · Informe ejecutivo';
+$ktActive = 'qrobici';
+require __DIR__ . '/../../views/layout/kt_top.php';
+?><link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap">
 <style>
@@ -618,9 +616,6 @@ body {
   max-width:480px;
 }
 </style>
-</head>
-<body>
-<?php $portalModulo='Qrobici'; @include __DIR__.'/../_portalbar.php'; ?>
 
 <?php if (!empty($data['vacio'])): ?>
   <div class="slide cover">
@@ -1226,5 +1221,4 @@ window.addEventListener('load', () => {
 </script>
 
 <?php endif; ?>
-</body>
-</html>
+<?php require __DIR__ . '/../../views/layout/kt_bottom.php'; ?>

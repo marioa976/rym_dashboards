@@ -63,12 +63,11 @@ if (is_array($config)) {
 }
 
 $navActive = 'home';
-?><!doctype html>
-<html lang="es">
-<head>
-<meta charset="utf-8">
-<title>Padrón DIF — Inicio</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+?><?php
+$ktTitle  = 'Padrón DIF — Inicio';
+$ktActive = 'dif';
+require __DIR__ . '/../../views/layout/kt_top.php';
+?>
 <style>
   :root{
     --bg:#f5f7fa; --panel:#fff; --bd:#e2e8f0; --fg:#0f172a; --mut:#64748b;
@@ -121,11 +120,6 @@ $navActive = 'home';
 
   footer{text-align:center;color:var(--mut);font-size:12px;padding:24px;border-top:1px solid var(--bd);margin-top:48px}
 </style>
-</head>
-<body>
-
-<?php $portalModulo='DIF'; @include __DIR__.'/../_portalbar.php'; ?>
-<?php include __DIR__ . '/_nav.php'; ?>
 
 <div class="hero">
   <h1>🏛 Sistema Padrón DIF Querétaro</h1>
@@ -276,5 +270,4 @@ $navActive = 'home';
   Sistema Padrón DIF · Querétaro · MariaDB + PHP 8.2 + Google Maps + IEEQ
 </footer>
 
-</body>
-</html>
+<?php require __DIR__ . '/../../views/layout/kt_bottom.php'; ?>

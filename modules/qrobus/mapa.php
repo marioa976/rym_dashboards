@@ -133,12 +133,11 @@ if (!is_array($payload)) {
         @file_put_contents($cacheFile, json_encode($payload, JSON_UNESCAPED_UNICODE));
     } catch (Throwable $e) { $dbError=$e->getMessage(); $payload=['pts'=>[],'geo'=>['type'=>'FeatureCollection','features'=>[]],'elec'=>[],'partido'=>$PARTIDO]; }
 }
-?><!doctype html>
-<html lang="es">
-<head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Qrobus · Mapa seccional</title>
-  <link rel="stylesheet" href="../../assets/css/qro.css">
+?><?php
+$ktTitle  = 'Qrobus · Mapa seccional';
+$ktActive = 'qrobus';
+require __DIR__ . '/../../views/layout/kt_top.php';
+?>
   <script src="https://unpkg.com/deck.gl@8.9.35/dist.min.js"></script>
   <style>
     .m-filtros{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:12px}
@@ -158,11 +157,7 @@ if (!is_array($payload)) {
     .m-bar{display:grid;grid-template-columns:1fr 46px;gap:6px;align-items:center;font-size:12px;margin:3px 0}
     .m-bar .tr{background:#eef2f6;border-radius:999px;height:12px;overflow:hidden}.m-bar .tr>span{display:block;height:100%;background:#005ab2}
   </style>
-</head>
-<body>
-<?php $portalModulo='Qrobus'; $navActive='mapa'; include __DIR__ . '/_nav.php'; ?>
 
-<main class="content" style="padding:28px 32px">
   <div class="page-head"><h1>Mapa seccional · Unidos</h1><p class="text-secondary">Densidad de beneficiarios cruzada con la geografía por sección (partido objetivo: <strong><?= htmlspecialchars($PARTIDO) ?></strong>).</p></div>
 
   <?php if ($dbError): ?><div class="alert alert-danger">No se pudieron cargar los datos.<br><span style="font-size:12px"><?= htmlspecialchars($dbError) ?></span></div><?php endif; ?>
@@ -202,7 +197,6 @@ if (!is_array($payload)) {
       <div id="m-detail" style="margin-top:8px"><p class="text-secondary" style="font-size:13px">Haz clic en una sección para ver beneficiarios y resultado por sección.</p></div>
     </div>
   </div>
-</main>
 
 <script>
 const MP = <?= json_encode($payload, JSON_UNESCAPED_UNICODE) ?>;
@@ -325,5 +319,4 @@ if(!HASKEY){ $('m-map').innerHTML='<div style="padding:20px;color:#991B1B">Googl
 <?php if ($apiKey): ?>
 <script async src="https://maps.googleapis.com/maps/api/js?key=<?= urlencode($apiKey) ?>&callback=initMMap&loading=async&v=weekly"></script>
 <?php endif; ?>
-</body>
-</html>
+<?php require __DIR__ . '/../../views/layout/kt_bottom.php'; ?>
