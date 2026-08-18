@@ -181,21 +181,21 @@ require __DIR__ . '/../../views/layout/kt_top.php';
 ?>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-  :root{--bg:#f5f7fb;--surface:#fff;--border:#d9e2f0;--text:#1f2937;--mut:#5b667a;--accent:#254185;--accent2:#005ab2;--ok:#188a5b;--warn:#d99000;--err:#ce3a2b}
+  :root{--bg:#f5f7fb;--surface:#fff;--border:#d9e2f0;--text:#1f2937;--mut:#5b667a;--accent2:#005ab2;--ok:#188a5b;--warn:#d99000;--err:#ce3a2b}
   *{box-sizing:border-box} html,body{margin:0;background:var(--bg);color:var(--text);font-size:14px}
   .crumb{padding:12px 24px;font-size:13px;color:var(--mut)} .crumb a{color:var(--accent2);text-decoration:none}
   .nav{display:flex;gap:6px;flex-wrap:wrap;padding:0 24px 12px}
   .nav a{font-size:12px;padding:7px 12px;border:1px solid var(--border);border-radius:7px;color:var(--text);text-decoration:none;background:#fff;font-weight:500}
-  .nav a.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .nav a.active{background:var(--primary);color:#fff;border-color:var(--primary)}
   .wrap{padding:6px 24px 28px}
   .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;box-shadow:0 2px 6px rgba(37,65,133,.06);margin-bottom:18px}
   form.filtros{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end}
   .field{display:flex;flex-direction:column;gap:4px} .field label{font-size:11px;font-weight:600;color:var(--mut);text-transform:uppercase;letter-spacing:.3px}
   .field input{border:1px solid var(--border);border-radius:8px;padding:9px 11px;font-size:14px;font-family:inherit}
-  .btn{background:var(--accent);color:#fff;border:0;border-radius:8px;padding:11px 18px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit}
-  .btn.sec{background:#fff;color:var(--accent);border:1px solid var(--accent)}
+  .btn{background:var(--primary);color:#fff;border:0;border-radius:8px;padding:11px 18px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit}
+  .btn.sec{background:#fff;color:var(--primary);border:1px solid var(--primary)}
   table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden}
-  th{background:#eef5fc;color:var(--accent);text-align:left;padding:10px 12px;font-size:12px;text-transform:uppercase;letter-spacing:.3px}
+  th{background:#eef5fc;color:var(--primary);text-align:left;padding:10px 12px;font-size:12px;text-transform:uppercase;letter-spacing:.3px}
   td{padding:10px 12px;border-top:1px solid var(--border);font-size:13px;vertical-align:top}
   tbody tr:hover{background:#f7fafe}
   .pill{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600;background:rgba(42,158,218,.12);color:var(--accent2)}
@@ -205,7 +205,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
   .alert.ok{background:rgba(24,138,91,.10);color:#166534;border:1px solid rgba(24,138,91,.25)}
   details summary{cursor:pointer;color:var(--accent2);font-size:12px}
   pre{background:#0b1430;color:#cfe0ff;padding:12px;border-radius:8px;overflow:auto;font-size:11.5px;max-height:320px}
-  h1{color:var(--accent)} h3{color:var(--accent)}
+  h1{color:var(--primary)} h3{color:var(--primary)}
 </style>
 
 <div class="crumb"><a href="dashboard.php">Dashboard</a> &rarr; Descargar de Zendesk</div>
@@ -224,7 +224,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
   <!-- Conector: sincronizar estructura + importar a la base -->
   <div class="card" style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:space-between">
     <div>
-      <strong style="color:var(--accent)">Conector Zendesk → tabla <code>tickets</code></strong>
+      <strong style="color:var(--primary)">Conector Zendesk → tabla <code>tickets</code></strong>
       <div class="muted" style="font-size:12.5px">
         Mapeo cargado: <?= count($mapeo) ?> campo(s).
         <?= $mapeo ? '' : ' <span style="color:var(--err)">Importa <code>sql/zendesk_mapeo.sql</code> primero.</span>' ?>
@@ -269,7 +269,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
     </div>
     <div id="inc-wrap" style="display:none;margin-top:16px">
       <div id="inc-status" class="muted mono" style="font-size:12px"></div>
-      <div id="inc-totales" style="margin-top:6px;font-weight:700;color:var(--accent)"></div>
+      <div id="inc-totales" style="margin-top:6px;font-weight:700;color:var(--primary)"></div>
       <div id="inc-log" class="mono" style="margin-top:8px;font-size:11px;max-height:160px;overflow:auto;color:var(--mut)"></div>
     </div>
   </div>
@@ -302,10 +302,10 @@ require __DIR__ . '/../../views/layout/kt_top.php';
     </div>
     <div id="bf-wrap" style="display:none;margin-top:16px">
       <div style="height:12px;background:#e7eef9;border-radius:999px;overflow:hidden">
-        <div id="bf-bar" style="height:100%;width:0;background:var(--accent);transition:width .2s"></div>
+        <div id="bf-bar" style="height:100%;width:0;background:var(--primary);transition:width .2s"></div>
       </div>
       <div id="bf-status" class="muted mono" style="margin-top:8px;font-size:12px"></div>
-      <div id="bf-totales" style="margin-top:6px;font-weight:700;color:var(--accent)"></div>
+      <div id="bf-totales" style="margin-top:6px;font-weight:700;color:var(--primary)"></div>
       <div id="bf-log" class="mono" style="margin-top:8px;font-size:11px;max-height:160px;overflow:auto;color:var(--mut)"></div>
     </div>
   </div>
@@ -468,8 +468,8 @@ require __DIR__ . '/../../views/layout/kt_top.php';
   <div class="card">
     <h3 style="margin-top:0">Historial de importaciones</h3>
     <div style="display:flex;gap:22px;flex-wrap:wrap;margin-bottom:12px">
-      <div><div class="muted" style="font-size:11px;text-transform:uppercase">Ejecuciones</div><div style="font-size:20px;font-weight:700;color:var(--accent)"><?= (int)$logResumen['ejecuciones'] ?></div></div>
-      <div><div class="muted" style="font-size:11px;text-transform:uppercase">Guardados (acum.)</div><div style="font-size:20px;font-weight:700;color:var(--accent)"><?= (int)$logResumen['guardados'] ?></div></div>
+      <div><div class="muted" style="font-size:11px;text-transform:uppercase">Ejecuciones</div><div style="font-size:20px;font-weight:700;color:var(--primary)"><?= (int)$logResumen['ejecuciones'] ?></div></div>
+      <div><div class="muted" style="font-size:11px;text-transform:uppercase">Guardados (acum.)</div><div style="font-size:20px;font-weight:700;color:var(--primary)"><?= (int)$logResumen['guardados'] ?></div></div>
       <div><div class="muted" style="font-size:11px;text-transform:uppercase">Rango cubierto</div><div style="font-size:14px;font-weight:600"><?= htmlspecialchars(($logResumen['min_desde'] ?? '—').' → '.($logResumen['max_hasta'] ?? '—')) ?></div></div>
       <div><div class="muted" style="font-size:11px;text-transform:uppercase">Última</div><div style="font-size:14px;font-weight:600"><?= htmlspecialchars($logResumen['ultima'] ?? '—') ?></div></div>
     </div>
@@ -483,7 +483,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
           <td class="muted" style="font-size:12px"><?= $l['tag'] ? htmlspecialchars($l['tag']) : '—' ?></td>
           <td><span class="pill"><?= htmlspecialchars($l['origen']) ?></span><?= $l['tope'] ? ' <span style="color:var(--warn)">⚠ llena</span>' : '' ?></td>
           <td class="muted"><?= (int)$l['traidos'] ?></td>
-          <td style="font-weight:600;color:var(--accent)"><?= (int)$l['guardados'] ?></td>
+          <td style="font-weight:600;color:var(--primary)"><?= (int)$l['guardados'] ?></td>
           <td class="muted" style="<?= (int)$l['errores']>0?'color:var(--err)':'' ?>"><?= (int)$l['errores'] ?></td>
         </tr>
         <?php endforeach; ?>

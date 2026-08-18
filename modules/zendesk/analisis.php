@@ -309,14 +309,14 @@ require __DIR__ . '/../../views/layout/kt_top.php';
 <style>
   :root{--bg:#fafafa;--surface:#fff;--border:#ececec;--border-strong:#e0e0e0;
     --text:#1a1a1a;--text-muted:#6b7280;--text-faint:#9ca3af;
-    --accent:#254185;--positive:#188a5b;--warning:#d99000;--negative:#ce3a2b;--neutral:#005ab2;--accent2:#2a9eda}
+    --positive:#188a5b;--warning:#d99000;--negative:#ce3a2b;--neutral:#005ab2;--accent2:#2a9eda}
   *{box-sizing:border-box;-webkit-font-smoothing:antialiased}
   body{margin:0;font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5}
   .container{max-width:1400px;margin:0 auto;padding:32px 32px 80px}
   header{margin-bottom:24px;display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:16px}
   header h1{font-size:22px;font-weight:600;letter-spacing:-.02em;margin:0 0 6px}
   header .crumb{color:var(--text-muted);font-size:13px}
-  header .crumb a{color:var(--accent);text-decoration:none}
+  header .crumb a{color:var(--primary);text-decoration:none}
   .nav{display:flex;gap:8px}
   .nav a{font-size:12px;padding:8px 14px;border:1px solid var(--border);border-radius:8px;color:var(--text);text-decoration:none;background:#fff;font-weight:500}
   .nav a.active{background:var(--text);color:#fff;border-color:var(--text)}
@@ -325,7 +325,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
   @media(max-width:680px){.filter-grid{grid-template-columns:repeat(2,1fr)}}
   .filter-grid label{display:block;font-size:11px;font-weight:600;color:var(--text-faint);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
   .filter-grid select,.filter-grid input{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font:inherit;font-size:13px;background:#fff;color:var(--text)}
-  .filter-grid button{padding:8px 16px;background:var(--accent);color:#fff;border:0;border-radius:6px;font:inherit;font-weight:500;cursor:pointer;font-size:13px}
+  .filter-grid button{padding:8px 16px;background:var(--primary);color:#fff;border:0;border-radius:6px;font:inherit;font-weight:500;cursor:pointer;font-size:13px}
   .filter-grid button:hover{filter:brightness(1.05)}
   .filter-bar .applied{margin-top:12px;font-size:12px;color:var(--text-muted);display:flex;flex-wrap:wrap;gap:8px;align-items:center}
   .chip{background:#eff6ff;color:#1d4ed8;padding:3px 9px;border-radius:999px;font-size:12px;font-weight:500;display:inline-flex;align-items:center;gap:6px}
@@ -370,7 +370,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
   .heat .col{font-size:10px;line-height:1.2;color:var(--text-faint);text-align:center;padding:4px}
   .row-link{cursor:pointer}
   .row-link:hover{background:#eff6ff !important}
-  a.action{font-size:11px;color:var(--accent);text-decoration:none;font-weight:500}
+  a.action{font-size:11px;color:var(--primary);text-decoration:none;font-weight:500}
   .insight{background:#fffbeb;border:1px solid #fcd34d;border-left:3px solid var(--warning);border-radius:6px;padding:12px 16px;font-size:13px;line-height:1.55;margin-top:14px}
   .insight b{font-weight:600}
   footer{margin-top:48px;padding-top:24px;border-top:1px solid var(--border);font-size:12px;color:var(--text-faint)}

@@ -172,7 +172,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
 <style>
   :root{
     --bg:#f5f7fb; --panel:#fff; --bd:#d9e2f0; --fg:#1f2937; --mut:#5b667a;
-    --accent:#254185; --accent2:#005ab2; --ok:#188a5b; --warn:#d99000; --err:#ce3a2b;
+     --accent2:#005ab2; --ok:#188a5b; --warn:#d99000; --err:#ce3a2b;
     --shadow:0 2px 6px rgba(37,65,133,.08);
   }
   *{box-sizing:border-box}
@@ -182,13 +182,13 @@ require __DIR__ . '/../../views/layout/kt_top.php';
   .nav{display:flex;gap:6px;flex-wrap:wrap;padding:0 24px 12px}
   .nav a{font-size:12px;padding:7px 12px;border:1px solid var(--bd);border-radius:7px;color:var(--fg);text-decoration:none;background:#fff;font-weight:500}
   .nav a:hover{background:#eef5fc}
-  .nav a.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .nav a.active{background:var(--primary);color:#fff;border-color:var(--primary)}
 
   .container{padding:6px 24px 18px}
   .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:12px;margin-bottom:16px}
   .kpi{background:var(--panel);border:1px solid var(--bd);border-radius:10px;padding:14px;box-shadow:var(--shadow)}
   .kpi .lbl{font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.3px;font-weight:600}
-  .kpi .val{font-size:23px;font-weight:700;margin-top:6px;color:var(--accent)}
+  .kpi .val{font-size:23px;font-weight:700;margin-top:6px;color:var(--primary)}
 
   .layout{display:grid;grid-template-columns:280px 1fr 320px;gap:14px;height:calc(100vh - 300px);min-height:520px}
   .side{background:var(--panel);border:1px solid var(--bd);border-radius:10px;padding:14px;overflow:auto;box-shadow:var(--shadow)}
@@ -200,7 +200,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
   .field label{font-size:11px;color:var(--mut);font-weight:600;text-transform:uppercase;letter-spacing:.3px}
   .field input,.field select{background:#fff;border:1px solid var(--bd);border-radius:6px;padding:7px 10px;font-size:13px;width:100%}
   .field input:focus,.field select:focus{outline:none;border-color:var(--accent2)}
-  .btn{background:var(--accent);color:#fff;border:0;border-radius:6px;padding:9px 14px;font-size:13px;font-weight:600;cursor:pointer;width:100%}
+  .btn{background:var(--primary);color:#fff;border:0;border-radius:6px;padding:9px 14px;font-size:13px;font-weight:600;cursor:pointer;width:100%}
   .btn:hover{filter:brightness(1.12)}
   .btn.ghost{background:transparent;color:var(--mut);border:1px solid var(--bd)}
   .btn.ghost:hover{background:#eef5fc}
@@ -208,7 +208,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
   .ranking .row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px dashed var(--bd);cursor:pointer}
   .ranking .row:last-child{border:0}
   .ranking .row:hover{background:#f7fafe}
-  .ranking .row strong{color:var(--accent)}
+  .ranking .row strong{color:var(--primary)}
   .badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10.5px;font-weight:600;background:#e8eef9;color:#254185}
   .legend{background:rgba(255,255,255,.96);border-radius:8px;padding:10px;position:absolute;bottom:18px;left:18px;box-shadow:0 4px 12px rgba(0,0,0,.15);font-size:11px;border:1px solid var(--bd);z-index:10}
   .legend h4{margin:0 0 6px;font-size:11px;color:var(--mut);text-transform:uppercase}

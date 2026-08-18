@@ -105,8 +105,8 @@ require __DIR__ . '/../../views/layout/kt_top.php';
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap">
 <style>
 :root {
-  --azul:#254185;
-  --azul-d:#1a2f63;
+  --azul:#005ab2;
+  --azul-d:#254185;
   --azul-l:#e8f0ff;
   --azul-ll:#f4f8ff;
   --tinta:#0a1b3d;
@@ -130,7 +130,7 @@ html {
   background:var(--azul-ll);
 }
 body {
-  font-family:'Space Grotesk', system-ui, sans-serif;
+  font-family:'Montserrat', system-ui, sans-serif;
   color:var(--tinta);
   -webkit-font-smoothing:antialiased;
   text-rendering:optimizeLegibility;

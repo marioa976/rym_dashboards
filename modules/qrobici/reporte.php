@@ -129,7 +129,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap">
 <style>
 :root{
-  --azul:#254185; --azul-d:#1a2f63; --azul-l:#e8f0ff; --azul-ll:#f4f8ff;
+  --azul:#005ab2; --azul-d:#254185; --azul-l:#e8f0ff; --azul-ll:#f4f8ff;
   --cielo:#2a9eda; --tinta:#0a1b3d; --gris:#5b6b8c; --gris-l:#9aa7c0;
   --linea:#e3e9f5; --bg:#fbfcfe; --blanco:#ffffff;
   --verde:#188a5b; --ambar:#d99000; --rojo:#ce3a2b; --rosa:#5b667a;
@@ -138,7 +138,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--tinta);line-height:1.5;-webkit-font-smoothing:antialiased}
+body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--tinta);line-height:1.5;-webkit-font-smoothing:antialiased}
 .wrap{max-width:1280px;margin:0 auto;padding:0 28px}
 
 header{background:linear-gradient(150deg,#254185 0%,#1a2f63 60%,#13234d 100%);color:#fff;padding:48px 0 130px;position:relative;overflow:hidden}
@@ -183,7 +183,7 @@ section{padding:54px 0 0}
   list-style:none;cursor:pointer;
   display:flex;align-items:center;gap:14px;
   padding:14px 20px;
-  font-family:'Space Grotesk',sans-serif;
+  font-family:'Montserrat',sans-serif;
   user-select:none;
 }
 .filters summary::-webkit-details-marker{display:none}
@@ -228,7 +228,7 @@ section{padding:54px 0 0}
   border:1px solid var(--bd);
   border-radius:10px;
   background:var(--gris-2);
-  font-family:'Space Grotesk',sans-serif;
+  font-family:'Montserrat',sans-serif;
   transition:all .15s ease;
   cursor:default;
 }
@@ -361,7 +361,7 @@ section{padding:54px 0 0}
 .legend .sw{width:11px;height:11px;border-radius:3px}
 
 svg .gridline{stroke:var(--linea);stroke-width:1;stroke-dasharray:3 4}
-svg text{font-family:'Space Grotesk',sans-serif}
+svg text{font-family:'Montserrat',sans-serif}
 svg .axlbl{font-size:10.5px;fill:var(--gris-l)}
 svg .vlbl{font-size:11px;fill:var(--tinta);font-weight:700;font-family:'Space Mono',monospace}
 
@@ -1337,7 +1337,7 @@ function renderPlanes(){
     const padL = 160, padR = 80, padT = 8, padB = 10;
     const iw = W - padL - padR;
     const rowH = (H - padT - padB) / filas.length;
-    const FONT_SANS = "font-family:'Space Grotesk',sans-serif";
+    const FONT_SANS = "font-family:'Montserrat',sans-serif";
     const FONT_MONO = "font-family:'Space Mono',monospace";
     let svg = '';
     filas.forEach((r, i) => {
@@ -1404,7 +1404,7 @@ function drawRoutes(){
     pl.addListener('mouseout',()=>pl.setOptions({strokeWeight:2.5,strokeOpacity:0.55}));
     const iw=new google.maps.InfoWindow();
     pl.addListener('click',e=>{
-      iw.setContent(`<div style="font-family:'Space Grotesk',sans-serif;font-size:12.5px;padding:2px 4px">
+      iw.setContent(`<div style="font-family:'Montserrat',sans-serif;font-size:12.5px;padding:2px 4px">
         <b style="font-family:'Archivo'">${r.origen} → ${r.destino}</b><br>
         ${r.tipo} · ${fmt1(r.dist/1000)} km · ${Math.round(r.dur/60)} min<br>
         <span style="color:#5b6b8c;font-family:'Space Mono';font-size:11px">${r.folio}</span></div>`);
