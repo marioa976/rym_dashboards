@@ -73,12 +73,12 @@ require __DIR__ . '/../../views/layout/kt_top.php';
     <div class="alert alert-danger">Falta <code>GOOGLE_MAPS_API_KEY</code>: el mapa no se mostrará, pero el listado sí.</div>
   <?php endif; ?>
 
-  <div class="ob-kpis">
-    <div class="ob-kpi"><div class="v"><?= number_format($kpis['total']) ?></div><div class="l">Obras (POA <?= $kpis['anios'] ?> años)</div></div>
-    <div class="ob-kpi"><div class="v" title="$<?= number_format($kpis['inversion'],2) ?>">$<?= number_format($invMDP,1) ?> <span style="font-size:13px">MDP</span></div><div class="l">Inversión ejercida</div></div>
-    <div class="ob-kpi"><div class="v"><?= number_format($kpis['con_coords']) ?> <span style="font-size:13px;color:var(--qro-text-muted)">/ <?= number_format($kpis['total']) ?></span></div><div class="l">Con ubicación en el mapa</div></div>
-    <div class="ob-kpi"><div class="v"><?= $pctTerm ?>%</div><div class="l"><?= number_format($kpis['terminadas']) ?> terminadas</div></div>
-    <div class="ob-kpi"><div class="v" id="k-vista"><?= number_format($kpis['total']) ?></div><div class="l" id="k-vista-inv">En vista (filtro)</div></div>
+  <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-4">
+    <div class="kt-card"><div class="kt-card-content p-4 flex flex-col gap-0.5"><span class="text-2xl font-bold text-primary leading-tight"><?= number_format($kpis['total']) ?></span><span class="text-xs text-secondary-foreground font-semibold">Obras (POA <?= $kpis['anios'] ?> años)</span></div></div>
+    <div class="kt-card"><div class="kt-card-content p-4 flex flex-col gap-0.5"><span class="text-2xl font-bold text-primary leading-tight" title="$<?= number_format($kpis['inversion'],2) ?>">$<?= number_format($invMDP,1) ?> <span class="text-sm">MDP</span></span><span class="text-xs text-secondary-foreground font-semibold">Inversión ejercida</span></div></div>
+    <div class="kt-card"><div class="kt-card-content p-4 flex flex-col gap-0.5"><span class="text-2xl font-bold text-primary leading-tight"><?= number_format($kpis['con_coords']) ?> <span class="text-sm text-muted-foreground">/ <?= number_format($kpis['total']) ?></span></span><span class="text-xs text-secondary-foreground font-semibold">Con ubicación en el mapa</span></div></div>
+    <div class="kt-card"><div class="kt-card-content p-4 flex flex-col gap-0.5"><span class="text-2xl font-bold text-primary leading-tight"><?= $pctTerm ?>%</span><span class="text-xs text-secondary-foreground font-semibold"><?= number_format($kpis['terminadas']) ?> terminadas</span></div></div>
+    <div class="kt-card"><div class="kt-card-content p-4 flex flex-col gap-0.5"><span class="text-2xl font-bold text-primary leading-tight" id="k-vista"><?= number_format($kpis['total']) ?></span><span class="text-xs text-secondary-foreground font-semibold" id="k-vista-inv">En vista (filtro)</span></div></div>
   </div>
 
   <div class="ob-tools">
