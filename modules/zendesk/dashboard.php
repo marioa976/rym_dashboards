@@ -302,11 +302,11 @@ $fmt = function($s) use ($meses) {
 $periodo_str = $fmt($rango['d_min']) . ' — ' . $fmt($rango['d_max']);
 $num_deleg = (int)$pdo->query("SELECT COUNT(DISTINCT delegacion_id) FROM tickets WHERE delegacion_id IS NOT NULL AND $WF")->fetchColumn();
 ?>
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<title>Dashboard Reportes de Servicio · Querétaro</title>
+<?php
+$ktTitle  = 'Dashboard Reportes de Servicio · Querétaro';
+$ktActive = 'zendesk';
+require __DIR__ . '/../../views/layout/kt_top.php';
+?>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -366,9 +366,7 @@ $num_deleg = (int)$pdo->query("SELECT COUNT(DISTINCT delegacion_id) FROM tickets
   .pill.negative{background:#fef2f2;color:#b91c1c}
   footer{margin-top:48px;padding-top:24px;border-top:1px solid var(--border);font-size:12px;color:var(--text-faint)}
 </style>
-</head>
-<body>
-<?php $portalModulo='Zendesk'; @include __DIR__.'/../_portalbar.php'; ?>
+
 <div class="container">
 
 <header>
@@ -383,8 +381,7 @@ $num_deleg = (int)$pdo->query("SELECT COUNT(DISTINCT delegacion_id) FROM tickets
       <?php endif; ?>
     </div>
   </div>
-  <?php $navExtra = ['?refresh=1' => '↻ Refrescar']; include __DIR__ . '/_navzendesk.php'; ?>
-</header>
+  </header>
 
 <form method="get" style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin:-28px 0 28px">
   <div><label style="font-size:11px;color:var(--text-muted);font-weight:600;display:block;margin-bottom:4px">Desde</label>
@@ -724,5 +721,4 @@ new Chart(document.getElementById('chVenc'),{type:'bar',
   data:{labels:Object.keys(DATA.venc_grp),datasets:[{data:Object.values(DATA.venc_grp),backgroundColor:COLORS.negative,borderRadius:3}]},
   options:{indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{...baseGrid,beginAtZero:true},y:{...noGrid,ticks:{...noGrid.ticks,font:{size:10.5}}}}}});
 </script>
-</body>
-</html>
+<?php require __DIR__ . '/../../views/layout/kt_bottom.php'; ?>

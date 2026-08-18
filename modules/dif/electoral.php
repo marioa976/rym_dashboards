@@ -200,12 +200,11 @@ function getSectionDetail(PDO $pdo, int $id, array $f): array
         'top_tipos'     => $topTipo->fetchAll(PDO::FETCH_ASSOC),
     ];
 }
-?><!doctype html>
-<html lang="es">
-<head>
-<meta charset="utf-8">
-<title>Reporte Electoral DIF — Querétaro</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+?><?php
+$ktTitle  = 'Reporte Electoral DIF — Querétaro';
+$ktActive = 'dif';
+require __DIR__ . '/../../views/layout/kt_top.php';
+?>
 <style>
   :root{
     --bg:#f5f7fa; --panel:#ffffff; --bd:#e2e8f0; --fg:#0f172a; --mut:#64748b;
@@ -282,11 +281,6 @@ function getSectionDetail(PDO $pdo, int $id, array $f): array
     #map{height:560px}
   }
 </style>
-</head>
-<body>
-
-<?php $portalModulo='DIF'; @include __DIR__.'/../_portalbar.php'; ?>
-<?php $navActive = 'electoral'; include __DIR__ . '/_nav.php'; ?>
 
 <?php if (!$ok): ?>
 <div class="err-banner">
@@ -790,5 +784,4 @@ function escapeHtml(s){ return String(s||'').replace(/[&<>"]/g, c => ({'&':'&amp
 
 <?php endif; ?>
 
-</body>
-</html>
+<?php require __DIR__ . '/../../views/layout/kt_bottom.php'; ?>

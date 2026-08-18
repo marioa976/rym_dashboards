@@ -18,13 +18,11 @@ try {
     $deleg = bloq_por_delegacion($pdo, 10);
     $serie = bloq_serie_dia($pdo, 120);
 } catch (Throwable $e) { $dbError = $e->getMessage(); }
-?><!doctype html>
-<html lang="es">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Bloque · Tablero</title>
-  <link rel="stylesheet" href="../../assets/css/qro.css">
+?><?php
+$ktTitle  = 'Bloque · Tablero';
+$ktActive = 'bloque';
+require __DIR__ . '/../../views/layout/kt_top.php';
+?>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
   <style>
     .bl-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:20px}
@@ -37,11 +35,7 @@ try {
     .bl-card h3{margin:0 0 10px;font-size:14px}
     .bl-wrap{position:relative;height:250px}
   </style>
-</head>
-<body>
-<?php $portalModulo = 'Bloque'; $navActive = 'home'; include __DIR__ . '/_nav.php'; ?>
 
-<main class="content" style="padding:28px 32px">
   <div style="background:linear-gradient(120deg,var(--qro-blue-dark),var(--qro-blue));color:#fff;border-radius:16px;padding:22px 26px;margin-bottom:20px">
     <h1 style="color:#fff;margin:0 0 4px;font-size:23px">💡 Bloque · Innovación y tecnología</h1>
     <p style="margin:0;opacity:.92;font-size:14px">Hola, <?= $nombre ?>. Usuarios, eventos y asistencia del edificio Bloque.</p>
@@ -66,7 +60,6 @@ try {
   </div>
 
   <a class="btn btn-primary" href="eventos.php">Ver eventos y ocupación →</a>
-</main>
 
 <script>
 const SEXO = <?= json_encode($demo['sexo'], JSON_UNESCAPED_UNICODE) ?>;
@@ -91,5 +84,4 @@ new Chart(document.getElementById('c-deleg'),{type:'bar',
   data:{labels:DELEG.map(r=>r.d),datasets:[{data:DELEG.map(r=>+r.n),backgroundColor:'#254185',borderRadius:5}]},
   options:{...base,indexAxis:'y',plugins:{legend:{display:false}}}});
 </script>
-</body>
-</html>
+<?php require __DIR__ . '/../../views/layout/kt_bottom.php'; ?>

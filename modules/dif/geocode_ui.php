@@ -87,12 +87,11 @@ if ($action !== '') {
 // =====================================================================
 // HTML
 // =====================================================================
-?><!doctype html>
-<html lang="es">
-<head>
-<meta charset="utf-8">
-<title>Geocodificador Padrón DIF</title>
-<style>
+?><?php
+$ktTitle  = 'Geocodificador Padrón DIF';
+$ktActive = 'dif';
+require __DIR__ . '/../../views/layout/kt_top.php';
+?><style>
   :root{--bg:#0f172a;--card:#1e293b;--bd:#334155;--mut:#94a3b8;--fg:#e2e8f0;
        --ok:#10b981;--warn:#f59e0b;--err:#ef4444;--accent:#005ab2}
   *{box-sizing:border-box}
@@ -150,11 +149,6 @@ if ($action !== '') {
   .small{font-size:12px;color:var(--mut)}
   .pill{padding:1px 6px;background:#334155;border-radius:3px;font-family:monospace;font-size:11px}
 </style>
-</head>
-<body>
-
-<?php $portalModulo='DIF'; @include __DIR__.'/../_portalbar.php'; ?>
-<?php $navActive = 'geocode'; include __DIR__ . '/_nav.php'; ?>
 
 <header>
   <h1>🗺️ Geocodificador Padrón DIF</h1>
@@ -745,8 +739,7 @@ async function resetPadron(){
   loadStats();
 }
 </script>
-</body>
-</html>
+<?php require __DIR__ . '/../../views/layout/kt_bottom.php'; ?>
 <?php
 
 // =====================================================================

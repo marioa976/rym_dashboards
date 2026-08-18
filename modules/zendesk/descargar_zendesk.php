@@ -174,11 +174,11 @@ try {
     $errRows  = $pdo->query("SELECT ejecutado_en, ticket_id, origen, mensaje
                                FROM zendesk_import_errores ORDER BY ejecutado_en DESC LIMIT 100")->fetchAll(PDO::FETCH_ASSOC);
 } catch (Throwable $e) { /* tabla aún no creada */ }
-?><!doctype html>
-<html lang="es">
-<head>
-<meta charset="utf-8">
-<title>Descargar tickets de Zendesk · Querétaro</title>
+?><?php
+$ktTitle  = 'Descargar tickets de Zendesk · Querétaro';
+$ktActive = 'zendesk';
+require __DIR__ . '/../../views/layout/kt_top.php';
+?>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
   :root{--bg:#f5f7fb;--surface:#fff;--border:#d9e2f0;--text:#1f2937;--mut:#5b667a;--accent:#254185;--accent2:#005ab2;--ok:#188a5b;--warn:#d99000;--err:#ce3a2b}
@@ -207,13 +207,8 @@ try {
   pre{background:#0b1430;color:#cfe0ff;padding:12px;border-radius:8px;overflow:auto;font-size:11.5px;max-height:320px}
   h1{color:var(--accent)} h3{color:var(--accent)}
 </style>
-</head>
-<body>
-<?php $portalModulo = 'Zendesk'; include __DIR__ . '/../_portalbar.php'; ?>
 
 <div class="crumb"><a href="dashboard.php">Dashboard</a> &rarr; Descargar de Zendesk</div>
-<?php include __DIR__ . '/_navzendesk.php'; ?>
-
 <div class="wrap">
   <div class="page-head" style="margin-bottom:14px">
     <h1 style="margin:0">Descargar tickets de Zendesk</h1>
@@ -601,5 +596,4 @@ try {
     </div>
   <?php endif; ?>
 </div>
-</body>
-</html>
+<?php require __DIR__ . '/../../views/layout/kt_bottom.php'; ?>

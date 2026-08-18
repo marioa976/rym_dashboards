@@ -244,11 +244,11 @@ if ($p_delegacion) {
 $meses = ['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'];
 $fecha_gen = (int)date('d').' '.$meses[(int)date('n')-1].' '.date('Y');
 ?>
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<title>Hoja de ruta · Cuadrilla <?= $cuadrilla_idx+1 ?> · Día <?= $dia_idx+1 ?></title>
+<?php
+$ktTitle  = 'Hoja de ruta · Cuadrilla ' . ($cuadrilla_idx + 1) . ' · Día ' . ($dia_idx + 1);
+$ktActive = 'zendesk';
+require __DIR__ . '/../../views/layout/kt_top.php';
+?>
 <style>
 @page { size: letter portrait; margin: 14mm 12mm; }
 
@@ -326,9 +326,6 @@ body { font-size:10.5pt; line-height:1.35; }
 /* Página break controles */
 .page-break { page-break-after: always; }
 </style>
-</head>
-<body>
-<?php $portalModulo='Zendesk'; @include __DIR__.'/../_portalbar.php'; ?>
 
 <div class="toolbar no-print">
   <div>
@@ -460,5 +457,4 @@ body { font-size:10.5pt; line-height:1.35; }
 
 </div>
 
-</body>
-</html>
+<?php require __DIR__ . '/../../views/layout/kt_bottom.php'; ?>

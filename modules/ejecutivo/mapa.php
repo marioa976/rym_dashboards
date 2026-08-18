@@ -24,13 +24,11 @@ try {
     $qb = ej_qrobici($pdo);           // remoto cacheado
     if ($qb) $estaciones = $qb['estaciones'];
 } catch (Throwable $e) { $dbError = $e->getMessage(); }
-?><!doctype html>
-<html lang="es">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Ejecutivo · Mapa por capas</title>
-  <link rel="stylesheet" href="../../assets/css/qro.css">
+?><?php
+$ktTitle  = 'Ejecutivo · Mapa por capas';
+$ktActive = 'ejecutivo';
+require __DIR__ . '/../../views/layout/kt_top.php';
+?>
   <script src="https://unpkg.com/deck.gl@8.9.35/dist.min.js"></script>
   <style>
     .ej-map-wrap{display:grid;grid-template-columns:280px 1fr;gap:16px}
@@ -46,11 +44,7 @@ try {
     .ej-sw{width:12px;height:12px;border-radius:3px;display:inline-block}
     .ej-load{font-size:11px;color:#b26b00}
   </style>
-</head>
-<body>
-<?php $portalModulo = 'Ejecutivo'; $navActive = 'mapa'; include __DIR__ . '/_nav.php'; ?>
 
-<main class="content" style="padding:28px 32px">
   <div class="page-head"><h1>Mapa por capas</h1><p class="text-secondary">Superpone la geografía de los distintos módulos. Prende y apaga capas para cruzar territorio.</p></div>
 
   <?php if ($dbError): ?><div class="alert alert-danger">Error: <?= htmlspecialchars($dbError) ?></div><?php endif; ?>
@@ -106,7 +100,6 @@ try {
     </div>
     <div><div id="ej-map"></div></div>
   </div>
-</main>
 
 <script>
 const OBRAS = <?= json_encode($obras, JSON_UNESCAPED_UNICODE) ?>;
@@ -318,5 +311,4 @@ if(!HASKEY){ $('ej-map').innerHTML='<div style="padding:20px;color:#991B1B">Goog
 <?php if ($apiKey): ?>
 <script async src="https://maps.googleapis.com/maps/api/js?key=<?= urlencode($apiKey) ?>&callback=initEjMap&loading=async&v=weekly"></script>
 <?php endif; ?>
-</body>
-</html>
+<?php require __DIR__ . '/../../views/layout/kt_bottom.php'; ?>

@@ -269,11 +269,11 @@ $fmt = function($s) {
 $duracion_total_min = (int)round(($end_sec - $start_sec) / 60);
 $km_dia = round(array_sum(array_map(fn($x)=>$x['km'], array_filter($timeline, fn($x)=>$x['tipo']==='viaje'))), 1);
 ?>
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<title>Simulación · Cuadrilla <?= $cuadrilla_idx+1 ?> · Día <?= $dia_idx+1 ?></title>
+<?php
+$ktTitle  = 'Simulación · Cuadrilla ' . ($cuadrilla_idx + 1) . ' · Día ' . ($dia_idx + 1);
+$ktActive = 'zendesk';
+require __DIR__ . '/../../views/layout/kt_top.php';
+?>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -329,9 +329,7 @@ html,body{margin:0;height:100%;font-family:'Inter',system-ui,sans-serif;backgrou
 .status-pill.servicio .dot{background:var(--ok)}
 .status-pill.fin .dot{background:var(--text-faint)}
 </style>
-</head>
-<body>
-<?php $portalModulo='Zendesk'; @include __DIR__.'/../_portalbar.php'; ?>
+
 <div class="app">
 
 <div class="app-header">
@@ -739,5 +737,4 @@ document.getElementById('bar').onclick = (e) => {
 </script>
 <script async defer src="https://maps.googleapis.com/maps/api/js?key=<?= htmlspecialchars($api_key) ?>&libraries=geometry&callback=initMap"></script>
 <?php endif; ?>
-</body>
-</html>
+<?php require __DIR__ . '/../../views/layout/kt_bottom.php'; ?>
