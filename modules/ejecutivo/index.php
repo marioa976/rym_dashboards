@@ -59,89 +59,84 @@ $ktActive = 'ejecutivo';
 require __DIR__ . '/../../views/layout/kt_top.php';
 ?>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
-  <style>
-    .ej-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-bottom:20px}
-    .ej-tile{background:#fff;border:1px solid var(--qro-border);border-radius:14px;padding:16px 18px;
-      text-decoration:none;color:inherit;border-left:5px solid var(--ac);display:block;transition:box-shadow .15s}
-    .ej-tile:hover{box-shadow:0 6px 18px rgba(0,0,0,.08)}
-    .ej-tile .t{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--ac)}
-    .ej-tile .v{font-size:26px;font-weight:800;color:var(--qro-text-primary);line-height:1.15;margin-top:3px}
-    .ej-tile .s{font-size:12px;color:var(--qro-text-secondary);margin-top:2px}
-    .ej-grid{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:20px}
-    @media(max-width:900px){.ej-grid{grid-template-columns:1fr}}
-    .ej-card{background:#fff;border:1px solid var(--qro-border);border-radius:14px;padding:16px 18px}
-    .ej-card h3{margin:0 0 10px;font-size:14px}
-    .ej-charts{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
-    @media(max-width:900px){.ej-charts{grid-template-columns:1fr}}
-    .ej-chart-wrap{position:relative;height:250px}
-    table.ej-mtx{width:100%;border-collapse:collapse;font-size:13px}
-    table.ej-mtx th,table.ej-mtx td{padding:9px 12px;border-bottom:1px solid #eef0f2;text-align:right;font-variant-numeric:tabular-nums}
-    table.ej-mtx th:first-child,table.ej-mtx td:first-child{text-align:left;font-weight:600}
-    table.ej-mtx thead th{position:sticky;top:0;background:#f5f7fb;font-size:11px;text-transform:uppercase;letter-spacing:.3px;color:var(--qro-text-secondary)}
-    table.ej-mtx tfoot td{font-weight:800;border-top:2px solid var(--qro-border);background:#fafbfe}
-    .ej-scroll{overflow:auto;border:1px solid var(--qro-border);border-radius:14px}
-  </style>
-  <div style="background:linear-gradient(120deg,#14224a,#254185);color:#fff;border-radius:16px;padding:22px 26px;margin-bottom:20px">
-    <h1 style="color:#fff;margin:0 0 4px;font-size:23px">📊 Tablero Ejecutivo</h1>
-    <p style="margin:0;opacity:.92;font-size:14px">Hola, <?= $nombre ?>. Indicadores cruzados de todos los módulos, por delegación.</p>
+  <!-- Hero -->
+  <div class="rounded-xl p-6 mb-5 text-white" style="background:linear-gradient(120deg,#14224a,#254185)">
+    <h1 class="text-2xl font-bold text-white">📊 Tablero Ejecutivo</h1>
+    <p class="text-sm opacity-90 mt-1">Hola, <?= $nombre ?>. Indicadores cruzados de todos los módulos, por delegación.</p>
   </div>
 
-  <?php if ($dbError): ?><div class="alert alert-danger">No se pudieron cargar los datos.<br><span style="font-size:12px"><?= htmlspecialchars($dbError) ?></span></div><?php endif; ?>
+  <?php if ($dbError): ?>
+    <div class="rounded-lg border border-destructive/30 bg-destructive/10 text-destructive px-4 py-3 mb-5 text-sm">No se pudieron cargar los datos.<br><span class="text-xs opacity-80"><?= htmlspecialchars($dbError) ?></span></div>
+  <?php endif; ?>
 
-  <div class="ej-tiles">
-    <a class="ej-tile" href="../obras/index.php" style="--ac:#c85a2b">
-      <div class="t">🏗 Obras</div><div class="v"><?= number_format($kpis['obras']['n']) ?></div>
-      <div class="s"><?= ej_money($kpis['obras']['inv']) ?> · <?= $kpis['obras']['term'] ?> terminadas</div></a>
-    <a class="ej-tile" href="../areasverdes/index.php" style="--ac:#2e9e5b">
-      <div class="t">🌳 Áreas verdes</div><div class="v"><?= number_format($kpis['areas']['n']) ?></div>
-      <div class="s">áreas mapeadas</div></a>
-    <a class="ej-tile" href="../dif/dashboard.php" style="--ac:#8e44ad">
-      <div class="t">🤝 DIF · padrón</div><div class="v"><?= number_format($kpis['dif']['n']) ?></div>
-      <div class="s"><?= number_format($kpis['dif']['geo']) ?> geolocalizados</div></a>
-    <a class="ej-tile" href="../zendesk/dashboard.php" style="--ac:#005ab2">
-      <div class="t">📮 Zendesk · tickets</div><div class="v"><?= number_format($kpis['zendesk']['n']) ?></div>
-      <div class="s"><?= number_format($kpis['zendesk']['geo']) ?> geolocalizados</div></a>
-    <a class="ej-tile" href="../bloque/index.php" style="--ac:#159c9c">
-      <div class="t">💡 Bloque</div><div class="v"><?= number_format($kpis['bloque']['n']) ?></div>
-      <div class="s">beneficiarios</div></a>
-    <a class="ej-tile" href="../qrobici/index.php" style="--ac:#e0872b">
-      <div class="t">🚲 Qrobici</div><div class="v"><?= $qrobici ? number_format($qrobici['kpis']['viajes']) : '—' ?></div>
-      <div class="s"><?= $qrobici ? number_format($qrobici['kpis']['estaciones']).' estaciones · '.number_format($qrobici['kpis']['km']).' km' : 'sin conexión remota' ?></div></a>
+  <!-- KPI tiles -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-5">
+    <?php
+    $tiles = [
+      ['🏗 Obras',           number_format($kpis['obras']['n']),   ej_money($kpis['obras']['inv']).' · '.$kpis['obras']['term'].' terminadas', '#c85a2b', '../obras/index.php'],
+      ['🌳 Áreas verdes',    number_format($kpis['areas']['n']),   'áreas mapeadas', '#2e9e5b', '../areasverdes/index.php'],
+      ['🤝 DIF · padrón',    number_format($kpis['dif']['n']),     number_format($kpis['dif']['geo']).' geolocalizados', '#8e44ad', '../dif/dashboard.php'],
+      ['📮 Zendesk',         number_format($kpis['zendesk']['n']), number_format($kpis['zendesk']['geo']).' geolocalizados', '#005ab2', '../zendesk/dashboard.php'],
+      ['💡 Bloque',          number_format($kpis['bloque']['n']),  'beneficiarios', '#159c9c', '../bloque/index.php'],
+      ['🚲 Qrobici',         $qrobici ? number_format($qrobici['kpis']['viajes']) : '—', $qrobici ? number_format($qrobici['kpis']['estaciones']).' estaciones · '.number_format($qrobici['kpis']['km']).' km' : 'sin conexión remota', '#e0872b', '../qrobici/index.php'],
+    ];
+    foreach ($tiles as [$t, $v, $s, $ac, $href]): ?>
+      <a class="kt-card hover:shadow-md transition-shadow" href="<?= $href ?>" style="border-inline-start:4px solid <?= $ac ?>">
+        <div class="kt-card-content p-4 flex flex-col gap-1">
+          <span class="text-xs font-bold uppercase tracking-wide" style="color:<?= $ac ?>"><?= $t ?></span>
+          <span class="text-2xl font-bold text-mono leading-tight"><?= $v ?></span>
+          <span class="text-xs text-secondary-foreground"><?= $s ?></span>
+        </div>
+      </a>
+    <?php endforeach; ?>
   </div>
 
-  <div class="ej-charts">
-    <div class="ej-card"><h3>Inversión en obras por delegación (MDP)</h3><div class="ej-chart-wrap"><canvas id="c-inv"></canvas></div></div>
-    <div class="ej-card"><h3>Atención ciudadana · tickets por delegación</h3><div class="ej-chart-wrap"><canvas id="c-tickets"></canvas></div></div>
-    <div class="ej-card"><h3>Apoyos DIF por delegación</h3><div class="ej-chart-wrap"><canvas id="c-dif"></canvas></div></div>
-    <div class="ej-card"><h3>Obras por estatus</h3><div class="ej-chart-wrap"><canvas id="c-est"></canvas></div></div>
+  <!-- Gráficas -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-5">
+    <?php foreach ([['c-inv','Inversión en obras por delegación (MDP)'],['c-tickets','Atención ciudadana · tickets por delegación'],['c-dif','Apoyos DIF por delegación'],['c-est','Obras por estatus']] as [$cid, $ctitle]): ?>
+      <div class="kt-card">
+        <div class="kt-card-header"><h3 class="kt-card-title"><?= $ctitle ?></h3></div>
+        <div class="kt-card-content"><div class="relative h-[250px]"><canvas id="<?= $cid ?>"></canvas></div></div>
+      </div>
+    <?php endforeach; ?>
   </div>
 
-  <div class="ej-card" style="padding:0;overflow:hidden">
-    <h3 style="padding:16px 18px 0">Matriz cruzada por delegación</h3>
-    <p class="text-secondary" style="padding:0 18px;font-size:12px;margin:2px 0 8px">Intensidad de color = valor relativo dentro de cada columna.</p>
-    <div class="ej-scroll" style="border:0;border-radius:0">
-      <table class="ej-mtx">
-        <thead><tr><th>Delegación</th>
-          <?php foreach ($cols as $c): ?><th style="color:<?= $c[2] ?>"><?= $c[1] ?></th><?php endforeach; ?>
-        </tr></thead>
-        <tbody>
-          <?php foreach ($matriz as $d => $v): ?>
-          <tr>
-            <td><?= htmlspecialchars($d) ?></td>
-            <?php foreach ($cols as $c):
-              $val = $v[$c[0]]; $mx = $maxc[$c[0]] ?: 1; $a = $mx>0 ? round(($val/$mx)*0.55, 3) : 0;
-              [$r,$g,$b] = sscanf($c[2], "#%02x%02x%02x");
-              $cell = $c[0]==='inv' ? ej_money($val) : number_format($val);
-            ?>
-              <td style="background:rgba(<?= $r ?>,<?= $g ?>,<?= $b ?>,<?= $a ?>)"><?= $cell ?></td>
+  <!-- Matriz cruzada -->
+  <div class="kt-card">
+    <div class="kt-card-header flex-col items-start gap-1 py-4">
+      <h3 class="kt-card-title">Matriz cruzada por delegación</h3>
+      <span class="text-xs text-secondary-foreground font-normal">Intensidad de color = valor relativo dentro de cada columna.</span>
+    </div>
+    <div class="kt-card-content p-0">
+      <div class="kt-scrollable-x-auto">
+        <table class="kt-table kt-table-border text-sm">
+          <thead>
+            <tr>
+              <th class="text-start">Delegación</th>
+              <?php foreach ($cols as $c): ?><th class="text-end" style="color:<?= $c[2] ?>"><?= $c[1] ?></th><?php endforeach; ?>
+            </tr>
+          </thead>
+          <tbody>
+            <?php foreach ($matriz as $d => $v): ?>
+            <tr>
+              <td class="font-semibold"><?= htmlspecialchars($d) ?></td>
+              <?php foreach ($cols as $c):
+                $val = $v[$c[0]]; $mx = $maxc[$c[0]] ?: 1; $a = $mx>0 ? round(($val/$mx)*0.55, 3) : 0;
+                [$r,$g,$b] = sscanf($c[2], "#%02x%02x%02x");
+                $cell = $c[0]==='inv' ? ej_money($val) : number_format($val); ?>
+                <td class="text-end tabular-nums" style="background:rgba(<?= $r ?>,<?= $g ?>,<?= $b ?>,<?= $a ?>)"><?= $cell ?></td>
+              <?php endforeach; ?>
+            </tr>
             <?php endforeach; ?>
-          </tr>
-          <?php endforeach; ?>
-        </tbody>
-        <tfoot><tr><td>Total</td>
-          <?php foreach ($cols as $c): ?><td><?= $c[0]==='inv' ? ej_money($tot[$c[0]]) : number_format($tot[$c[0]]) ?></td><?php endforeach; ?>
-        </tr></tfoot>
-      </table>
+          </tbody>
+          <tfoot>
+            <tr class="font-bold">
+              <td>Total</td>
+              <?php foreach ($cols as $c): ?><td class="text-end tabular-nums"><?= $c[0]==='inv' ? ej_money($tot[$c[0]]) : number_format($tot[$c[0]]) ?></td><?php endforeach; ?>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
     </div>
   </div>
 <script>
