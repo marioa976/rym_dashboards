@@ -27,7 +27,7 @@ $__icons = [
  * módulo activo. Los módulos de una sola página no aparecen aquí.
  */
 $__subpages = [
-    'ejecutivo' => [['Tablero','index.php'],['Mapa por capas','mapa.php'],['Electoral seccional','electoral.php']],
+    'ejecutivo' => [['Tablero','index.php'],['Mapa por capas','mapa.php'],['Electoral seccional','electoral.php'],['Recorrido territorial','recorrido.php']],
     'bloque'    => [['Tablero','index.php'],['Eventos','eventos.php'],['Procedencia','mapa.php']],
     'qrobus'    => [['Inicio','index.php'],['KPIs','kpis.php'],['Mapa seccional','mapa.php'],['Geocodificar','geocode.php',true]],
     'dif'       => [['Inicio','index.php'],['Dashboard','dashboard.php'],['Electoral','electoral.php'],
