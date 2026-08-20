@@ -17,7 +17,9 @@ header('Content-Type: application/json; charset=utf-8');
 
 $verPII = function_exists('puede_editar') && puede_editar('ejecutivo');
 $sec    = isset($_GET['sec'])   ? (int)$_GET['sec']            : 0;
+$dist   = isset($_GET['dist'])  ? (int)$_GET['dist']           : 0;
 $deleg  = isset($_GET['deleg']) ? trim((string)$_GET['deleg']) : '';
+$dias   = isset($_GET['dias'])  ? max(0, (int)$_GET['dias'])   : 0;   // 0 = sin filtro de fecha
 $LIMIT  = 4000;   // tope duro por capa (una delegación grande no debe reventar)
 
 /** Ray-casting: ¿el punto cae dentro de alguno de los anillos? */
@@ -63,6 +65,19 @@ try {
         // contexto electoral (cacheado)
         $el = ej_electoral($pdo);
         if (isset($el['sec'][$sec])) { $part = $el['sec'][$sec]['part'] ?? null; $gan = $el['sec'][$sec]['gan'] ?? null; }
+    } elseif ($dist > 0) {
+        // Distrito = unión de las secciones con ese distrito_id.
+        $st = $pdo->prepare("SELECT ST_AsGeoJSON(g.geom,6) gj
+                               FROM secciones s JOIN secciones_geo g ON g.seccion_id=s.id
+                              WHERE s.distrito_id=?");
+        $st->execute([$dist]);
+        foreach ($st as $r) {
+            $gg = json_decode((string)$r['gj'], true);
+            if (is_array($gg)) foreach (rec_rings_from_geojson($gg) as $ring) $rings[] = $ring;
+        }
+        $dn = $pdo->prepare("SELECT numero,nombre FROM distritos WHERE id=? LIMIT 1"); $dn->execute([$dist]); $dr = $dn->fetch();
+        $titulo = 'Distrito ' . ($dr['numero'] ?? $dist) . (!empty($dr['nombre']) ? ' — ' . $dr['nombre'] : '');
+        if ($rings) $geom = ['type'=>'MultiPolygon','coordinates'=>array_map(fn($ri)=>[$ri], $rings)];
     } elseif ($deleg !== '') {
         foreach (ej_poligonos($pdo) as $p) {
             if (ej_canon($p['n']) === ej_canon($deleg)) {
@@ -104,6 +119,7 @@ try {
     $layers = [];
 
     // --- Tickets abiertos (problemas) -----------------------------------
+    $ticketFecha = $dias > 0 ? " AND t.fecha_creacion >= (CURDATE() - INTERVAL " . (int)$dias . " DAY)" : "";
     try {
         $layers['tickets'] = $collect(
             "SELECT t.ticket_id id, t.latitud lat, t.longitud lng,
@@ -115,7 +131,7 @@ try {
                LEFT JOIN cat_estado e ON e.id=t.estado_id
                LEFT JOIN cat_tipo_servicio ts ON ts.id=t.tipo_servicio_id
               WHERE t.latitud BETWEEN ? AND ? AND t.longitud BETWEEN ? AND ?
-                AND e.es_resuelto = 0",
+                AND e.es_resuelto = 0" . $ticketFecha,
             fn($r,$lat,$lng) => [
                 'lat'=>round($lat,6),'lng'=>round($lng,6),
                 'id'=>(int)$r['id'],'tipo'=>$r['servicio'] ?: 'Reporte',
@@ -162,7 +178,8 @@ try {
     foreach ($layers as $k=>$v) $counts[$k] = count($v);
 
     echo json_encode([
-        'ok'=>true, 'titulo'=>$titulo, 'sec'=>$sec ?: null, 'deleg'=>$deleg ?: null,
+        'ok'=>true, 'titulo'=>$titulo, 'sec'=>$sec ?: null, 'dist'=>$dist ?: null,
+        'deleg'=>$deleg ?: null, 'dias'=>$dias ?: null,
         'part'=>$part, 'gan'=>$gan, 'verPII'=>$verPII,
         'center'=>['lat'=>$cLat,'lng'=>$cLng], 'geom'=>$geom,
         'counts'=>$counts, 'layers'=>$layers,

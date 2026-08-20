@@ -16,7 +16,7 @@ require_once __DIR__ . '/lib.php';
 $cfg     = ej_config();
 $apiKey  = $cfg['google_maps_api_key'] ?? '';
 $verPII  = function_exists('puede_editar') && puede_editar('ejecutivo');
-$dbError = null; $limites = []; $secciones = []; $delegaciones = [];
+$dbError = null; $limites = []; $secciones = []; $delegaciones = []; $distritos = [];
 try {
     $pdo     = ej_pdo();
     $limites = ej_limites($pdo);
@@ -24,6 +24,15 @@ try {
     foreach ($pdo->query("SELECT DISTINCT s.num_seccion n
                             FROM secciones s JOIN secciones_geo g ON g.seccion_id=s.id
                            ORDER BY s.num_seccion") as $r) $secciones[] = (int)$r['n'];
+    // distritos que tienen secciones con geometría
+    try {
+        foreach ($pdo->query("SELECT DISTINCT d.id, d.numero, d.nombre
+                                FROM distritos d
+                                JOIN secciones s ON s.distrito_id = d.id
+                                JOIN secciones_geo g ON g.seccion_id = s.id
+                               ORDER BY d.numero") as $r)
+            $distritos[] = ['id'=>(int)$r['id'],'numero'=>(int)$r['numero'],'nombre'=>$r['nombre']];
+    } catch (Throwable $e) { /* sin catálogo de distritos: se omite el scope */ }
 } catch (Throwable $e) { $dbError = $e->getMessage(); }
 
 $ktTitle  = 'Ejecutivo · Recorrido territorial';
@@ -91,8 +100,9 @@ require __DIR__ . '/../../views/layout/kt_top.php';
     <div class="rc-panel">
       <h3>1 · Territorio</h3>
       <div class="rc-seg" id="rc-scope">
-        <button data-scope="sec" class="on">Por sección</button>
-        <button data-scope="deleg">Por delegación</button>
+        <button data-scope="sec" class="on">Sección</button>
+        <button data-scope="dist">Distrito</button>
+        <button data-scope="deleg">Delegación</button>
       </div>
       <div class="rc-field" id="rc-f-sec">
         <label>Sección</label>
@@ -101,11 +111,29 @@ require __DIR__ . '/../../views/layout/kt_top.php';
           <?php foreach ($secciones as $s): ?><option value="<?= $s ?>"><?= $s ?></option><?php endforeach; ?>
         </select>
       </div>
+      <div class="rc-field" id="rc-f-dist" style="display:none">
+        <label>Distrito</label>
+        <select id="rc-dist">
+          <option value="">— elige un distrito —</option>
+          <?php foreach ($distritos as $d): ?><option value="<?= $d['id'] ?>">Distrito <?= $d['numero'] ?><?= $d['nombre'] ? ' — '.htmlspecialchars($d['nombre']) : '' ?></option><?php endforeach; ?>
+        </select>
+        <?php if (!$distritos): ?><div class="rc-hint">Sin catálogo de distritos disponible.</div><?php endif; ?>
+      </div>
       <div class="rc-field" id="rc-f-deleg" style="display:none">
         <label>Delegación</label>
         <select id="rc-deleg">
           <option value="">— elige una delegación —</option>
           <?php foreach ($delegaciones as $d): ?><option value="<?= htmlspecialchars($d) ?>"><?= htmlspecialchars($d) ?></option><?php endforeach; ?>
+        </select>
+      </div>
+      <div class="rc-field">
+        <label>Tickets: solo reportados en los últimos… (días)</label>
+        <select id="rc-dias">
+          <option value="7">7 días</option>
+          <option value="15">15 días</option>
+          <option value="30" selected>30 días</option>
+          <option value="90">90 días</option>
+          <option value="0">Todos</option>
         </select>
       </div>
       <button class="rc-btn" id="rc-load">Cargar territorio</button>
@@ -115,12 +143,12 @@ require __DIR__ . '/../../views/layout/kt_top.php';
     <div class="rc-panel" style="margin-top:14px">
       <h3>2 · Capas</h3>
       <div class="rc-layers" id="rc-layers">
-        <label><span class="rc-swatch" style="background:#dc2626"></span> Tickets abiertos <input type="checkbox" data-layer="tickets" checked style="display:none"><span class="cnt" data-cnt="tickets">—</span></label>
-        <label><span class="rc-swatch" style="background:#059669"></span> Beneficiarios DIF <input type="checkbox" data-layer="dif" checked style="display:none"><span class="cnt" data-cnt="dif">—</span></label>
-        <label><span class="rc-swatch" style="background:#2563eb"></span> Obras <input type="checkbox" data-layer="obras" checked style="display:none"><span class="cnt" data-cnt="obras">—</span></label>
-        <label><span class="rc-swatch" style="background:#0891b2"></span> Áreas verdes <input type="checkbox" data-layer="areas" checked style="display:none"><span class="cnt" data-cnt="areas">—</span></label>
+        <label><input type="checkbox" class="rc-cb" data-layer="tickets" checked> <span class="rc-swatch" style="background:#dc2626"></span> Tickets abiertos <span class="cnt" data-cnt="tickets">—</span></label>
+        <label><input type="checkbox" class="rc-cb" data-layer="dif" checked> <span class="rc-swatch" style="background:#059669"></span> Beneficiarios DIF <span class="cnt" data-cnt="dif">—</span></label>
+        <label><input type="checkbox" class="rc-cb" data-layer="obras" checked> <span class="rc-swatch" style="background:#2563eb"></span> Obras <span class="cnt" data-cnt="obras">—</span></label>
+        <label><input type="checkbox" class="rc-cb" data-layer="areas" checked> <span class="rc-swatch" style="background:#0891b2"></span> Áreas verdes <span class="cnt" data-cnt="areas">—</span></label>
       </div>
-      <div class="rc-hint">Clic en cada capa para prender/apagar. Los conteos son del territorio cargado.</div>
+      <div class="rc-hint">Palomea las capas que quieres incluir en el recorrido. Los conteos son del territorio cargado.</div>
     </div>
 
     <div class="rc-panel" style="margin-top:14px">
@@ -129,6 +157,10 @@ require __DIR__ . '/../../views/layout/kt_top.php';
         <button class="rc-btn ghost" id="rc-poly" style="width:auto;flex:1">✏️ Polígono</button>
         <button class="rc-btn ghost" id="rc-corr" style="width:auto;flex:1">📏 Corredor</button>
         <button class="rc-btn ghost" id="rc-clear" style="width:auto">🗑</button>
+      </div>
+      <div class="rc-tools" id="rc-draw-actions" style="display:none">
+        <button class="rc-btn" id="rc-finish" style="flex:1" disabled>✓ Terminar</button>
+        <button class="rc-btn ghost" id="rc-cancel" style="width:auto">✗ Cancelar</button>
       </div>
       <div class="rc-field" id="rc-buffer-wrap" style="display:none">
         <label>Ancho del corredor (metros a cada lado)</label>
@@ -177,8 +209,10 @@ let scope='sec';
 let TERR=null;                 // datos del territorio cargado
 const markers={};              // layer -> [google marker]
 const enabled={tickets:true,dif:true,obras:true,areas:true};
-let drawMgr=null, drawnPoly=null, corridorLine=null, routeLine=null;
-let mode=null;                 // 'poly' | 'corr' | null
+let cluster=null;              // MarkerClusterer combinado (evita que trabe el mapa)
+let drawnPoly=null, corridorLine=null, routeLine=null;
+// Dibujo manual: el DrawingManager fue removido del Maps JS API en v3.65.
+let drawMode=null, draftPts=[], draftLine=null, draftDots=[];
 
 window.initRcMap = function(){
   map = new google.maps.Map($('rc-map'), {center:{lat:20.59,lng:-100.39}, zoom:11,
@@ -196,23 +230,69 @@ window.initRcMap = function(){
     if(!b.isEmpty()) map.fitBounds(b);
   }
 
-  drawMgr = new google.maps.drawing.DrawingManager({
-    drawingMode:null, drawingControl:false,
-    polygonOptions:{fillColor:'#005ab2',fillOpacity:.10,strokeColor:'#005ab2',strokeWeight:2,editable:true,zIndex:5},
-    polylineOptions:{strokeColor:'#005ab2',strokeWeight:3,editable:true,zIndex:5},
-  });
-  drawMgr.setMap(map);
-  google.maps.event.addListener(drawMgr,'polygoncomplete', p=>{ clearShapes(false); drawnPoly=p; drawMgr.setDrawingMode(null); enableGen(); });
-  google.maps.event.addListener(drawMgr,'polylinecomplete', l=>{ clearShapes(false); corridorLine=l; drawMgr.setDrawingMode(null); enableGen(); });
+  // dibujo manual: clic en el mapa agrega vértices; el botón "Terminar" cierra.
+  map.addListener('click', e=>{ if(drawMode) addVertex(e.latLng); });
 };
+
+// ---------- dibujo manual (reemplaza al DrawingManager removido) ----------
+function startDraw(m){
+  clearShapes(true); cancelDraft(); $('rc-ficha').style.display='none';
+  drawMode=m;
+  map.setOptions({draggableCursor:'crosshair', disableDoubleClickZoom:true});
+  $('rc-buffer-wrap').style.display = (m==='corr') ? '' : 'none';
+  $('rc-draw-actions').style.display='flex';
+  $('rc-poly').disabled=true; $('rc-corr').disabled=true;
+  $('rc-draw-hint').textContent = 'Haz clic en el mapa para ir marcando '+(m==='poly'?'los vértices de la zona':'la ruta de la calle')+'. Cuando termines, pulsa "Terminar".';
+}
+function addVertex(ll){ draftPts.push(ll); redrawDraft(); $('rc-finish').disabled = draftPts.length < (drawMode==='poly'?3:2); }
+function redrawDraft(){
+  if(draftLine) draftLine.setMap(null);
+  draftLine = new google.maps.Polyline({path:draftPts, map, strokeColor:'#005ab2', strokeWeight:2, strokeOpacity:.9});
+  draftDots.forEach(d=>d.setMap(null)); draftDots=[];
+  draftPts.forEach(p=>draftDots.push(new google.maps.Marker({position:p, map,
+    icon:{path:google.maps.SymbolPath.CIRCLE, scale:4, fillColor:'#005ab2', fillOpacity:1, strokeColor:'#fff', strokeWeight:1.5}})));
+}
+function finishDraw(){
+  const need = drawMode==='poly'?3:2;
+  if(draftPts.length < need) return;
+  const pts = draftPts.slice(); const wasPoly = drawMode==='poly';
+  cancelDraft();
+  if(wasPoly) drawnPoly = new google.maps.Polygon({paths:pts, map, fillColor:'#005ab2', fillOpacity:.10, strokeColor:'#005ab2', strokeWeight:2, zIndex:5});
+  else        corridorLine = new google.maps.Polyline({path:pts, map, strokeColor:'#005ab2', strokeWeight:3, strokeOpacity:.9, zIndex:5});
+  enableGen();
+}
+function cancelDraft(){
+  drawMode=null; draftPts=[];
+  if(draftLine){ draftLine.setMap(null); draftLine=null; }
+  draftDots.forEach(d=>d.setMap(null)); draftDots=[];
+  if(map) map.setOptions({draggableCursor:null, disableDoubleClickZoom:false});
+  const da=$('rc-draw-actions'); if(da) da.style.display='none';
+  $('rc-poly').disabled=false; $('rc-corr').disabled=false;
+}
+
+// ---------- clustering (una sola capa combinada) ----------
+function rebuildCluster(){
+  const list=[];
+  for(const layer of Object.keys(LAYER_META)) if(enabled[layer]) list.push(...(markers[layer]||[]));
+  if(!window.markerClusterer){ // fallback: sin librería, pinta directo
+    for(const layer of Object.keys(LAYER_META)) (markers[layer]||[]).forEach(m=>m.setMap(enabled[layer]?map:null));
+    return;
+  }
+  if(cluster){ cluster.clearMarkers(); } else { cluster = new markerClusterer.MarkerClusterer({map, markers:[]}); }
+  cluster.addMarkers(list);
+}
 
 // ---------- carga de territorio ----------
 async function loadTerritory(){
-  const val = scope==='sec' ? $('rc-sec').value : $('rc-deleg').value;
-  if(!val){ $('rc-ctx').textContent = 'Elige un '+(scope==='sec'?'número de sección':'delegación')+'.'; return; }
+  let param='', val='';
+  if(scope==='sec'){ val=$('rc-sec').value; param='sec='+encodeURIComponent(val); }
+  else if(scope==='dist'){ val=$('rc-dist').value; param='dist='+encodeURIComponent(val); }
+  else { val=$('rc-deleg').value; param='deleg='+encodeURIComponent(val); }
+  if(!val){ $('rc-ctx').textContent = 'Elige un '+(scope==='sec'?'número de sección':scope==='dist'?'distrito':'delegación')+'.'; return; }
+  param += '&dias='+encodeURIComponent($('rc-dias').value||'30');
   $('rc-load').disabled=true; $('rc-load').textContent='Cargando…';
   try{
-    const url = BASE + '/recorrido_data.php?' + (scope==='sec' ? 'sec='+encodeURIComponent(val) : 'deleg='+encodeURIComponent(val));
+    const url = BASE + '/recorrido_data.php?' + param;
     const r = await fetch(url, {headers:{'X-Requested-With':'fetch'}});
     const d = await r.json();
     if(!d.ok){ $('rc-ctx').textContent = d.error||'No se pudo cargar.'; return; }
@@ -245,7 +325,7 @@ function renderTerritory(d){
     const pts = d.layers[layer]||[];
     const cntEl = document.querySelector('[data-cnt="'+layer+'"]'); if(cntEl) cntEl.textContent = pts.length;
     markers[layer] = pts.map(p=>{
-      const m = new google.maps.Marker({position:{lat:p.lat,lng:p.lng}, map:enabled[layer]?map:null,
+      const m = new google.maps.Marker({position:{lat:p.lat,lng:p.lng},
         icon:{path:google.maps.SymbolPath.CIRCLE, scale:6, fillColor:LAYER_META[layer].color, fillOpacity:.9, strokeColor:'#fff', strokeWeight:1.5},
         zIndex: layer==='tickets'?4:2});
       m._layer=layer; m._p=p;
@@ -253,6 +333,7 @@ function renderTerritory(d){
       return m;
     });
   }
+  rebuildCluster();
   enableGen();
 }
 
@@ -266,13 +347,12 @@ function stopHtml(layer, p){
   return '<div style="font:13px/1.5 Montserrat,sans-serif;max-width:240px"><b style="color:'+c+'">'+t+'</b><br>'+s+'</div>';
 }
 
-// ---------- capas on/off ----------
-document.querySelectorAll('#rc-layers label').forEach(l=>{
-  l.addEventListener('click', e=>{
-    const cb=l.querySelector('input'); const layer=cb.dataset.layer;
-    enabled[layer]=!enabled[layer];
-    l.style.opacity = enabled[layer]?'1':'.45';
-    (markers[layer]||[]).forEach(m=>m.setMap(enabled[layer]?map:null));
+// ---------- capas on/off (palomear) ----------
+document.querySelectorAll('.rc-cb').forEach(cb=>{
+  cb.addEventListener('change', ()=>{
+    const layer=cb.dataset.layer; enabled[layer]=cb.checked;
+    cb.closest('label').style.opacity = cb.checked?'1':'.5';
+    rebuildCluster();
   });
 });
 
@@ -281,22 +361,24 @@ $('rc-scope').addEventListener('click', e=>{
   const b=e.target.closest('button'); if(!b) return;
   scope=b.dataset.scope;
   document.querySelectorAll('#rc-scope button').forEach(x=>x.classList.toggle('on', x===b));
-  $('rc-f-sec').style.display   = scope==='sec' ? '' : 'none';
+  $('rc-f-sec').style.display   = scope==='sec'   ? '' : 'none';
+  $('rc-f-dist').style.display  = scope==='dist'  ? '' : 'none';
   $('rc-f-deleg').style.display = scope==='deleg' ? '' : 'none';
 });
 $('rc-load').addEventListener('click', loadTerritory);
 
-// ---------- herramientas de dibujo ----------
-$('rc-poly').addEventListener('click', ()=>{ if(!map) return; mode='poly'; $('rc-buffer-wrap').style.display='none'; drawMgr.setDrawingMode(google.maps.drawing.OverlayType.POLYGON); });
-$('rc-corr').addEventListener('click', ()=>{ if(!map) return; mode='corr'; $('rc-buffer-wrap').style.display=''; drawMgr.setDrawingMode(google.maps.drawing.OverlayType.POLYLINE); });
-$('rc-clear').addEventListener('click', ()=>{ clearShapes(true); $('rc-ficha').style.display='none'; enableGen(); });
+// ---------- herramientas de dibujo (manual) ----------
+$('rc-poly').addEventListener('click', ()=>{ if(map) startDraw('poly'); });
+$('rc-corr').addEventListener('click', ()=>{ if(map) startDraw('corr'); });
+$('rc-finish').addEventListener('click', finishDraw);
+$('rc-cancel').addEventListener('click', ()=>{ cancelDraft(); enableGen(); });
+$('rc-clear').addEventListener('click', ()=>{ clearShapes(true); cancelDraft(); $('rc-ficha').style.display='none'; enableGen(); });
 $('rc-gen').addEventListener('click', generar);
 
 function clearShapes(clearRoute){
   if(drawnPoly){ drawnPoly.setMap(null); drawnPoly=null; }
   if(corridorLine){ corridorLine.setMap(null); corridorLine=null; }
   if(clearRoute && routeLine){ routeLine.setMap(null); routeLine=null; }
-  if(drawMgr) drawMgr.setDrawingMode(null);
 }
 function enableGen(){
   const hasShape = !!(drawnPoly||corridorLine);
@@ -397,11 +479,13 @@ function box(v,l){ return '<div class="b"><div class="v">'+v+'</div><div class="
 
 $('rc-print-btn').addEventListener('click', ()=>window.print());
 
-function clearMarkers(){ for(const k of Object.keys(markers)){ (markers[k]||[]).forEach(m=>m.setMap(null)); markers[k]=[]; } }
+function clearMarkers(){ if(cluster) cluster.clearMarkers(); for(const k of Object.keys(markers)){ (markers[k]||[]).forEach(m=>m.setMap(null)); markers[k]=[]; } }
 
 if(!HASKEY){ $('rc-map').innerHTML='<div style="padding:20px;color:#991B1B">Google Maps API key no configurada.</div>'; }
 </script>
+<!-- MarkerClusterer (agrupa los pines para que no trabe el mapa) — antes del API -->
+<script src="https://unpkg.com/@googlemaps/markerclusterer@2.5.3/dist/index.min.js"></script>
 <?php if ($apiKey): ?>
-<script async src="https://maps.googleapis.com/maps/api/js?key=<?= urlencode($apiKey) ?>&libraries=drawing,geometry&callback=initRcMap&loading=async&v=weekly"></script>
+<script async src="https://maps.googleapis.com/maps/api/js?key=<?= urlencode($apiKey) ?>&libraries=geometry&callback=initRcMap&loading=async&v=weekly"></script>
 <?php endif; ?>
 <?php require __DIR__ . '/../../views/layout/kt_bottom.php'; ?>
