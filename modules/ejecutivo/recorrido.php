@@ -98,7 +98,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
   <!-- ============ PANEL DE CONTROL ============ -->
   <div>
     <div class="rc-panel">
-      <h3>1 · Territorio</h3>
+      <h3>1 · Ubícate (opcional)</h3>
       <div class="rc-seg" id="rc-scope">
         <button data-scope="sec" class="on">Sección</button>
         <button data-scope="dist">Distrito</button>
@@ -136,8 +136,8 @@ require __DIR__ . '/../../views/layout/kt_top.php';
           <option value="0">Todos</option>
         </select>
       </div>
-      <button class="rc-btn" id="rc-load">Cargar territorio</button>
-      <div id="rc-ctx" class="rc-ctx"></div>
+      <button class="rc-btn ghost" id="rc-load">Ubicar en el mapa</button>
+      <div id="rc-ctx" class="rc-ctx" style="margin-top:8px">Haz zoom a tu zona (o usa el selector) y traza el recorrido. Los puntos se cargan solo dentro de tu trazo.</div>
     </div>
 
     <div class="rc-panel" style="margin-top:14px">
@@ -145,10 +145,11 @@ require __DIR__ . '/../../views/layout/kt_top.php';
       <div class="rc-layers" id="rc-layers">
         <label><input type="checkbox" class="rc-cb" data-layer="tickets" checked> <span class="rc-swatch" style="background:#dc2626"></span> Tickets abiertos <span class="cnt" data-cnt="tickets">—</span></label>
         <label><input type="checkbox" class="rc-cb" data-layer="dif" checked> <span class="rc-swatch" style="background:#059669"></span> Beneficiarios DIF <span class="cnt" data-cnt="dif">—</span></label>
+        <label><input type="checkbox" class="rc-cb" data-layer="bloque" checked> <span class="rc-swatch" style="background:#7c3aed"></span> Beneficiarios Bloque <span class="cnt" data-cnt="bloque">—</span></label>
         <label><input type="checkbox" class="rc-cb" data-layer="obras" checked> <span class="rc-swatch" style="background:#2563eb"></span> Obras <span class="cnt" data-cnt="obras">—</span></label>
         <label><input type="checkbox" class="rc-cb" data-layer="areas" checked> <span class="rc-swatch" style="background:#0891b2"></span> Áreas verdes <span class="cnt" data-cnt="areas">—</span></label>
       </div>
-      <div class="rc-hint">Palomea las capas que quieres incluir en el recorrido. Los conteos son del territorio cargado.</div>
+      <div class="rc-hint">Palomea las capas que quieres incluir. Al generar el recorrido solo se cargan estas capas dentro de tu trazo.</div>
     </div>
 
     <div class="rc-panel" style="margin-top:14px">
@@ -199,7 +200,8 @@ function esc(s){ return String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&l
 
 const LAYER_META = {
   tickets:{color:'#dc2626', label:'Problema'},
-  dif:    {color:'#059669', label:'Beneficiario'},
+  dif:    {color:'#059669', label:'Beneficiario DIF'},
+  bloque: {color:'#7c3aed', label:'Beneficiario Bloque'},
   obras:  {color:'#2563eb', label:'Obra'},
   areas:  {color:'#0891b2', label:'Área verde'},
 };
@@ -208,7 +210,7 @@ let map, info, boundary=null, secLayer=null;
 let scope='sec';
 let TERR=null;                 // datos del territorio cargado
 const markers={};              // layer -> [google marker]
-const enabled={tickets:true,dif:true,obras:true,areas:true};
+const enabled={tickets:true,dif:true,bloque:true,obras:true,areas:true};
 let cluster=null;              // MarkerClusterer combinado (evita que trabe el mapa)
 let drawnPoly=null, corridorLine=null, routeLine=null;
 // Dibujo manual: el DrawingManager fue removido del Maps JS API en v3.65.
@@ -283,47 +285,51 @@ function rebuildCluster(){
 }
 
 // ---------- carga de territorio ----------
-async function loadTerritory(){
+let selSec=null;   // sección seleccionada (para adjuntar contexto electoral al trazo)
+
+// Ubicar (opcional): solo dibuja el contorno del territorio y hace zoom. Ligero.
+async function ubicar(){
   let param='', val='';
   if(scope==='sec'){ val=$('rc-sec').value; param='sec='+encodeURIComponent(val); }
   else if(scope==='dist'){ val=$('rc-dist').value; param='dist='+encodeURIComponent(val); }
   else { val=$('rc-deleg').value; param='deleg='+encodeURIComponent(val); }
-  if(!val){ $('rc-ctx').textContent = 'Elige un '+(scope==='sec'?'número de sección':scope==='dist'?'distrito':'delegación')+'.'; return; }
-  param += '&dias='+encodeURIComponent($('rc-dias').value||'30');
-  $('rc-load').disabled=true; $('rc-load').textContent='Cargando…';
+  if(!val){ $('rc-ctx').textContent = 'Elige un '+(scope==='sec'?'número de sección':scope==='dist'?'distrito':'delegación')+' para ubicarte.'; return; }
+  selSec = (scope==='sec') ? val : null;
+  $('rc-load').disabled=true; $('rc-load').textContent='Ubicando…';
   try{
-    const url = BASE + '/recorrido_data.php?' + param;
-    const r = await fetch(url, {headers:{'X-Requested-With':'fetch'}});
+    const r = await fetch(BASE+'/recorrido_data.php?geomonly=1&'+param, {headers:{'X-Requested-With':'fetch'}});
     const d = await r.json();
-    if(!d.ok){ $('rc-ctx').textContent = d.error||'No se pudo cargar.'; return; }
-    renderTerritory(d);
+    if(!d.ok){ $('rc-ctx').textContent = d.error||'No se pudo ubicar.'; return; }
+    outlineTerritory(d);
   }catch(e){ $('rc-ctx').textContent='Error de red.'; }
-  finally{ $('rc-load').disabled=false; $('rc-load').textContent='Cargar territorio'; }
+  finally{ $('rc-load').disabled=false; $('rc-load').textContent='Ubicar en el mapa'; }
 }
 
-function renderTerritory(d){
-  TERR = d;
-  clearMarkers(); clearShapes(true); $('rc-ficha').style.display='none';
-  // geometría del territorio
+function outlineTerritory(d){
   if(secLayer){ secLayer.setMap(null); secLayer=null; }
   if(d.geom){
     secLayer = new google.maps.Data();
     secLayer.addGeoJson({type:'Feature',geometry:d.geom,properties:{}});
-    secLayer.setStyle({fillColor:'#005ab2',fillOpacity:.05,strokeColor:'#005ab2',strokeWeight:2,strokeOpacity:.7,clickable:false});
+    secLayer.setStyle({fillColor:'#005ab2',fillOpacity:.04,strokeColor:'#005ab2',strokeWeight:2,strokeOpacity:.7,clickable:false});
     secLayer.setMap(map);
     const b=new google.maps.LatLngBounds();
     secLayer.forEach(f=>f.getGeometry().forEachLatLng(ll=>b.extend(ll)));
     if(!b.isEmpty()) map.fitBounds(b);
-  }
-  // contexto
+  } else if(d.center){ map.setCenter(d.center); map.setZoom(14); }
   let ctx = '<b>'+esc(d.titulo)+'</b>';
   if(d.part!=null) ctx += ' · participación <b>'+d.part+'%</b>';
   if(d.gan) ctx += ' · ganó <b>'+esc(d.gan)+'</b>';
+  ctx += '<br><span style="font-size:11px">Ahora traza tu recorrido; se cargará solo lo que quede dentro.</span>';
   $('rc-ctx').innerHTML = ctx;
-  // markers + counts
+}
+
+// Pinta los puntos devueltos (ya vienen filtrados por el trazo) + conteos.
+function renderPoints(d){
+  clearMarkers();
   for(const layer of Object.keys(LAYER_META)){
     const pts = d.layers[layer]||[];
-    const cntEl = document.querySelector('[data-cnt="'+layer+'"]'); if(cntEl) cntEl.textContent = pts.length;
+    const cntEl = document.querySelector('[data-cnt="'+layer+'"]');
+    if(cntEl) cntEl.textContent = d.layers[layer] ? pts.length : '—';
     markers[layer] = pts.map(p=>{
       const m = new google.maps.Marker({position:{lat:p.lat,lng:p.lng},
         icon:{path:google.maps.SymbolPath.CIRCLE, scale:6, fillColor:LAYER_META[layer].color, fillOpacity:.9, strokeColor:'#fff', strokeWeight:1.5},
@@ -334,7 +340,6 @@ function renderTerritory(d){
     });
   }
   rebuildCluster();
-  enableGen();
 }
 
 function stopHtml(layer, p){
@@ -342,6 +347,7 @@ function stopHtml(layer, p){
   let t='', s='';
   if(layer==='tickets'){ t='Problema · '+esc(p.tipo); s=(p.dias!=null?p.dias+' días abierto':'')+(p.vencido?' · <b style="color:#dc2626">VENCIDO</b>':'')+(p.dir?'<br>'+esc(p.dir):'')+' · ticket #'+p.id; }
   else if(layer==='dif'){ t='Beneficiario DIF'; s=esc(p.prog||'')+(p.apoyo?' · '+esc(p.apoyo):'')+(p.nombre?'<br><b>'+esc(p.nombre)+'</b>'+(p.col?' · '+esc(p.col):''):''); }
+  else if(layer==='bloque'){ t='Beneficiario Bloque'; s=(p.emp?esc(p.emp):'')+(p.deleg?' · '+esc(p.deleg):'')+(p.nombre?'<br><b>'+esc(p.nombre)+'</b>'+(p.dir?' · '+esc(p.dir):''):''); }
   else if(layer==='obras'){ t='Obra · '+esc(p.estatus||''); s=esc(p.n||'')+(p.inv?'<br>Inversión: $'+Number(p.inv).toLocaleString('es-MX'):''); }
   else if(layer==='areas'){ t='Área verde'; s=esc(p.n||''); }
   return '<div style="font:13px/1.5 Montserrat,sans-serif;max-width:240px"><b style="color:'+c+'">'+t+'</b><br>'+s+'</div>';
@@ -365,7 +371,7 @@ $('rc-scope').addEventListener('click', e=>{
   $('rc-f-dist').style.display  = scope==='dist'  ? '' : 'none';
   $('rc-f-deleg').style.display = scope==='deleg' ? '' : 'none';
 });
-$('rc-load').addEventListener('click', loadTerritory);
+$('rc-load').addEventListener('click', ubicar);
 
 // ---------- herramientas de dibujo (manual) ----------
 $('rc-poly').addEventListener('click', ()=>{ if(map) startDraw('poly'); });
@@ -382,51 +388,46 @@ function clearShapes(clearRoute){
 }
 function enableGen(){
   const hasShape = !!(drawnPoly||corridorLine);
-  const hasTerr  = !!TERR;
-  $('rc-gen').disabled = !(hasShape && hasTerr);
-  $('rc-draw-hint').textContent = !hasTerr ? 'Elige un territorio primero.' :
-    (!hasShape ? 'Dibuja un polígono o un corredor sobre el mapa.' : 'Listo: genera el recorrido.');
+  $('rc-gen').disabled = !hasShape;
+  $('rc-draw-hint').textContent = hasShape
+    ? 'Listo: al generar se cargan las capas palomeadas SOLO dentro de tu trazo.'
+    : 'Dibuja un polígono o un corredor sobre el mapa (paso 3).';
 }
 
-// ---------- generar recorrido ----------
+// ---------- generar recorrido (carga solo lo que hay en el trazo) ----------
 function metersBetween(a,b){ return google.maps.geometry.spherical.computeDistanceBetween(a,b); }
 
-function pointsInShape(){
-  // reúne los puntos de las capas encendidas que caen en el polígono / corredor
-  const all=[];
-  for(const layer of Object.keys(LAYER_META)){
-    if(!enabled[layer]) continue;
-    for(const m of (markers[layer]||[])){
-      const pos=m.getPosition();
-      if(inShape(pos)) all.push({layer, p:m._p, pos});
-    }
+async function generar(){
+  if(!(drawnPoly||corridorLine)){ alert('Primero traza un polígono o un corredor.'); return; }
+  const layers = Object.keys(LAYER_META).filter(k=>enabled[k]);
+  if(!layers.length){ alert('Palomea al menos una capa.'); return; }
+  let param = 'shape='+(drawnPoly?'poly':'corr')
+            + '&layers='+encodeURIComponent(layers.join(','))
+            + '&dias='+encodeURIComponent($('rc-dias').value||'30');
+  if(selSec) param += '&sec='+encodeURIComponent(selSec);
+  if(drawnPoly){
+    const pts = drawnPoly.getPath().getArray().map(ll=>ll.lat().toFixed(6)+','+ll.lng().toFixed(6)).join(';');
+    param += '&poly='+encodeURIComponent(pts);
+  } else {
+    const pts = corridorLine.getPath().getArray().map(ll=>ll.lat().toFixed(6)+','+ll.lng().toFixed(6)).join(';');
+    param += '&line='+encodeURIComponent(pts)+'&buffer='+encodeURIComponent(Math.max(20,+$('rc-buffer').value||150));
   }
-  return all;
-}
-function inShape(latlng){
-  if(drawnPoly){ return google.maps.geometry.poly.containsLocation(latlng, drawnPoly); }
-  if(corridorLine){
-    const buf = Math.max(20, +$('rc-buffer').value||150);
-    const path = corridorLine.getPath().getArray();
-    // muestreo denso de la polilínea y prueba de cercanía
-    for(let i=0;i<path.length-1;i++){
-      const a=path[i], b=path[i+1];
-      const segLen=metersBetween(a,b);
-      const steps=Math.max(1, Math.ceil(segLen/(buf/2)));
-      for(let s=0;s<=steps;s++){
-        const t=s/steps;
-        const ll=google.maps.geometry.spherical.interpolate(a,b,t);
-        if(metersBetween(ll,latlng)<=buf) return true;
-      }
-    }
-    return false;
-  }
-  return false;
+  $('rc-gen').disabled=true; $('rc-gen').textContent='Cargando…';
+  try{
+    const r = await fetch(BASE+'/recorrido_data.php?'+param, {headers:{'X-Requested-With':'fetch'}});
+    const d = await r.json();
+    if(!d.ok){ alert(d.error||'No se pudieron cargar los datos.'); return; }
+    TERR=d;
+    renderPoints(d);
+    const stops=[];
+    for(const layer of layers) for(const p of (d.layers[layer]||[])) stops.push({layer, p, pos:new google.maps.LatLng(p.lat,p.lng)});
+    if(!stops.length){ alert('No hay puntos (de las capas palomeadas) dentro de tu trazo.'); $('rc-ficha').style.display='none'; return; }
+    routeStops(stops);
+  }catch(e){ alert('Error de red al cargar el trazo.'); }
+  finally{ $('rc-gen').disabled=false; $('rc-gen').textContent='Generar recorrido'; }
 }
 
-function generar(){
-  const stops = pointsInShape();
-  if(stops.length===0){ alert('No hay puntos (de las capas encendidas) dentro de tu trazo.'); return; }
+function routeStops(stops){
   // orden vecino-más-cercano desde el punto más al noroeste
   let start=0, best=1e9;
   stops.forEach((s,i)=>{ const v=-s.pos.lat()+s.pos.lng(); if(v<best){best=v;start=i;} });
@@ -434,13 +435,15 @@ function generar(){
   let cur=start; used[cur]=true; ordered.push(stops[cur]);
   for(let k=1;k<stops.length;k++){
     let nn=-1, nd=1e18;
-    for(let j=0;j<stops.length;j++){ if(used[j])continue; const d=metersBetween(stops[cur].pos,stops[j].pos); if(d<nd){nd=d;nn=j;} }
+    for(let j=0;j<stops.length;j++){ if(used[j])continue; const dd=metersBetween(stops[cur].pos,stops[j].pos); if(dd<nd){nd=dd;nn=j;} }
     used[nn]=true; ordered.push(stops[nn]); cur=nn;
   }
-  // dibuja la ruta
   if(routeLine) routeLine.setMap(null);
   routeLine = new google.maps.Polyline({path:ordered.map(o=>o.pos), map,
     strokeColor:'#005ab2', strokeOpacity:.9, strokeWeight:3, icons:[{icon:{path:google.maps.SymbolPath.FORWARD_CLOSED_ARROW},offset:'50%',repeat:'120px'}]});
+  // zoom a la ruta
+  const b=new google.maps.LatLngBounds(); ordered.forEach(o=>b.extend(o.pos));
+  if(!b.isEmpty()) map.fitBounds(b, {top:40,bottom:40,left:40,right:40});
   renderFicha(ordered);
 }
 
@@ -448,14 +451,14 @@ function renderFicha(ordered){
   const dist = google.maps.geometry.spherical.computeLength(ordered.map(o=>o.pos)); // metros
   const walkMin = dist/1.35/60;                 // ~1.35 m/s caminando
   const stopMin = ordered.length*2;             // ~2 min por parada
-  const cnt={tickets:0,dif:0,obras:0,areas:0}; ordered.forEach(o=>cnt[o.layer]++);
+  const cnt={tickets:0,dif:0,bloque:0,obras:0,areas:0}; ordered.forEach(o=>cnt[o.layer]++);
   // resumen
   $('rc-sum').innerHTML =
     box(ordered.length,'paradas')+
     box((dist/1000).toFixed(2)+' km','distancia')+
     box(Math.round(walkMin+stopMin)+' min','tiempo estimado')+
     box(cnt.tickets,'problemas')+
-    box(cnt.dif,'beneficiarios')+
+    box(cnt.dif+cnt.bloque,'beneficiarios')+
     box(cnt.obras+cnt.areas,'obras/áreas');
   // territorio
   let terr = TERR? ('<b>'+esc(TERR.titulo)+'</b>'+(TERR.part!=null?' · participación '+TERR.part+'%':'')+(TERR.gan?' · ganó '+esc(TERR.gan):'')) : '';
@@ -465,6 +468,7 @@ function renderFicha(ordered){
     const meta=LAYER_META[o.layer]; const p=o.p; let t='',s='';
     if(o.layer==='tickets'){ t='Problema · '+esc(p.tipo); s=(p.dias!=null?p.dias+'d abierto':'')+(p.vencido?' · VENCIDO':'')+(p.dir?' · '+esc(p.dir):''); }
     else if(o.layer==='dif'){ t='Beneficiario DIF'; s=esc(p.prog||'')+(p.nombre?' · '+esc(p.nombre):''); }
+    else if(o.layer==='bloque'){ t='Beneficiario Bloque'; s=(p.emp?esc(p.emp):'')+(p.nombre?' · '+esc(p.nombre):(p.deleg?' · '+esc(p.deleg):'')); }
     else if(o.layer==='obras'){ t='Obra · '+esc(p.estatus||''); s=esc(p.n||''); }
     else { t='Área verde'; s=esc(p.n||''); }
     return '<div class="rc-stop"><div class="num" style="background:'+meta.color+'">'+(i+1)+'</div>'+
