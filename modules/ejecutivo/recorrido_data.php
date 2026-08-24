@@ -167,6 +167,19 @@ try {
         }
         return $out;
     };
+    // Como $collect pero DEDUPLICA por persona: $keyf(row) da la clave; $baseMap
+    // crea el punto la primera vez; $merge($punto, row) agrega cada registro extra.
+    $collectPeople = function(string $sql, callable $keyf, callable $baseMap, callable $merge) use ($pdo,$bb,$inside,$LIMIT): array {
+        $ppl = []; $st = $pdo->prepare($sql); $st->execute([$bb[0],$bb[1],$bb[2],$bb[3]]);
+        foreach ($st as $r) {
+            $lat=(float)$r['lat']; $lng=(float)$r['lng']; if (!$lat || !$lng) continue;
+            if (!$inside($lat,$lng)) continue;
+            $k = $keyf($r);
+            if (!isset($ppl[$k])) { if (count($ppl) >= $LIMIT) continue; $ppl[$k] = $baseMap($r,$lat,$lng); }
+            $merge($ppl[$k], $r);
+        }
+        return array_values($ppl);
+    };
     $want = fn($k) => in_array($k, $layersReq, true);
     $layers = [];
 
@@ -189,25 +202,33 @@ try {
     }
     if ($want('dif')) {
         try {
-            $layers['dif'] = $collect(
-                "SELECT id, latitud lat, longitud lng, programa, tipo_apoyo, ciudadano, colonia
+            $layers['dif'] = $collectPeople(
+                "SELECT curp, ciudadano, colonia, programa, tipo_apoyo, latitud lat, longitud lng
                    FROM padron WHERE latitud BETWEEN ? AND ? AND longitud BETWEEN ? AND ?",
+                fn($r) => !empty($r['curp']) ? 'C:'.strtoupper(trim($r['curp'])) : 'N:'.mb_strtoupper(trim((string)$r['ciudadano'])),
                 function($r,$lat,$lng) use ($verPII) {
-                    $p = ['lat'=>round($lat,6),'lng'=>round($lng,6),'prog'=>$r['programa'] ?: 'Apoyo DIF','apoyo'=>$r['tipo_apoyo'] ?: null];
+                    $p = ['lat'=>round($lat,6),'lng'=>round($lng,6),'n'=>0,'apoyos'=>[]];
                     if ($verPII) { $p['nombre']=$r['ciudadano'] ?: null; $p['col']=$r['colonia'] ?: null; }
                     return $p;
+                },
+                function(&$p,$r) {
+                    $p['n']++;
+                    $a = trim(($r['programa'] ?? '') . ($r['tipo_apoyo'] ? ' · '.$r['tipo_apoyo'] : ''));
+                    if ($a !== '' && !in_array($a, $p['apoyos'], true) && count($p['apoyos']) < 12) $p['apoyos'][] = $a;
                 });
         } catch (Throwable $e) { $layers['dif'] = []; }
     }
     if ($want('bloque')) {
         try {
-            $layers['bloque'] = $collect(
-                "SELECT id, dLatitud lat, dLongitud lng, sNombre, sPaterno, sMaterno,
-                        sColonia, sCalle, sNumExterior, sEmpresa, sDelegacion
+            $layers['bloque'] = $collectPeople(
+                "SELECT sCurp, sNombre, sPaterno, sMaterno, sColonia, sCalle, sNumExterior,
+                        sEmpresa, sDelegacion, dLatitud lat, dLongitud lng
                    FROM bloque_usuario
                   WHERE dLatitud BETWEEN ? AND ? AND dLongitud BETWEEN ? AND ?",
+                fn($r) => !empty($r['sCurp']) ? 'C:'.strtoupper(trim($r['sCurp']))
+                        : 'N:'.mb_strtoupper(trim(($r['sNombre'] ?? '').' '.($r['sPaterno'] ?? '').' '.($r['sMaterno'] ?? ''))),
                 function($r,$lat,$lng) use ($verPII) {
-                    $p = ['lat'=>round($lat,6),'lng'=>round($lng,6),
+                    $p = ['lat'=>round($lat,6),'lng'=>round($lng,6),'n'=>0,
                           'emp'=>$r['sEmpresa'] ?: null,'deleg'=>$r['sDelegacion'] ?: null];
                     if ($verPII) {
                         $p['nombre'] = trim(($r['sNombre'] ?? '').' '.($r['sPaterno'] ?? '').' '.($r['sMaterno'] ?? '')) ?: null;
@@ -215,7 +236,8 @@ try {
                         $p['dir']    = trim(($r['sCalle'] ?? '').' '.($r['sNumExterior'] ?? '')) ?: null;
                     }
                     return $p;
-                });
+                },
+                function(&$p,$r) { $p['n']++; });
         } catch (Throwable $e) { $layers['bloque'] = []; }
     }
     if ($want('obras')) {
