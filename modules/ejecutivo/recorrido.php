@@ -82,6 +82,19 @@ require __DIR__ . '/../../views/layout/kt_top.php';
     #rc-print,#rc-print *{visibility:visible}
     #rc-print{position:absolute;left:0;top:0;width:100%}
   }
+  /* Segunda pantalla (presentación del recorrido) */
+  #rc-screen{position:fixed;inset:0;z-index:60;background:var(--background);display:none;flex-direction:column}
+  #rc-screen.open{display:flex}
+  #rc-screen .sc-head{display:flex;align-items:center;gap:14px;padding:12px 18px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+  #rc-screen .sc-head h2{font-size:16px;font-weight:700;color:var(--foreground)}
+  #rc-screen .sc-chips{display:flex;gap:8px;flex-wrap:wrap}
+  #rc-screen .sc-chip{background:var(--muted);border-radius:999px;padding:4px 10px;font-size:12px;font-weight:600;color:var(--foreground)}
+  #rc-screen .sc-actions{margin-left:auto;display:flex;gap:8px}
+  #rc-screen .sc-body{flex:1;display:grid;grid-template-columns:1fr 400px;min-height:0}
+  @media(max-width:900px){#rc-screen .sc-body{grid-template-columns:1fr;grid-template-rows:1fr 45%}}
+  #rc-screen-map{width:100%;height:100%}
+  #rc-screen-map #rc-map{height:100%!important;border-radius:0;border:0}
+  #rc-screen .sc-list{border-inline-start:1px solid var(--border);overflow:auto;padding:10px 14px}
 </style>
 
 <?php if ($dbError): ?><div class="rc-panel" style="border-inline-start:3px solid #dc2626;margin-bottom:14px"><b style="color:#dc2626">Error:</b> <?= htmlspecialchars($dbError) ?></div><?php endif; ?>
@@ -179,15 +192,33 @@ require __DIR__ . '/../../views/layout/kt_top.php';
         <div class="rc-sum" id="rc-sum"></div>
         <div id="rc-stops"></div>
       </div>
-      <div class="rc-row" style="margin-top:12px">
+      <button class="rc-btn" id="rc-screen-btn" style="margin-top:12px">🖥 Ver a pantalla completa</button>
+      <div class="rc-row" style="margin-top:8px">
         <button class="rc-btn ghost" id="rc-print-btn" style="flex:1">🖨 Imprimir</button>
-        <a class="rc-btn" id="rc-gmaps" target="_blank" rel="noopener" style="flex:1;text-decoration:none">📍 Abrir en Maps</a>
+        <a class="rc-btn ghost" id="rc-gmaps" target="_blank" rel="noopener" style="flex:1;text-decoration:none">📍 Abrir en Maps</a>
       </div>
     </div>
   </div>
 
   <!-- ============ MAPA ============ -->
   <div><div id="rc-map"></div></div>
+</div>
+
+<!-- ============ SEGUNDA PANTALLA (presentación) ============ -->
+<div id="rc-screen">
+  <div class="sc-head">
+    <h2 id="sc-title">Recorrido</h2>
+    <div class="sc-chips" id="sc-chips"></div>
+    <div class="sc-actions">
+      <button class="rc-btn ghost" id="sc-print" style="width:auto">🖨 Imprimir</button>
+      <a class="rc-btn" id="sc-gmaps" target="_blank" rel="noopener" style="width:auto;text-decoration:none">📍 Maps</a>
+      <button class="rc-btn ghost" id="sc-close" style="width:auto">✕ Cerrar</button>
+    </div>
+  </div>
+  <div class="sc-body">
+    <div id="rc-screen-map"></div>
+    <div class="sc-list" id="sc-list"></div>
+  </div>
 </div>
 
 <script>
@@ -215,6 +246,7 @@ let cluster=null;              // MarkerClusterer combinado (evita que trabe el 
 let drawnPoly=null, corridorLine=null, routeLine=null;
 // Dibujo manual: el DrawingManager fue removido del Maps JS API en v3.65.
 let drawMode=null, draftPts=[], draftLine=null, draftDots=[];
+let lastOrdered=null, mapHome=null;   // para la segunda pantalla
 
 window.initRcMap = function(){
   map = new google.maps.Map($('rc-map'), {center:{lat:20.59,lng:-100.39}, zoom:11,
@@ -346,8 +378,13 @@ function stopHtml(layer, p){
   const c=LAYER_META[layer].color;
   let t='', s='';
   if(layer==='tickets'){ t='Problema · '+esc(p.tipo); s=(p.dias!=null?p.dias+' días abierto':'')+(p.vencido?' · <b style="color:#dc2626">VENCIDO</b>':'')+(p.dir?'<br>'+esc(p.dir):'')+' · ticket #'+p.id; }
-  else if(layer==='dif'){ t='Beneficiario DIF'; s=esc(p.prog||'')+(p.apoyo?' · '+esc(p.apoyo):'')+(p.nombre?'<br><b>'+esc(p.nombre)+'</b>'+(p.col?' · '+esc(p.col):''):''); }
-  else if(layer==='bloque'){ t='Beneficiario Bloque'; s=(p.emp?esc(p.emp):'')+(p.deleg?' · '+esc(p.deleg):'')+(p.nombre?'<br><b>'+esc(p.nombre)+'</b>'+(p.dir?' · '+esc(p.dir):''):''); }
+  else if(layer==='dif'){ t='Beneficiario DIF';
+    s=(p.nombre?'<b>'+esc(p.nombre)+'</b>':'(sin nombre)')+(p.col?' · '+esc(p.col):'')
+     +(p.n?'<br>'+p.n+' apoyo'+(p.n>1?'s':''):'')
+     +(p.apoyos&&p.apoyos.length?'<br>· '+p.apoyos.map(esc).join('<br>· '):''); }
+  else if(layer==='bloque'){ t='Beneficiario Bloque';
+    s=(p.nombre?'<b>'+esc(p.nombre)+'</b>':'(sin nombre)')+(p.emp?' · '+esc(p.emp):'')
+     +(p.dir?'<br>'+esc(p.dir):'')+(p.deleg?'<br>'+esc(p.deleg):''); }
   else if(layer==='obras'){ t='Obra · '+esc(p.estatus||''); s=esc(p.n||'')+(p.inv?'<br>Inversión: $'+Number(p.inv).toLocaleString('es-MX'):''); }
   else if(layer==='areas'){ t='Área verde'; s=esc(p.n||''); }
   return '<div style="font:13px/1.5 Montserrat,sans-serif;max-width:240px"><b style="color:'+c+'">'+t+'</b><br>'+s+'</div>';
@@ -448,6 +485,7 @@ function routeStops(stops){
 }
 
 function renderFicha(ordered){
+  lastOrdered = ordered;
   const dist = google.maps.geometry.spherical.computeLength(ordered.map(o=>o.pos)); // metros
   const walkMin = dist/1.35/60;                 // ~1.35 m/s caminando
   const stopMin = ordered.length*2;             // ~2 min por parada
@@ -467,8 +505,8 @@ function renderFicha(ordered){
   $('rc-stops').innerHTML = ordered.map((o,i)=>{
     const meta=LAYER_META[o.layer]; const p=o.p; let t='',s='';
     if(o.layer==='tickets'){ t='Problema · '+esc(p.tipo); s=(p.dias!=null?p.dias+'d abierto':'')+(p.vencido?' · VENCIDO':'')+(p.dir?' · '+esc(p.dir):''); }
-    else if(o.layer==='dif'){ t='Beneficiario DIF'; s=esc(p.prog||'')+(p.nombre?' · '+esc(p.nombre):''); }
-    else if(o.layer==='bloque'){ t='Beneficiario Bloque'; s=(p.emp?esc(p.emp):'')+(p.nombre?' · '+esc(p.nombre):(p.deleg?' · '+esc(p.deleg):'')); }
+    else if(o.layer==='dif'){ t='Beneficiario DIF'; s=(p.nombre?esc(p.nombre):'(sin nombre)')+(p.n>1?' · '+p.n+' apoyos':(p.apoyos&&p.apoyos.length?' · '+esc(p.apoyos[0]):'')); }
+    else if(o.layer==='bloque'){ t='Beneficiario Bloque'; s=(p.nombre?esc(p.nombre):(p.emp?esc(p.emp):'—'))+(p.nombre&&p.emp?' · '+esc(p.emp):''); }
     else if(o.layer==='obras'){ t='Obra · '+esc(p.estatus||''); s=esc(p.n||''); }
     else { t='Área verde'; s=esc(p.n||''); }
     return '<div class="rc-stop"><div class="num" style="background:'+meta.color+'">'+(i+1)+'</div>'+
@@ -482,6 +520,42 @@ function renderFicha(ordered){
 function box(v,l){ return '<div class="b"><div class="v">'+v+'</div><div class="l">'+l+'</div></div>'; }
 
 $('rc-print-btn').addEventListener('click', ()=>window.print());
+
+// ---------- segunda pantalla (presentación del recorrido) ----------
+function scStopHtml(o,i){
+  const meta=LAYER_META[o.layer]; const p=o.p; let t='',s='';
+  if(o.layer==='tickets'){ t='Problema · '+esc(p.tipo); s=(p.dias!=null?p.dias+'d abierto':'')+(p.vencido?' · <b style="color:#dc2626">VENCIDO</b>':'')+(p.dir?'<br>'+esc(p.dir):''); }
+  else if(o.layer==='dif'){ t='Beneficiario DIF'; s=(p.nombre?'<b>'+esc(p.nombre)+'</b>':'(sin nombre)')+(p.n>1?' · '+p.n+' apoyos':'')+(p.apoyos&&p.apoyos.length?'<br>'+p.apoyos.map(esc).join(' · '):''); }
+  else if(o.layer==='bloque'){ t='Beneficiario Bloque'; s=(p.nombre?'<b>'+esc(p.nombre)+'</b>':(p.emp?esc(p.emp):''))+(p.emp&&p.nombre?' · '+esc(p.emp):'')+(p.dir?'<br>'+esc(p.dir):''); }
+  else if(o.layer==='obras'){ t='Obra · '+esc(p.estatus||''); s=esc(p.n||''); }
+  else { t='Área verde'; s=esc(p.n||''); }
+  return '<div class="rc-stop"><div class="num" style="background:'+meta.color+'">'+(i+1)+'</div><div><div class="t">'+t+'</div><div class="s">'+s+'</div></div></div>';
+}
+function openScreen(){
+  if(!lastOrdered||!lastOrdered.length) return;
+  const rcMap=$('rc-map'); if(!mapHome) mapHome=rcMap.parentElement;
+  $('rc-screen-map').appendChild(rcMap);
+  $('rc-screen').classList.add('open');
+  $('sc-title').textContent = TERR ? TERR.titulo : 'Recorrido';
+  const sums=[...document.querySelectorAll('#rc-sum .b')].map(b=>'<span class="sc-chip">'+b.querySelector('.v').textContent+' '+b.querySelector('.l').textContent+'</span>').join('');
+  $('sc-chips').innerHTML = sums
+    + (TERR&&TERR.part!=null?'<span class="sc-chip">participación '+TERR.part+'%</span>':'')
+    + (TERR&&TERR.gan?'<span class="sc-chip">ganó '+esc(TERR.gan)+'</span>':'');
+  $('sc-gmaps').href = $('rc-gmaps').href;
+  $('sc-list').innerHTML = lastOrdered.map(scStopHtml).join('');
+  setTimeout(()=>{ google.maps.event.trigger(map,'resize');
+    const b=new google.maps.LatLngBounds(); lastOrdered.forEach(o=>b.extend(o.pos));
+    if(!b.isEmpty()) map.fitBounds(b,{top:50,bottom:50,left:50,right:50}); }, 80);
+}
+function closeScreen(){
+  const rcMap=$('rc-map'); if(mapHome) mapHome.appendChild(rcMap);
+  $('rc-screen').classList.remove('open');
+  setTimeout(()=>google.maps.event.trigger(map,'resize'), 80);
+}
+$('rc-screen-btn').addEventListener('click', openScreen);
+$('sc-close').addEventListener('click', closeScreen);
+$('sc-print').addEventListener('click', ()=>window.print());
+document.addEventListener('keydown', e=>{ if(e.key==='Escape' && $('rc-screen').classList.contains('open')) closeScreen(); });
 
 function clearMarkers(){ if(cluster) cluster.clearMarkers(); for(const k of Object.keys(markers)){ (markers[k]||[]).forEach(m=>m.setMap(null)); markers[k]=[]; } }
 
