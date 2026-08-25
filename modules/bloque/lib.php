@@ -130,6 +130,85 @@ function bloq_geo_stats(PDO $pdo): array {
     return ['total'=>(int)$r['total'], 'geo'=>(int)$r['geo']];
 }
 
+/**
+ * Usuarios geocodificados con detalle para la tabla. El nombre/domicilio (PII)
+ * solo se incluye si $verPII (editor/admin del módulo).
+ */
+function bloq_puntos_detalle(PDO $pdo, bool $verPII): array {
+    $out = [];
+    $sql = "SELECT dLatitud lat, dLongitud lng,
+                   COALESCE(NULLIF(TRIM(sDelegacion),''),'(sin dato)') d,
+                   sColonia col, sEmpresa emp, sNombre, sPaterno, sMaterno
+              FROM bloque_usuario
+             WHERE dLatitud IS NOT NULL AND dLatitud<>0
+               AND dLongitud IS NOT NULL AND dLongitud<>0";
+    foreach ($pdo->query($sql) as $r) {
+        $row = ['lat'=>(float)$r['lat'], 'lng'=>(float)$r['lng'], 'd'=>$r['d'],
+                'col'=>$r['col'] ?: '', 'emp'=>$r['emp'] ?: ''];
+        if ($verPII) $row['nombre'] = trim(($r['sNombre'] ?? '').' '.($r['sPaterno'] ?? '').' '.($r['sMaterno'] ?? ''));
+        $out[] = $row;
+    }
+    return $out;
+}
+
+/**
+ * Secciones (GeoJSON) para la capa de límites seccionales + un índice
+ * (num, bbox, anillo) para asignar cada beneficiario a su sección por
+ * point-in-polygon. Cachea los features 1 h (geometría estática).
+ */
+function bloq_secciones(PDO $pdo): array {
+    $cache = sys_get_temp_dir() . '/bloque_secciones.json';
+    $features = null;
+    if (is_file($cache) && (time() - filemtime($cache)) < 3600) {
+        $d = json_decode((string)@file_get_contents($cache), true);
+        if (is_array($d)) $features = $d;
+    }
+    if ($features === null) {
+        $features = [];
+        try {
+            foreach ($pdo->query("SELECT s.num_seccion, ST_AsGeoJSON(g.geom,5) gj
+                                    FROM secciones s JOIN secciones_geo g ON g.seccion_id=s.id") as $r) {
+                $g = json_decode((string)$r['gj'], true); if (!is_array($g)) continue;
+                $features[] = ['type'=>'Feature','geometry'=>$g,'properties'=>['s'=>(int)$r['num_seccion']]];
+            }
+            @file_put_contents($cache, json_encode($features, JSON_UNESCAPED_UNICODE));
+        } catch (Throwable $e) { $features = []; }
+    }
+    // índice para PIP
+    $idx = [];
+    foreach ($features as $ft) {
+        $g = $ft['geometry']; $num = $ft['properties']['s'] ?? null; if ($num === null) continue;
+        $rings = ($g['type'] ?? '') === 'Polygon' ? [$g['coordinates'][0] ?? []]
+               : (($g['type'] ?? '') === 'MultiPolygon' ? array_map(fn($p)=>$p[0] ?? [], $g['coordinates']) : []);
+        foreach ($rings as $ring) {
+            if (count($ring) < 3) continue;
+            $mnx=180;$mxx=-180;$mny=90;$mxy=-90;
+            foreach ($ring as $p) { $mnx=min($mnx,$p[0]);$mxx=max($mxx,$p[0]);$mny=min($mny,$p[1]);$mxy=max($mxy,$p[1]); }
+            $idx[] = ['s'=>$num,'bb'=>[$mnx,$mxx,$mny,$mxy],'ring'=>$ring];
+        }
+    }
+    return ['features'=>$features, 'idx'=>$idx];
+}
+
+/** Asigna num_seccion (campo 's') a cada punto por point-in-polygon (prefiltro bbox). */
+function bloq_asigna_seccion(array &$pts, array $idx): void {
+    foreach ($pts as &$p) {
+        $p['s'] = null; $lat=$p['lat']; $lng=$p['lng'];
+        foreach ($idx as $it) {
+            $bb=$it['bb'];
+            if ($lng<$bb[0]||$lng>$bb[1]||$lat<$bb[2]||$lat>$bb[3]) continue;
+            $ring=$it['ring']; $inside=false; $n=count($ring);
+            for ($i=0,$j=$n-1;$i<$n;$j=$i++) {
+                $xi=$ring[$i][0];$yi=$ring[$i][1];$xj=$ring[$j][0];$yj=$ring[$j][1];
+                $dy=($yj-$yi)?:1e-12;
+                if ((($yi>$lat)!==($yj>$lat)) && ($lng<($xj-$xi)*($lat-$yi)/$dy+$xi)) $inside=!$inside;
+            }
+            if ($inside) { $p['s']=$it['s']; break; }
+        }
+    }
+    unset($p);
+}
+
 /** Límites delegacionales oficiales (GeoJSON) para contexto del mapa. */
 function bloq_limites(PDO $pdo): array {
     try { $rows = $pdo->query("SELECT nombre, geojson FROM delegaciones_geo ORDER BY nombre")->fetchAll(); }
