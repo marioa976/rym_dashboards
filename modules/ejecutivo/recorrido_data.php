@@ -131,9 +131,15 @@ try {
     }
 
     // Contexto electoral (si se pasó una sección, aun en modo trazo).
+    $elec = null;
     if ($sec > 0) {
         $el = ej_electoral($pdo);
-        if (isset($el['sec'][$sec])) { $part = $el['sec'][$sec]['part'] ?? null; $gan = $el['sec'][$sec]['gan'] ?? null; }
+        if (isset($el['sec'][$sec])) {
+            $s = $el['sec'][$sec];
+            $part = $s['part'] ?? null; $gan = $s['gan'] ?? null;
+            $elec = ['part'=>$s['part'] ?? null, 'gan'=>$s['gan'] ?? null,
+                     'ganp'=>$s['ganp'] ?? null, 'pan'=>$s['pan'] ?? null, 'ln'=>$s['ln'] ?? null];
+        }
     }
 
     // Bounding-box (de los anillos o de la línea +/- buffer).
@@ -152,7 +158,7 @@ try {
 
     // geomonly: geometría + contexto, sin puntos.
     if ($geomonly) {
-        echo json_encode(['ok'=>true,'titulo'=>$titulo,'geom'=>$geom,'center'=>$center,'part'=>$part,'gan'=>$gan], JSON_UNESCAPED_UNICODE);
+        echo json_encode(['ok'=>true,'titulo'=>$titulo,'geom'=>$geom,'center'=>$center,'part'=>$part,'gan'=>$gan,'elec'=>$elec], JSON_UNESCAPED_UNICODE);
         exit;
     }
 
@@ -263,7 +269,7 @@ try {
     echo json_encode([
         'ok'=>true, 'titulo'=>$titulo, 'sec'=>$sec ?: null, 'dist'=>$dist ?: null,
         'deleg'=>$deleg ?: null, 'dias'=>$dias ?: null, 'shape'=>$shape ?: null,
-        'part'=>$part, 'gan'=>$gan, 'verPII'=>$verPII,
+        'part'=>$part, 'gan'=>$gan, 'elec'=>$elec, 'verPII'=>$verPII,
         'center'=>$center, 'geom'=>$geom, 'counts'=>$counts, 'layers'=>$layers,
     ], JSON_UNESCAPED_UNICODE);
 

@@ -201,7 +201,7 @@ function ej_qrobici(PDO $pdo): ?array {
  * por sección + polígonos + KPIs globales. Cacheado 1 h (datos estáticos).
  */
 function ej_electoral(PDO $pdo): array {
-    $cache = sys_get_temp_dir() . '/ejec_electoral_ayto2024.json';
+    $cache = sys_get_temp_dir() . '/ejec_electoral_ayto2024_v2.json';   // v2: incluye rentabilidad PAN por sección
     if (is_file($cache) && (time() - filemtime($cache)) < 3600) {
         $d = json_decode((string)@file_get_contents($cache), true);
         if (is_array($d)) return $d;
@@ -234,14 +234,19 @@ function ej_electoral(PDO $pdo): array {
         $excl = ['NULOS'=>1,'NO_REGISTRADAS'=>1,'CANDIDATO_NO_REGISTRADO'=>1];
         $sec = []; $totLN=0; $totEmit=0; $totVal=0;
         foreach ($votos as $s => $cs) {
-            $val=0; $emit=0; $gan=null; $ganv=0;
+            $val=0; $emit=0; $gan=null; $ganv=0; $panv=0;
             foreach ($cs as $c => $v) {
                 $emit += $v; $up = strtoupper($c);
-                if (!isset($excl[$up])) { $val += $v; if ($v > $ganv) { $ganv=$v; $gan=$c; } }
+                if (!isset($excl[$up])) {
+                    $val += $v; if ($v > $ganv) { $ganv=$v; $gan=$c; }
+                    // Rentabilidad PAN = voto para PAN y coaliciones encabezadas por PAN.
+                    if (strpos($up, 'PAN') !== false) $panv += $v;
+                }
             }
             $lnv = $ln[$s] ?? 0; $totLN+=$lnv; $totEmit+=$emit; $totVal+=$val;
             $sec[$s] = ['part'=>$lnv>0?round($emit/$lnv*100,1):null, 'gan'=>$gan,
-                        'ganp'=>$val>0?round($ganv/$val*100,1):null, 'ln'=>$lnv, 'val'=>$val];
+                        'ganp'=>$val>0?round($ganv/$val*100,1):null,
+                        'pan'=>$val>0?round($panv/$val*100,1):null, 'ln'=>$lnv, 'val'=>$val];
         }
 
         $features = []; $vistos = [];

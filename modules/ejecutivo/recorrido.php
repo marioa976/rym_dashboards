@@ -16,7 +16,7 @@ require_once __DIR__ . '/lib.php';
 $cfg     = ej_config();
 $apiKey  = $cfg['google_maps_api_key'] ?? '';
 $verPII  = function_exists('puede_editar') && puede_editar('ejecutivo');
-$dbError = null; $limites = []; $secciones = []; $delegaciones = []; $distritos = [];
+$dbError = null; $limites = []; $secciones = []; $delegaciones = []; $distritos = []; $distSecs = [];
 try {
     $pdo     = ej_pdo();
     $limites = ej_limites($pdo);
@@ -33,7 +33,16 @@ try {
                                ORDER BY d.numero") as $r)
             $distritos[] = ['id'=>(int)$r['id'],'numero'=>(int)$r['numero'],'nombre'=>$r['nombre']];
     } catch (Throwable $e) { /* sin catálogo de distritos: se omite el scope */ }
+    // Mapa distrito_id -> [num_seccion,...] para la cascada distrito->sección.
+    try {
+        foreach ($pdo->query("SELECT s.distrito_id d, s.num_seccion n
+                                FROM secciones s JOIN secciones_geo g ON g.seccion_id=s.id
+                               WHERE s.distrito_id IS NOT NULL
+                               ORDER BY s.distrito_id, s.num_seccion") as $r)
+            $distSecs[(int)$r['d']][] = (int)$r['n'];
+    } catch (Throwable $e) { /* sin mapeo: la sección listará todas */ }
 } catch (Throwable $e) { $dbError = $e->getMessage(); }
+$distSecs = $distSecs ?? [];
 
 $ktTitle  = 'Ejecutivo · Recorrido territorial';
 $ktActive = 'ejecutivo';
@@ -95,6 +104,14 @@ require __DIR__ . '/../../views/layout/kt_top.php';
   #rc-screen-map{width:100%;height:100%}
   #rc-screen-map #rc-map{height:100%!important;border-radius:0;border:0}
   #rc-screen .sc-list{border-inline-start:1px solid var(--border);overflow:auto;padding:10px 14px}
+  /* Indicador electoral (afinidad / rentabilidad) */
+  .rc-elec{background:var(--muted);border-radius:8px;padding:10px 12px}
+  .rc-elec .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted-foreground);font-weight:600;margin-bottom:8px}
+  .rc-elec .row{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--muted-foreground);margin-bottom:6px}
+  .rc-elec .row b{color:var(--foreground);font-weight:600}
+  .rc-elec .bar{height:7px;border-radius:999px;background:var(--border);overflow:hidden;margin-top:3px}
+  .rc-elec .bar>span{display:block;height:100%;border-radius:999px}
+  .rc-elec .tag{display:inline-block;padding:2px 8px;border-radius:999px;color:#fff;font-weight:700;font-size:11px}
 </style>
 
 <?php if ($dbError): ?><div class="rc-panel" style="border-inline-start:3px solid #dc2626;margin-bottom:14px"><b style="color:#dc2626">Error:</b> <?= htmlspecialchars($dbError) ?></div><?php endif; ?>
@@ -111,20 +128,8 @@ require __DIR__ . '/../../views/layout/kt_top.php';
   <!-- ============ PANEL DE CONTROL ============ -->
   <div>
     <div class="rc-panel">
-      <h3>1 · Ubícate (opcional)</h3>
-      <div class="rc-seg" id="rc-scope">
-        <button data-scope="sec" class="on">Sección</button>
-        <button data-scope="dist">Distrito</button>
-        <button data-scope="deleg">Delegación</button>
-      </div>
-      <div class="rc-field" id="rc-f-sec">
-        <label>Sección</label>
-        <select id="rc-sec">
-          <option value="">— elige una sección —</option>
-          <?php foreach ($secciones as $s): ?><option value="<?= $s ?>"><?= $s ?></option><?php endforeach; ?>
-        </select>
-      </div>
-      <div class="rc-field" id="rc-f-dist" style="display:none">
+      <h3>1 · Elige tu zona</h3>
+      <div class="rc-field">
         <label>Distrito</label>
         <select id="rc-dist">
           <option value="">— elige un distrito —</option>
@@ -132,10 +137,16 @@ require __DIR__ . '/../../views/layout/kt_top.php';
         </select>
         <?php if (!$distritos): ?><div class="rc-hint">Sin catálogo de distritos disponible.</div><?php endif; ?>
       </div>
-      <div class="rc-field" id="rc-f-deleg" style="display:none">
-        <label>Delegación</label>
+      <div class="rc-field">
+        <label>Sección <span style="font-weight:400">(del distrito)</span></label>
+        <select id="rc-sec" disabled>
+          <option value="">— elige primero un distrito —</option>
+        </select>
+      </div>
+      <div class="rc-field">
+        <label style="font-weight:400;font-size:11px">…o por delegación (alternativa)</label>
         <select id="rc-deleg">
-          <option value="">— elige una delegación —</option>
+          <option value="">— ninguna —</option>
           <?php foreach ($delegaciones as $d): ?><option value="<?= htmlspecialchars($d) ?>"><?= htmlspecialchars($d) ?></option><?php endforeach; ?>
         </select>
       </div>
@@ -149,8 +160,9 @@ require __DIR__ . '/../../views/layout/kt_top.php';
           <option value="0">Todos</option>
         </select>
       </div>
-      <button class="rc-btn ghost" id="rc-load">Ubicar en el mapa</button>
-      <div id="rc-ctx" class="rc-ctx" style="margin-top:8px">Haz zoom a tu zona (o usa el selector) y traza el recorrido. Los puntos se cargan solo dentro de tu trazo.</div>
+      <button class="rc-btn ghost" id="rc-load">Pintar la zona en el mapa</button>
+      <div id="rc-ctx" class="rc-ctx" style="margin-top:8px">Elige distrito y sección, pinta la zona, traza tu polígono y genera la ruta. Los puntos se cargan solo dentro de tu trazo.</div>
+      <div id="rc-elec" style="display:none;margin-top:10px"></div>
     </div>
 
     <div class="rc-panel" style="margin-top:14px">
@@ -223,6 +235,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
 
 <script>
 const LIMITES = <?= json_encode($limites, JSON_UNESCAPED_UNICODE) ?>;
+const DIST_SECS = <?= json_encode($distSecs) ?>;
 const HASKEY  = <?= $apiKey ? 'true' : 'false' ?>;
 const VERPII  = <?= $verPII ? 'true' : 'false' ?>;
 const BASE    = <?= json_encode(rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? ''), '/')) ?>;
@@ -238,7 +251,6 @@ const LAYER_META = {
 };
 
 let map, info, boundary=null, secLayer=null;
-let scope='sec';
 let TERR=null;                 // datos del territorio cargado
 const markers={};              // layer -> [google marker]
 const enabled={tickets:true,dif:true,bloque:true,obras:true,areas:true};
@@ -319,22 +331,31 @@ function rebuildCluster(){
 // ---------- carga de territorio ----------
 let selSec=null;   // sección seleccionada (para adjuntar contexto electoral al trazo)
 
-// Ubicar (opcional): solo dibuja el contorno del territorio y hace zoom. Ligero.
+// Cascada Distrito -> Sección.
+$('rc-dist').addEventListener('change', ()=>{
+  const id=$('rc-dist').value; const sel=$('rc-sec');
+  if(!id){ sel.innerHTML='<option value="">— elige primero un distrito —</option>'; sel.disabled=true; return; }
+  const secs=DIST_SECS[id]||[];
+  sel.innerHTML='<option value="">— todo el distrito —</option>'+secs.map(n=>'<option value="'+n+'">Sección '+n+'</option>').join('');
+  sel.disabled = secs.length===0;
+});
+
+// Pinta el contorno de la zona elegida + indicador electoral. Sin cargar puntos.
 async function ubicar(){
-  let param='', val='';
-  if(scope==='sec'){ val=$('rc-sec').value; param='sec='+encodeURIComponent(val); }
-  else if(scope==='dist'){ val=$('rc-dist').value; param='dist='+encodeURIComponent(val); }
-  else { val=$('rc-deleg').value; param='deleg='+encodeURIComponent(val); }
-  if(!val){ $('rc-ctx').textContent = 'Elige un '+(scope==='sec'?'número de sección':scope==='dist'?'distrito':'delegación')+' para ubicarte.'; return; }
-  selSec = (scope==='sec') ? val : null;
-  $('rc-load').disabled=true; $('rc-load').textContent='Ubicando…';
+  const sv=$('rc-sec').value, dv=$('rc-dist').value, gv=$('rc-deleg').value;
+  let param='';
+  if(sv){ param='sec='+encodeURIComponent(sv); selSec=sv; }
+  else if(dv){ param='dist='+encodeURIComponent(dv); selSec=null; }
+  else if(gv){ param='deleg='+encodeURIComponent(gv); selSec=null; }
+  else { $('rc-ctx').textContent='Elige un distrito (y opcionalmente una sección) o una delegación.'; return; }
+  $('rc-load').disabled=true; $('rc-load').textContent='Pintando…';
   try{
     const r = await fetch(BASE+'/recorrido_data.php?geomonly=1&'+param, {headers:{'X-Requested-With':'fetch'}});
     const d = await r.json();
-    if(!d.ok){ $('rc-ctx').textContent = d.error||'No se pudo ubicar.'; return; }
+    if(!d.ok){ $('rc-ctx').textContent = d.error||'No se pudo pintar la zona.'; return; }
     outlineTerritory(d);
   }catch(e){ $('rc-ctx').textContent='Error de red.'; }
-  finally{ $('rc-load').disabled=false; $('rc-load').textContent='Ubicar en el mapa'; }
+  finally{ $('rc-load').disabled=false; $('rc-load').textContent='Pintar la zona en el mapa'; }
 }
 
 function outlineTerritory(d){
@@ -348,11 +369,25 @@ function outlineTerritory(d){
     secLayer.forEach(f=>f.getGeometry().forEachLatLng(ll=>b.extend(ll)));
     if(!b.isEmpty()) map.fitBounds(b);
   } else if(d.center){ map.setCenter(d.center); map.setZoom(14); }
-  let ctx = '<b>'+esc(d.titulo)+'</b>';
-  if(d.part!=null) ctx += ' · participación <b>'+d.part+'%</b>';
-  if(d.gan) ctx += ' · ganó <b>'+esc(d.gan)+'</b>';
-  ctx += '<br><span style="font-size:11px">Ahora traza tu recorrido; se cargará solo lo que quede dentro.</span>';
-  $('rc-ctx').innerHTML = ctx;
+  $('rc-ctx').innerHTML = '<b>'+esc(d.titulo)+'</b><br><span style="font-size:11px">Ahora traza tu polígono o corredor; se cargará solo lo que quede dentro.</span>';
+  renderElec(d.elec);
+}
+
+// Indicador de afinidad partidista / rentabilidad electoral (por sección).
+const PARTY_COLORS={PAN:'#0a4bce',MORENA:'#a6212b',MC:'#f58220',PRI:'#0f9d58',PVEM:'#7ac142',PT:'#d5202a',PRD:'#f4c20d',QS:'#00a3a3'};
+function partyColor(c){ if(!c) return '#8a8a8a'; const u=String(c).toUpperCase(); for(const k in PARTY_COLORS){ if(u.indexOf(k)>=0) return PARTY_COLORS[k]; } return '#8a8a8a'; }
+function renderElec(e){
+  const box=$('rc-elec');
+  if(!e){ box.style.display='none'; box.innerHTML=''; return; }
+  const pan=(e.pan!=null)?e.pan:null;
+  const rentColor = pan==null?'#999':(pan>=50?'#0a4bce':pan>=40?'#5b8fd0':pan>=30?'#e0872b':'#c0392b');
+  box.style.display=''; box.className='rc-elec';
+  box.innerHTML =
+    '<div class="lbl">Indicador electoral · Ayuntamiento 2024</div>'+
+    (e.gan?'<div class="row"><span>Afinidad (partido ganador)</span><span class="tag" style="background:'+partyColor(e.gan)+'">'+esc(e.gan)+(e.ganp!=null?' · '+e.ganp+'%':'')+'</span></div>':'')+
+    (e.part!=null?'<div class="row"><span>Participación</span><b>'+e.part+'%</b></div>':'')+
+    (pan!=null?'<div class="row" style="display:block"><div style="display:flex;justify-content:space-between"><span>Rentabilidad PAN</span><b>'+pan+'%</b></div><div class="bar"><span style="width:'+Math.min(100,Math.max(2,pan))+'%;background:'+rentColor+'"></span></div></div>':'')+
+    (e.ln!=null?'<div class="row"><span>Lista nominal</span><b>'+Number(e.ln).toLocaleString('es-MX')+'</b></div>':'');
 }
 
 // Pinta los puntos devueltos (ya vienen filtrados por el trazo) + conteos.
@@ -399,15 +434,6 @@ document.querySelectorAll('.rc-cb').forEach(cb=>{
   });
 });
 
-// ---------- scope selector ----------
-$('rc-scope').addEventListener('click', e=>{
-  const b=e.target.closest('button'); if(!b) return;
-  scope=b.dataset.scope;
-  document.querySelectorAll('#rc-scope button').forEach(x=>x.classList.toggle('on', x===b));
-  $('rc-f-sec').style.display   = scope==='sec'   ? '' : 'none';
-  $('rc-f-dist').style.display  = scope==='dist'  ? '' : 'none';
-  $('rc-f-deleg').style.display = scope==='deleg' ? '' : 'none';
-});
 $('rc-load').addEventListener('click', ubicar);
 
 // ---------- herramientas de dibujo (manual) ----------
@@ -436,6 +462,7 @@ function metersBetween(a,b){ return google.maps.geometry.spherical.computeDistan
 
 async function generar(){
   if(!(drawnPoly||corridorLine)){ alert('Primero traza un polígono o un corredor.'); return; }
+  selSec = $('rc-sec').value || selSec || null;   // contexto electoral de la sección elegida
   const layers = Object.keys(LAYER_META).filter(k=>enabled[k]);
   if(!layers.length){ alert('Palomea al menos una capa.'); return; }
   let param = 'shape='+(drawnPoly?'poly':'corr')
