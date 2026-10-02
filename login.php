@@ -53,7 +53,7 @@ $cfg = require __DIR__ . '/config/config.php';
           </div>
         <?php endif; ?>
 
-        <form method="post" action="<?= e(url('login.php')) ?>" class="flex flex-col gap-4" novalidate>
+        <form method="post" action="<?= e(url('login.php')) ?>" class="flex flex-col gap-4">
           <?= csrf_field() ?>
           <div class="flex flex-col gap-1.5">
             <label class="text-sm font-medium text-foreground" for="email">Correo institucional</label>

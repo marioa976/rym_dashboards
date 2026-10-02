@@ -22,7 +22,7 @@ try {
     $porDeleg = av_por_delegacion($pdo);
     $limites  = av_limites($pdo);          // FeatureCollection de límites oficiales
     $nDisc    = av_num_discrepancias($pdo);
-} catch (Throwable $e) { $dbError = $e->getMessage(); }
+} catch (Throwable $e) { error_log("[portal] " . $e->getMessage()); $dbError = "No se pudieron cargar los datos."; }
 
 $total   = count($areas);
 $nDeleg  = count($porDeleg);

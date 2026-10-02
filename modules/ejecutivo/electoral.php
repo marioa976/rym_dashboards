@@ -18,7 +18,7 @@ try {
     $pdo = ej_pdo();
     $el = ej_electoral($pdo);
     $limites = ej_limites($pdo);
-} catch (Throwable $e) { $dbError = $e->getMessage(); }
+} catch (Throwable $e) { error_log("[portal] " . $e->getMessage()); $dbError = "No se pudieron cargar los datos."; }
 $k = $el['kpis'];
 ?><?php
 $ktTitle  = 'Ejecutivo · Electoral seccional';

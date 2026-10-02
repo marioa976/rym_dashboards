@@ -282,5 +282,5 @@ try {
     ob_clean();
     http_response_code(500);
     header('Content-Type: application/json; charset=utf-8');
-    echo json_encode(['error' => $e->getMessage()]);
+    error_log('[portal] ' . $e->getMessage()); echo json_encode(['error' => 'Error al consultar los datos.']);
 }

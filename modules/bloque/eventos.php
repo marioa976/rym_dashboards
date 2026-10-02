@@ -8,7 +8,7 @@ require_once __DIR__ . '/lib.php';
 
 $eventos = []; $dbError = null;
 try { $eventos = bloq_eventos(bloq_pdo()); }
-catch (Throwable $e) { $dbError = $e->getMessage(); }
+catch (Throwable $e) { error_log("[portal] " . $e->getMessage()); $dbError = "No se pudieron cargar los datos."; }
 
 function bl_fecha(?string $d): string { return $d ? date('d/m/Y', strtotime($d)) : '—'; }
 function bl_ocupColor($p): string {

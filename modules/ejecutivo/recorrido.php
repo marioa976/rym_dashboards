@@ -41,7 +41,7 @@ try {
                                ORDER BY s.distrito_id, s.num_seccion") as $r)
             $distSecs[(int)$r['d']][] = (int)$r['n'];
     } catch (Throwable $e) { /* sin mapeo: la sección listará todas */ }
-} catch (Throwable $e) { $dbError = $e->getMessage(); }
+} catch (Throwable $e) { error_log("[portal] " . $e->getMessage()); $dbError = "No se pudieron cargar los datos."; }
 $distSecs = $distSecs ?? [];
 
 $ktTitle  = 'Ejecutivo · Recorrido territorial';
@@ -53,7 +53,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
   .rc-wrap{display:grid;grid-template-columns:360px 1fr;gap:16px;align-items:start}
   @media(max-width:1100px){.rc-wrap{grid-template-columns:1fr}}
   .rc-panel{background:var(--card);border:1px solid var(--border);border-radius:.75rem;padding:16px 18px}
-  .rc-panel h3{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted-foreground);font-weight:600;margin-bottom:10px}
+  .rc-panel h2{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted-foreground);font-weight:600;margin-bottom:10px}
   .rc-field{margin-bottom:12px}
   .rc-field label{display:block;font-size:12px;font-weight:600;color:var(--muted-foreground);margin-bottom:4px}
   .rc-field select,.rc-field input{width:100%;border:1px solid var(--border);border-radius:8px;padding:8px 10px;font:inherit;font-size:13px;background:var(--background)}
@@ -128,7 +128,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
   <!-- ============ PANEL DE CONTROL ============ -->
   <div>
     <div class="rc-panel">
-      <h3>1 · Elige tu zona</h3>
+      <h2>1 · Elige tu zona</h2>
       <div class="rc-field">
         <label>Distrito</label>
         <select id="rc-dist">
@@ -166,7 +166,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
     </div>
 
     <div class="rc-panel" style="margin-top:14px">
-      <h3>2 · Capas</h3>
+      <h2>2 · Capas</h2>
       <div class="rc-layers" id="rc-layers">
         <label><input type="checkbox" class="rc-cb" data-layer="tickets" checked> <span class="rc-swatch" style="background:#dc2626"></span> Tickets abiertos <span class="cnt" data-cnt="tickets">—</span></label>
         <label><input type="checkbox" class="rc-cb" data-layer="dif" checked> <span class="rc-swatch" style="background:#059669"></span> Beneficiarios DIF <span class="cnt" data-cnt="dif">—</span></label>
@@ -178,7 +178,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
     </div>
 
     <div class="rc-panel" style="margin-top:14px">
-      <h3>3 · Traza tu recorrido</h3>
+      <h2>3 · Traza tu recorrido</h2>
       <div class="rc-tools">
         <button class="rc-btn ghost" id="rc-poly" style="width:auto;flex:1"><i class="ki-filled ki-pencil" aria-hidden="true"></i> Polígono</button>
         <button class="rc-btn ghost" id="rc-corr" style="width:auto;flex:1"><i class="ki-filled ki-route" aria-hidden="true"></i> Corredor</button>
@@ -199,7 +199,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
     <!-- ============ FICHA ============ -->
     <div class="rc-panel rc-ficha" id="rc-ficha" style="display:none">
       <div id="rc-print">
-        <h3 style="margin-bottom:6px">Ficha de recorrido</h3>
+        <h2 style="margin-bottom:6px">Ficha de recorrido</h2>
         <div id="rc-ficha-terr" class="rc-ctx" style="margin-bottom:10px"></div>
         <div class="rc-sum" id="rc-sum"></div>
         <div id="rc-stops"></div>
@@ -241,6 +241,14 @@ const VERPII  = <?= $verPII ? 'true' : 'false' ?>;
 const BASE    = <?= json_encode(rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? ''), '/')) ?>;
 const AUDIT_URL = <?= json_encode(url('audit.php')) ?>;
 function auditBeacon(action,detail){ try{ const fd=new FormData(); fd.append('action',action); fd.append('detail',detail||''); if(navigator.sendBeacon){navigator.sendBeacon(AUDIT_URL,fd);} else {fetch(AUDIT_URL,{method:'POST',body:fd,keepalive:true});} }catch(e){} }
+// Aviso no bloqueante (reemplaza alert()).
+function rcMsg(t){
+  let el=document.getElementById('rc-toast');
+  if(!el){ el=document.createElement('div'); el.id='rc-toast';
+    el.style.cssText='position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#1f2937;color:#fff;padding:11px 18px;border-radius:10px;font-size:13px;font-weight:500;box-shadow:0 10px 30px rgba(0,0,0,.25);z-index:70;opacity:0;transition:opacity .2s;pointer-events:none;max-width:90vw;text-align:center';
+    el.setAttribute('role','status'); el.setAttribute('aria-live','polite'); document.body.appendChild(el); }
+  el.textContent=t; el.style.opacity='1'; clearTimeout(rcMsg._t); rcMsg._t=setTimeout(()=>{el.style.opacity='0';},3200);
+}
 function imprimirFicha(){
   if(VERPII){
     const n = lastOrdered ? lastOrdered.length : 0;
@@ -471,10 +479,10 @@ function enableGen(){
 function metersBetween(a,b){ return google.maps.geometry.spherical.computeDistanceBetween(a,b); }
 
 async function generar(){
-  if(!(drawnPoly||corridorLine)){ alert('Primero traza un polígono o un corredor.'); return; }
+  if(!(drawnPoly||corridorLine)){ rcMsg('Primero traza un polígono o un corredor.'); return; }
   selSec = $('rc-sec').value || selSec || null;   // contexto electoral de la sección elegida
   const layers = Object.keys(LAYER_META).filter(k=>enabled[k]);
-  if(!layers.length){ alert('Palomea al menos una capa.'); return; }
+  if(!layers.length){ rcMsg('Palomea al menos una capa.'); return; }
   let param = 'shape='+(drawnPoly?'poly':'corr')
             + '&layers='+encodeURIComponent(layers.join(','))
             + '&dias='+encodeURIComponent($('rc-dias').value||'30');
@@ -490,14 +498,14 @@ async function generar(){
   try{
     const r = await fetch(BASE+'/recorrido_data.php?'+param, {headers:{'X-Requested-With':'fetch'}});
     const d = await r.json();
-    if(!d.ok){ alert(d.error||'No se pudieron cargar los datos.'); return; }
+    if(!d.ok){ rcMsg(d.error||'No se pudieron cargar los datos.'); return; }
     TERR=d;
     renderPoints(d);
     const stops=[];
     for(const layer of layers) for(const p of (d.layers[layer]||[])) stops.push({layer, p, pos:new google.maps.LatLng(p.lat,p.lng)});
-    if(!stops.length){ alert('No hay puntos (de las capas palomeadas) dentro de tu trazo.'); $('rc-ficha').style.display='none'; return; }
+    if(!stops.length){ rcMsg('No hay puntos de las capas elegidas dentro de tu trazo.'); $('rc-ficha').style.display='none'; return; }
     routeStops(stops);
-  }catch(e){ alert('Error de red al cargar el trazo.'); }
+  }catch(e){ rcMsg('Error de red al cargar el trazo.'); }
   finally{ $('rc-gen').disabled=false; $('rc-gen').textContent='Generar recorrido'; }
 }
 
