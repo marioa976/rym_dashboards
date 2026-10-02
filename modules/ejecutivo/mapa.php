@@ -23,7 +23,7 @@ try {
     $limites = ej_limites($pdo);
     $qb = ej_qrobici($pdo);           // remoto cacheado
     if ($qb) $estaciones = $qb['estaciones'];
-} catch (Throwable $e) { $dbError = $e->getMessage(); }
+} catch (Throwable $e) { error_log("[portal] " . $e->getMessage()); $dbError = "No se pudieron cargar los datos."; }
 ?><?php
 $ktTitle  = 'Ejecutivo · Mapa por capas';
 $ktActive = 'ejecutivo';

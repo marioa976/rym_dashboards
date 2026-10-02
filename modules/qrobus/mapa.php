@@ -131,7 +131,7 @@ if (!is_array($payload)) {
 
         $payload = ['pts'=>$pts,'geo'=>['type'=>'FeatureCollection','features'=>$features],'elec'=>$elec,'partido'=>$PARTIDO];
         @file_put_contents($cacheFile, json_encode($payload, JSON_UNESCAPED_UNICODE));
-    } catch (Throwable $e) { $dbError=$e->getMessage(); $payload=['pts'=>[],'geo'=>['type'=>'FeatureCollection','features'=>[]],'elec'=>[],'partido'=>$PARTIDO]; }
+    } catch (Throwable $e) { error_log("[portal] " . $e->getMessage()); $dbError = "No se pudieron cargar los datos."; $payload=['pts'=>[],'geo'=>['type'=>'FeatureCollection','features'=>[]],'elec'=>[],'partido'=>$PARTIDO]; }
 }
 ?><?php
 $ktTitle  = 'Qrobus · Mapa seccional';

@@ -17,7 +17,7 @@ try {
     $demo  = bloq_demografia($pdo);
     $deleg = bloq_por_delegacion($pdo, 10);
     $serie = bloq_serie_dia($pdo, 120);
-} catch (Throwable $e) { $dbError = $e->getMessage(); }
+} catch (Throwable $e) { error_log("[portal] " . $e->getMessage()); $dbError = "No se pudieron cargar los datos."; }
 ?><?php
 $ktTitle  = 'Bloque · Tablero';
 $ktActive = 'bloque';

@@ -111,7 +111,7 @@ if ($action !== '') {
 
 /* ------------------------------ HTML ------------------------------ */
 $stats = null; $dbError = null;
-try { $stats = qb_stats(qb_pdo()); } catch (Throwable $e) { $dbError = $e->getMessage(); }
+try { $stats = qb_stats(qb_pdo()); } catch (Throwable $e) { error_log("[portal] " . $e->getMessage()); $dbError = "No se pudieron cargar los datos."; }
 ?><?php
 $ktTitle  = 'Qrobus · Geocodificar';
 $ktActive = 'qrobus';

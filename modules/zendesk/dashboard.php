@@ -396,7 +396,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
 
 <!-- ====================== KPIs ====================== -->
 <section class="section">
-  <div class="section-title">Indicadores principales</div>
+  <h2 class="section-title">Indicadores principales</h2>
   <div class="grid kpi-grid">
     <div class="card kpi">
       <div class="label">Total de reportes</div>
@@ -443,7 +443,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
 
 <!-- ====================== Distribución ====================== -->
 <section class="section">
-  <div class="section-title">Distribución de tickets</div>
+  <h2 class="section-title">Distribución de tickets</h2>
   <div class="grid row-3">
     <div class="card">
       <div class="card-header"><h3 class="card-title">Estado</h3><span class="card-sub"><?= count($status) ?> estados</span></div>
@@ -462,7 +462,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
 
 <!-- ====================== Tendencia ====================== -->
 <section class="section">
-  <div class="section-title">Tendencia diaria</div>
+  <h2 class="section-title">Tendencia diaria</h2>
   <div class="card">
     <div class="card-header"><h3 class="card-title">Tickets creados vs resueltos</h3><span class="card-sub">Caídas marcan fines de semana</span></div>
     <div class="chart-wrap tall"><canvas id="chTime"></canvas></div>
@@ -481,7 +481,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
 
 <!-- ====================== Delegaciones / Grupos ====================== -->
 <section class="section">
-  <div class="section-title">Desempeño por delegación y grupo</div>
+  <h2 class="section-title">Desempeño por delegación y grupo</h2>
   <div class="grid row-2">
     <div class="card">
       <div class="card-header"><h3 class="card-title">Delegaciones</h3><span class="card-sub">Volumen y % resolución</span></div>
@@ -496,7 +496,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
 
 <!-- ====================== Heatmap ====================== -->
 <section class="section">
-  <div class="section-title">Mapa de calor</div>
+  <h2 class="section-title">Mapa de calor</h2>
   <div class="card">
     <div class="card-header"><h3 class="card-title">Delegación × grupo de servicio</h3><span class="card-sub">Top 7 × top 8</span></div>
     <div style="overflow-x:auto" id="heatmap"></div>
@@ -505,7 +505,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
 
 <!-- ====================== Servicios / Colonias ====================== -->
 <section class="section">
-  <div class="section-title">Servicios y zonas con más demanda</div>
+  <h2 class="section-title">Servicios y zonas con más demanda</h2>
   <div class="grid row-2">
     <div class="card">
       <div class="card-header"><h3 class="card-title">Tipos de servicio (top 15)</h3></div>
@@ -520,7 +520,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
 
 <!-- ====================== Backlog ====================== -->
 <section class="section">
-  <div class="section-title">Backlog y tickets vencidos</div>
+  <h2 class="section-title">Backlog y tickets vencidos</h2>
   <div class="grid row-2">
     <div class="card">
       <div class="card-header"><h3 class="card-title">Antigüedad del backlog</h3><span class="card-sub"><?= number_format($no_resueltos) ?> no resueltos · media <?= $antiguedad_prom ?>d</span></div>
@@ -535,7 +535,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
 
 <!-- ====================== Tablas ====================== -->
 <section class="section">
-  <div class="section-title">Detalle por delegación</div>
+  <h2 class="section-title">Detalle por delegación</h2>
   <div class="card" style="padding:8px 0">
     <table>
       <thead><tr>
@@ -565,7 +565,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
 </section>
 
 <section class="section">
-  <div class="section-title">Detalle por grupo de servicio</div>
+  <h2 class="section-title">Detalle por grupo de servicio</h2>
   <div class="card" style="padding:8px 0">
     <table>
       <thead><tr>

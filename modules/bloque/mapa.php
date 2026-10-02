@@ -24,7 +24,7 @@ try {
     foreach ($pts as $p) if (($p['s'] ?? null) !== null) $usadas[$p['s']] = true;
     $secFeatures = array_values(array_filter($secData['features'], fn($f) => isset($usadas[$f['properties']['s'] ?? -1])));
     $gs      = bloq_geo_stats($pdo);
-} catch (Throwable $e) { $dbError = $e->getMessage(); }
+} catch (Throwable $e) { error_log("[portal] " . $e->getMessage()); $dbError = "No se pudieron cargar los datos."; }
 $pct = $gs['total'] > 0 ? round($gs['geo'] / $gs['total'] * 100) : 0;
 ?><?php
 $ktTitle  = 'Bloque · Mapa de procedencia';

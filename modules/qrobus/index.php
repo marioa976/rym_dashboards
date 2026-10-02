@@ -12,7 +12,7 @@ $nombre = htmlspecialchars((string)(Auth::user()['nombre'] ?? 'usuario'));
 
 $stats = null; $dbError = null;
 try { $stats = qb_stats(qb_pdo()); }
-catch (Throwable $e) { $dbError = $e->getMessage(); }
+catch (Throwable $e) { error_log("[portal] " . $e->getMessage()); $dbError = "No se pudieron cargar los datos."; }
 $pct = ($stats && $stats['total'] > 0) ? round($stats['con_coords'] / $stats['total'] * 100) : 0;
 ?><?php
 $ktTitle  = 'Qrobus · Inicio';

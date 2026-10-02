@@ -19,7 +19,7 @@ try {
     $matriz = ej_matriz($pdo);
     $estatus = ej_obras_estatus($pdo);
     $qrobici = ej_qrobici($pdo);       // remoto, cacheado (puede ser null si no responde)
-} catch (Throwable $e) { $dbError = $e->getMessage(); }
+} catch (Throwable $e) { error_log("[portal] " . $e->getMessage()); $dbError = "No se pudieron cargar los datos."; }
 
 // Inyecta la columna Qrobici (viajes por delegación de estación origen) en la matriz.
 foreach ($matriz as $d => &$row) { $row['qrobici'] = $qrobici['por_deleg'][$d] ?? 0; }
@@ -95,7 +95,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-5">
     <?php foreach ([['c-inv','Inversión en obras por delegación (MDP)'],['c-tickets','Atención ciudadana · tickets por delegación'],['c-dif','Apoyos DIF por delegación'],['c-est','Obras por estatus']] as [$cid, $ctitle]): ?>
       <div class="kt-card">
-        <div class="kt-card-header"><h3 class="kt-card-title"><?= $ctitle ?></h3></div>
+        <div class="kt-card-header"><h2 class="kt-card-title"><?= $ctitle ?></h2></div>
         <div class="kt-card-content"><div class="relative h-[250px]"><canvas id="<?= $cid ?>"></canvas></div></div>
       </div>
     <?php endforeach; ?>
@@ -104,7 +104,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
   <!-- Matriz cruzada -->
   <div class="kt-card">
     <div class="kt-card-header flex-col items-start gap-1 py-4">
-      <h3 class="kt-card-title">Matriz cruzada por delegación</h3>
+      <h2 class="kt-card-title">Matriz cruzada por delegación</h2>
       <span class="text-xs text-secondary-foreground font-normal">Intensidad de color = valor relativo dentro de cada columna.</span>
     </div>
     <div class="kt-card-content p-0">

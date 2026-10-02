@@ -44,7 +44,7 @@ try {
                               FROM `$tabla` GROUP BY t, s"),
     ];
     $D['sexosTop2'] = array_slice(array_column($D['sexo'], 'k'), 0, 2);
-} catch (Throwable $e) { $dbError = $e->getMessage(); }
+} catch (Throwable $e) { error_log("[portal] " . $e->getMessage()); $dbError = "No se pudieron cargar los datos."; }
 
 $pct = ($D && $D['total']>0) ? round($D['geocod']/$D['total']*100) : 0;
 $topTipo = ($D && $D['tipo']) ? $D['tipo'][0] : null;

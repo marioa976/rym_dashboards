@@ -57,7 +57,7 @@ function kt_menu_item(string $href, string $icon, string $label, bool $active): 
     $titleCls = 'kt-menu-title text-sm ' . ($active ? 'font-semibold text-primary' : 'font-medium text-foreground');
     $iconCls  = 'kt-menu-icon items-start w-[20px] ' . ($active ? 'text-primary' : 'text-muted-foreground');
     return '<div class="kt-menu-item">'
-        . '<a class="' . $linkBase . '" href="' . e($href) . '" tabindex="0">'
+        . '<a class="' . $linkBase . '" href="' . e($href) . '" tabindex="0" title="' . e($label) . '">'
         . '<span class="' . $iconCls . '"><i class="ki-filled ki-' . e($icon) . ' text-lg"></i></span>'
         . '<span class="' . $titleCls . '">' . e($label) . '</span>'
         . '</a></div>';

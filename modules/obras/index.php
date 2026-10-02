@@ -23,7 +23,7 @@ try {
     $obras   = obr_obras($pdo);
     $kpis    = obr_kpis($pdo);
     $limites = obr_limites($pdo);
-} catch (Throwable $e) { $dbError = $e->getMessage(); }
+} catch (Throwable $e) { error_log("[portal] " . $e->getMessage()); $dbError = "No se pudieron cargar los datos."; }
 
 $invMDP  = $kpis['inversion'] / 1e6;
 $pctTerm = $kpis['total'] > 0 ? round($kpis['terminadas'] / $kpis['total'] * 100) : 0;
