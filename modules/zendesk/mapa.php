@@ -152,7 +152,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{--bg:#fafafa;--surface:#fff;--border:#ececec;--text:#1a1a1a;--text-muted:#6b7280;--text-faint:#9ca3af;
-    --positive:#188a5b;--warning:#d99000;--negative:#ce3a2b;--neutral:#005ab2}
+    --positive:#188a5b;--warning:#b45309;--negative:#ce3a2b;--neutral:#005ab2}
   *{box-sizing:border-box;-webkit-font-smoothing:antialiased}
   html,body{margin:0;height:100%;font-family:'Inter',system-ui,sans-serif;color:var(--text);font-size:14px;background:var(--bg)}
   .topbar{padding:14px 24px;background:#fff;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
@@ -294,7 +294,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
 
     <div class="legend">
       <div class="legend-item"><span class="legend-dot" style="background:#ce3a2b"></span>Vencido (sin resolver)</div>
-      <div class="legend-item"><span class="legend-dot" style="background:#d99000"></span>Sin resolver</div>
+      <div class="legend-item"><span class="legend-dot" style="background:#b45309"></span>Sin resolver</div>
       <div class="legend-item"><span class="legend-dot" style="background:#188a5b"></span>Resuelto</div>
       <div class="legend-item"><span class="legend-dot" style="background:#6b7280"></span>Otro</div>
     </div>
@@ -473,7 +473,7 @@ function makeHeatOverlay(points, opts = {}) {
 function colorParaTicket(t) {
   if (t.vencido == 1)      return '#ce3a2b'; // rojo
   if (t.resuelto == 1)     return '#188a5b'; // verde
-  if (t.estado === 'Abierto' || t.estado === 'Nuevo' || t.estado === 'Asignado cuadrilla') return '#d99000'; // ámbar
+  if (t.estado === 'Abierto' || t.estado === 'Nuevo' || t.estado === 'Asignado cuadrilla') return '#b45309'; // ámbar
   return '#6b7280';                          // gris
 }
 

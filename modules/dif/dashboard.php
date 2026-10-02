@@ -142,9 +142,9 @@ require __DIR__ . '/../../views/layout/kt_top.php';
 <style>
   /* Paleta de gráficas (Chart.js) y semáforos de calidad — se conservan */
   :root{
-    --chart1:#254185;--chart2:#005ab2;--chart3:#188a5b;--chart4:#d99000;
+    --chart1:#254185;--chart2:#005ab2;--chart3:#188a5b;--chart4:#b45309;
     --chart5:#2a9eda;--chart6:#ce3a2b;--chart7:#1a2f63;--chart8:#5b667a;
-    --ok:#188a5b;--warn:#d99000;--err:#ce3a2b;--info:#2a9eda;
+    --ok:#188a5b;--warn:#b45309;--err:#ce3a2b;--info:#2a9eda;
   }
 
   /* Tab control (Ejecutivo / Geográfico) — segmentado Metronic */
@@ -449,7 +449,7 @@ function monthKey(s){ return s ? s.substring(0,7) : null; }
 // ======================================================================
 // COLORES
 // ======================================================================
-const PALETTE = ['#254185','#005ab2','#188a5b','#d99000','#2a9eda',
+const PALETTE = ['#254185','#005ab2','#188a5b','#b45309','#2a9eda',
                  '#ce3a2b','#1a2f63','#5b667a','#ca8a04','#475569',
                  '#7c3aed','#db2777','#0369a1','#15803d','#a16207'];
 const programColor = {};
@@ -761,7 +761,7 @@ function renderCharts(){
   }
   const dpairs = Object.entries(benByDel)
                        .map(([k,s])=>[k,s.size]).sort((a,b)=>b[1]-a[1]).slice(0,10);
-  buildBar('ch-delegacion', dpairs.map(x=>x[0]), dpairs.map(x=>x[1]), '#d99000', true);
+  buildBar('ch-delegacion', dpairs.map(x=>x[0]), dpairs.map(x=>x[1]), '#b45309', true);
 
   d = topN(r,'colonia',10);
   buildBar('ch-colonia', d.map(x=>x[0]), d.map(x=>x[1]), '#2a9eda', true);

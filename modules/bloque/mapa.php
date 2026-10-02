@@ -85,9 +85,12 @@ require __DIR__ . '/../../views/layout/kt_top.php';
     <div class="bl-tablehead">
       <div><strong>Beneficiarios</strong> <span id="bl-tcount" class="bl-muted"></span></div>
       <div class="bl-tactions">
+        <label style="font-size:12px;color:var(--qro-text-secondary);display:inline-flex;align-items:center;gap:6px">Sección
+          <select id="bl-secfilter" style="border:1px solid var(--qro-border);border-radius:8px;padding:6px 8px;font:inherit;font-size:13px;background:#fff"><option value="">Todas</option></select>
+        </label>
         <span id="bl-tfilter" class="bl-chip" style="display:none"></span>
         <button id="bl-clear" class="bl-btn" style="display:none">Ver todos</button>
-        <button id="bl-export" class="bl-btn primary"><i class="ki-filled ki-file-down"></i> Exportar CSV</button>
+        <button id="bl-export" class="bl-btn primary"><i class="ki-filled ki-file-down" aria-hidden="true"></i> Exportar CSV</button>
       </div>
     </div>
     <div class="bl-tablewrap">
@@ -167,8 +170,20 @@ function apply(){
 function setFilter(s){
   filterSec = (filterSec===s)?null:s;
   if(secBoundary) secBoundary.setStyle(styleSec);
+  const sel=$('bl-secfilter'); if(sel) sel.value = filterSec==null ? '' : String(filterSec);
   renderTable();
 }
+// Alternativa accesible por teclado al clic en el mapa: filtrar por <select>.
+(function(){
+  const sel=$('bl-secfilter'); if(!sel) return;
+  const secs=[...new Set(PTS.map(p=>p.s).filter(s=>s!=null))].sort((a,b)=>a-b);
+  sel.innerHTML='<option value="">Todas</option>'+secs.map(s=>'<option value="'+s+'">Sección '+s+'</option>').join('');
+  sel.addEventListener('change',()=>{
+    filterSec = sel.value==='' ? null : +sel.value;
+    if(secBoundary) secBoundary.setStyle(styleSec);
+    renderTable();
+  });
+})();
 function currentRows(){ return filterSec==null ? PTS : PTS.filter(p=>p.s===filterSec); }
 function renderTable(){
   const rows = currentRows();

@@ -316,7 +316,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <style>
-  :root{ --positive:#188a5b;--warning:#d99000;--negative:#ce3a2b;--neutral:#005ab2; }
+  :root{ --positive:#188a5b;--warning:#b45309;--negative:#ce3a2b;--neutral:#005ab2; }
   .container{padding:0}
   header{margin-bottom:24px;display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:16px}
   header h1{font-size:22px;font-weight:600;letter-spacing:-.02em;margin:0 0 6px;color:var(--foreground)}
@@ -547,7 +547,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
         <?php foreach ($tabla_deleg as $r):
           $pct = (float)$r['pct_resolucion'];
           $cls = $pct>=40?'positive':($pct>=30?'warning':'negative');
-          $color = $pct>=40?'#188a5b':($pct>=30?'#d99000':'#ce3a2b');
+          $color = $pct>=40?'#188a5b':($pct>=30?'#b45309':'#ce3a2b');
           $noRes = $r['total']-$r['resueltos'];
         ?>
         <tr>
@@ -577,7 +577,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
         <?php foreach ($tabla_grupo as $r):
           $pct = (float)$r['pct_resolucion'];
           $cls = $pct>=70?'positive':($pct>=40?'warning':'negative');
-          $color = $pct>=70?'#188a5b':($pct>=40?'#d99000':'#ce3a2b');
+          $color = $pct>=70?'#188a5b':($pct>=40?'#b45309':'#ce3a2b');
         ?>
         <tr>
           <td style="padding-left:20px"><?= htmlspecialchars($r['grupo']) ?></td>

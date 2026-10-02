@@ -72,7 +72,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
   :root{
     --bg:#f5f7fa; --panel:#fff; --bd:#e2e8f0; --fg:#0f172a; --mut:#64748b;
     --accent:#254185; --accent2:#005ab2;
-    --ok:#188a5b; --warn:#d99000; --err:#ce3a2b;
+    --ok:#188a5b; --warn:#b45309; --err:#ce3a2b;
     --shadow:0 1px 3px rgba(15,23,42,.06), 0 1px 2px rgba(15,23,42,.05);
   }
   *{box-sizing:border-box}

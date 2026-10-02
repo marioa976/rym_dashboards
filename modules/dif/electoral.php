@@ -210,7 +210,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
   :root{
     --bg:#f5f7fa; --panel:#ffffff; --bd:#e2e8f0; --fg:#0f172a; --mut:#64748b;
     --accent:#254185; --accent2:#005ab2;
-    --ok:#188a5b; --warn:#d99000; --err:#ce3a2b;
+    --ok:#188a5b; --warn:#b45309; --err:#ce3a2b;
     --shadow:0 1px 3px rgba(15,23,42,.05);
   }
   *{box-sizing:border-box}
@@ -406,7 +406,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
 const SECCIONES = <?= json_encode($secs, JSON_UNESCAPED_UNICODE) ?>;
 const GMAPS_KEY = <?= json_encode($gmapsKey) ?>;
 const DISTRITOS = <?= json_encode($distritos, JSON_UNESCAPED_UNICODE) ?>;
-const DISTRITO_COLORS = ['#254185','#005ab2','#188a5b','#d99000','#2a9eda',
+const DISTRITO_COLORS = ['#254185','#005ab2','#188a5b','#b45309','#2a9eda',
                         '#ce3a2b','#1a2f63','#5b667a','#ca8a04','#475569',
                         '#7c3aed','#db2777','#0369a1','#15803d','#a16207'];
 

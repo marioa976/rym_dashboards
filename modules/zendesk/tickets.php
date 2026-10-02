@@ -187,7 +187,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
 <style>
   :root{--bg:#fafafa;--surface:#fff;--border:#ececec;--border-strong:#e0e0e0;
     --text:#1a1a1a;--text-muted:#6b7280;--text-faint:#9ca3af;
-    --positive:#188a5b;--warning:#d99000;--negative:#ce3a2b;--neutral:#005ab2;--accent2:#2a9eda}
+    --positive:#188a5b;--warning:#b45309;--negative:#ce3a2b;--neutral:#005ab2;--accent2:#2a9eda}
   *{box-sizing:border-box;-webkit-font-smoothing:antialiased}
   body{margin:0;font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5}
   .container{max-width:1400px;margin:0 auto;padding:32px 32px 80px}

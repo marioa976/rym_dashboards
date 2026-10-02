@@ -309,7 +309,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
 <style>
   :root{--bg:#fafafa;--surface:#fff;--border:#ececec;--border-strong:#e0e0e0;
     --text:#1a1a1a;--text-muted:#6b7280;--text-faint:#9ca3af;
-    --positive:#188a5b;--warning:#d99000;--negative:#ce3a2b;--neutral:#005ab2;--accent2:#2a9eda}
+    --positive:#188a5b;--warning:#b45309;--negative:#ce3a2b;--neutral:#005ab2;--accent2:#2a9eda}
   *{box-sizing:border-box;-webkit-font-smoothing:antialiased}
   body{margin:0;font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5}
   .container{max-width:1400px;margin:0 auto;padding:32px 32px 80px}
@@ -502,7 +502,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
         <?php foreach ($canal_perf as $c):
           $p = (float)$c['pct_resolucion'];
           $cls = $p>=70?'positive':($p>=40?'warning':'negative');
-          $color = $p>=70?'#188a5b':($p>=40?'#d99000':'#ce3a2b');
+          $color = $p>=70?'#188a5b':($p>=40?'#b45309':'#ce3a2b');
           $canal_id = qOne($pdo,"SELECT id FROM cat_canal_origen WHERE nombre=?",[$c['canal']])['id'] ?? null;
         ?>
         <tr>
@@ -553,7 +553,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
         <?php foreach ($servicio_perf as $s):
           $p = (float)$s['pct_resolucion'];
           $cls = $p>=70?'positive':($p>=40?'warning':'negative');
-          $color = $p>=70?'#188a5b':($p>=40?'#d99000':'#ce3a2b');
+          $color = $p>=70?'#188a5b':($p>=40?'#b45309':'#ce3a2b');
         ?>
         <tr>
           <td style="padding-left:20px"><?= htmlspecialchars($s['servicio']) ?></td>
@@ -746,7 +746,7 @@ if (elT) {
 // Antigüedad
 new Chart(document.getElementById('chAnt'),{type:'bar',
   data:{labels:DATA.antiguedad.labels,datasets:[{data:DATA.antiguedad.values,
-    backgroundColor:['#188a5b','#84cc16','#d99000','#f97316','#ce3a2b','#7f1d1d'],borderRadius:4,barThickness:36}]},
+    backgroundColor:['#188a5b','#84cc16','#b45309','#f97316','#ce3a2b','#7f1d1d'],borderRadius:4,barThickness:36}]},
   options:{plugins:{legend:{display:false}},scales:{x:noGrid,y:baseGrid}}});
 </script>
 <?php require __DIR__ . '/../../views/layout/kt_bottom.php'; ?>

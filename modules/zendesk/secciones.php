@@ -173,7 +173,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
 <style>
   :root{
     --bg:#f5f7fb; --panel:#fff; --bd:#d9e2f0; --fg:#1f2937; --mut:#5b667a;
-     --accent2:#005ab2; --ok:#188a5b; --warn:#d99000; --err:#ce3a2b;
+     --accent2:#005ab2; --ok:#188a5b; --warn:#b45309; --err:#ce3a2b;
     --shadow:0 2px 6px rgba(37,65,133,.08);
   }
   *{box-sizing:border-box}
@@ -316,7 +316,7 @@ const DISTRITOS      = <?= json_encode($distritos, JSON_UNESCAPED_UNICODE) ?>;
 const GMAPS_KEY      = <?= json_encode($gmapsKey) ?>;
 let   CURRENT_COUNTS = <?= json_encode($initialCounts) ?>;
 let   CURRENT_MAX    = 0;
-const DISTRITO_COLORS = ['#254185','#005ab2','#188a5b','#d99000','#2a9eda',
+const DISTRITO_COLORS = ['#254185','#005ab2','#188a5b','#b45309','#2a9eda',
                          '#ce3a2b','#1a2f63','#5b667a','#ca8a04','#475569',
                          '#7c3aed','#db2777','#0369a1','#15803d','#a16207'];
 
