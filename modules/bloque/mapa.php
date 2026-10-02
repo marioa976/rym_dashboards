@@ -90,7 +90,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
         </label>
         <span id="bl-tfilter" class="bl-chip" style="display:none"></span>
         <button id="bl-clear" class="bl-btn" style="display:none">Ver todos</button>
-        <button id="bl-export" class="bl-btn primary"><i class="ki-filled ki-file-down" aria-hidden="true"></i> Exportar CSV</button>
+        <button id="bl-export" class="bl-btn primary"><i class="ki-filled ki-file-down" aria-hidden="true"></i> Exportar CSV<?php if ($verPII): ?> <i class="ki-filled ki-lock" aria-hidden="true"></i><?php endif; ?></button>
       </div>
     </div>
     <div class="bl-tablewrap">
@@ -110,6 +110,8 @@ const LIMITES = <?= json_encode($limites, JSON_UNESCAPED_UNICODE) ?>;
 const SECS = <?= json_encode($secFeatures, JSON_UNESCAPED_UNICODE) ?>;
 const HASKEY = <?= $apiKey ? 'true':'false' ?>;
 const VERPII = <?= $verPII ? 'true':'false' ?>;
+const AUDIT_URL = <?= json_encode(url('audit.php')) ?>;
+function auditBeacon(action,detail){ try{ const fd=new FormData(); fd.append('action',action); fd.append('detail',detail||''); if(navigator.sendBeacon){navigator.sendBeacon(AUDIT_URL,fd);} else {fetch(AUDIT_URL,{method:'POST',body:fd,keepalive:true});} }catch(e){} }
 const $ = id => document.getElementById(id);
 function esc(s){ return String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 
@@ -206,6 +208,11 @@ function renderTable(){
 function csvCell(v){ v=String(v==null?'':v); return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; }
 function exportCSV(){
   const rows=currentRows();
+  if(!rows.length){ return; }
+  if(VERPII){
+    if(!confirm('Vas a exportar '+rows.length.toLocaleString('es-MX')+' beneficiario(s) CON datos personales (nombre, colonia). La descarga queda registrada en auditoría. ¿Continuar?')) return;
+    auditBeacon('export_csv_bloque', rows.length+' filas'+(filterSec!=null?' · seccion '+filterSec:' · todas'));
+  }
   const head=(VERPII?['Nombre']:[]).concat(['Delegación','Colonia','Empresa','Sección']);
   const lines=[head.join(',')];
   rows.forEach(p=>{ const vals=(VERPII?[p.nombre||'']:[]).concat([p.d||'',p.col||'',p.emp||'',(p.s==null?'':p.s)]);
