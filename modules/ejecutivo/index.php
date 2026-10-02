@@ -61,7 +61,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
   <!-- Hero -->
   <div class="rounded-xl p-6 mb-5 text-white" style="background:linear-gradient(120deg,#14224a,#254185)">
-    <h1 class="text-2xl font-bold text-white">📊 Tablero Ejecutivo</h1>
+    <h1 class="text-2xl font-bold text-white">Tablero Ejecutivo</h1>
     <p class="text-sm opacity-90 mt-1">Hola, <?= $nombre ?>. Indicadores cruzados de todos los módulos, por delegación.</p>
   </div>
 
@@ -73,12 +73,12 @@ require __DIR__ . '/../../views/layout/kt_top.php';
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-5">
     <?php
     $tiles = [
-      ['🏗 Obras',           number_format($kpis['obras']['n']),   ej_money($kpis['obras']['inv']).' · '.$kpis['obras']['term'].' terminadas', '#c85a2b', '../obras/index.php'],
-      ['🌳 Áreas verdes',    number_format($kpis['areas']['n']),   'áreas mapeadas', '#2e9e5b', '../areasverdes/index.php'],
+      ['Obras',           number_format($kpis['obras']['n']),   ej_money($kpis['obras']['inv']).' · '.$kpis['obras']['term'].' terminadas', '#c85a2b', '../obras/index.php'],
+      ['Áreas verdes',    number_format($kpis['areas']['n']),   'áreas mapeadas', '#2e9e5b', '../areasverdes/index.php'],
       ['🤝 DIF · padrón',    number_format($kpis['dif']['n']),     number_format($kpis['dif']['geo']).' geolocalizados', '#8e44ad', '../dif/dashboard.php'],
       ['📮 Zendesk',         number_format($kpis['zendesk']['n']), number_format($kpis['zendesk']['geo']).' geolocalizados', '#005ab2', '../zendesk/dashboard.php'],
       ['💡 Bloque',          number_format($kpis['bloque']['n']),  'beneficiarios', '#159c9c', '../bloque/index.php'],
-      ['🚲 Qrobici',         $qrobici ? number_format($qrobici['kpis']['viajes']) : '—', $qrobici ? number_format($qrobici['kpis']['estaciones']).' estaciones · '.number_format($qrobici['kpis']['km']).' km' : 'sin conexión remota', '#e0872b', '../qrobici/index.php'],
+      ['Qrobici',         $qrobici ? number_format($qrobici['kpis']['viajes']) : '—', $qrobici ? number_format($qrobici['kpis']['estaciones']).' estaciones · '.number_format($qrobici['kpis']['km']).' km' : 'sin conexión remota', '#e0872b', '../qrobici/index.php'],
     ];
     foreach ($tiles as [$t, $v, $s, $ac, $href]): ?>
       <a class="kt-card hover:shadow-md transition-shadow" href="<?= $href ?>" style="border-inline-start:4px solid <?= $ac ?>">

@@ -23,13 +23,19 @@ function qOne(PDO $pdo, string $sql, array $params = []) {
 // Si no hay datos cargados, mostrar pantalla de bienvenida
 $total_rows = (int)$pdo->query("SELECT COUNT(*) FROM tickets")->fetchColumn();
 if ($total_rows === 0) {
+    $ktTitle = 'Reportes de Servicio'; $ktActive = 'zendesk';
+    require __DIR__ . '/../../views/layout/kt_top.php';
     ?>
-    <!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
-    <title>Dashboard · sin datos</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <style>body{font-family:'Inter',system-ui;background:#fafafa;color:#1a1a1a;display:flex;align-items:center;justify-content:center;height:100vh;margin:0}.box{background:#fff;border:1px solid #ececec;border-radius:12px;padding:40px;text-align:center;max-width:480px}h1{margin:0 0 8px;font-size:22px}p{color:#6b7280;line-height:1.6;margin:0 0 20px}a{display:inline-block;background:#254185;color:#fff;padding:10px 18px;border-radius:8px;text-decoration:none;font-weight:500}</style>
-    </head><body><div class="box"><h1>Aún no hay tickets cargados</h1><p>La base de datos está conectada pero la tabla <code>tickets</code> está vacía. Descarga los tickets desde Zendesk.</p><a href="descargar_zendesk.php">Ir a descargar de Zendesk →</a></div></body></html>
+    <div class="page-head"><h1 style="color:#005ab2;font-weight:700">Reportes de Servicio · Municipio de Querétaro</h1>
+      <p class="text-secondary">Sistema de atención ciudadana</p></div>
+    <div style="max-width:560px;margin:48px auto;text-align:center;background:var(--card);border:1px solid var(--border);border-radius:.75rem;padding:40px 32px">
+      <div style="width:56px;height:56px;border-radius:14px;background:#e8f1fb;color:#005ab2;display:inline-flex;align-items:center;justify-content:center;margin-bottom:18px"><i class="ki-filled ki-document" style="font-size:26px"></i></div>
+      <h2 style="font-size:18px;font-weight:700;color:var(--foreground);margin:0 0 8px">Aún no hay tickets cargados</h2>
+      <p style="color:var(--muted-foreground);line-height:1.6;margin:0 0 22px">La base de datos está conectada pero la tabla <code>tickets</code> está vacía. Descarga los tickets desde Zendesk para ver el dashboard.</p>
+      <a href="descargar_zendesk.php" style="display:inline-block;background:#005ab2;color:#fff;padding:10px 18px;border-radius:8px;text-decoration:none;font-weight:600">Ir a descargar de Zendesk</a>
+    </div>
     <?php
+    require __DIR__ . '/../../views/layout/kt_bottom.php';
     exit;
 }
 
@@ -303,13 +309,12 @@ $periodo_str = $fmt($rango['d_min']) . ' — ' . $fmt($rango['d_max']);
 $num_deleg = (int)$pdo->query("SELECT COUNT(DISTINCT delegacion_id) FROM tickets WHERE delegacion_id IS NOT NULL AND $WF")->fetchColumn();
 ?>
 <?php
-$ktTitle  = 'Dashboard Reportes de Servicio · Querétaro';
+$ktTitle  = 'Reportes de Servicio';
 $ktActive = 'zendesk';
 require __DIR__ . '/../../views/layout/kt_top.php';
 ?>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{ --positive:#188a5b;--warning:#d99000;--negative:#ce3a2b;--neutral:#005ab2; }
   .container{padding:0}
@@ -596,10 +601,10 @@ require __DIR__ . '/../../views/layout/kt_top.php';
 <script>
 const DATA = <?= json_encode($DATA, JSON_UNESCAPED_UNICODE) ?>;
 
-const COLORS = {primary:'#254185',positive:'#188a5b',warning:'#d99000',negative:'#ce3a2b',neutral:'#005ab2',accent:'#2a9eda',pink:'#5b667a',slate:'#5b667a'};
+const COLORS = {primary:'#005ab2',positive:'#188a5b',warning:'#b45309',negative:'#ce3a2b',neutral:'#94a3b8',accent:'#2a9eda',pink:'#5b667a',slate:'#64748b'};
 const PALETTE = [COLORS.primary,COLORS.positive,COLORS.warning,COLORS.negative,COLORS.neutral,COLORS.accent,COLORS.pink,COLORS.slate];
 
-Chart.defaults.font.family = 'Inter, system-ui, sans-serif';
+Chart.defaults.font.family = 'Montserrat, system-ui, sans-serif';
 Chart.defaults.font.size = 11;
 Chart.defaults.color = '#6b7280';
 Chart.defaults.borderColor = '#ececec';
