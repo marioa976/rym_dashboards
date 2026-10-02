@@ -78,6 +78,17 @@ function kt_menu_item(string $href, string $icon, string $label, bool $active): 
      sueltos. Las sub-páginas siguen accesibles al expandir el sidebar. */
   body.kt-sidebar-collapse .kt-submenu-group,
   body.kt-sidebar-collapse .kt-heading-item { display: none !important; }
+
+  /* Fix de overflow horizontal en móvil. Va aquí (después de styles.css) para
+     ganar el cascade: el wrapper es flex y debe poder encogerse (min-width:0),
+     y con el sidebar oculto (<lg) no debe reservar su ancho. */
+  .kt-wrapper, .kt-container-fixed, .kt-container-fluid, main, .container { min-width: 0; }
+  @media (max-width: 1023px) {
+    .kt-wrapper, .kt-header { padding-inline-start: 0 !important; }
+    /* Evita que un contenido ancho (p.ej. el heatmap) expanda el viewport de
+       layout en celular y deje el header/"Salir" fuera de pantalla. */
+    html, body { overflow-x: clip; max-width: 100vw; }
+  }
 </style>
 <?php if (!empty($ktHead)) echo $ktHead; ?>
 </head>
