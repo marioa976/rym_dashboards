@@ -71,10 +71,10 @@ require __DIR__ . '/../../views/layout/kt_top.php';
   </div>
 
   <div class="bl-ctrl">
-    <label><input type="checkbox" id="t-heat" checked> 🔥 Mapa de calor</label>
-    <label><input type="checkbox" id="t-pts"> 📍 Puntos</label>
-    <label><input type="checkbox" id="t-lim" checked> 🗺 Límites delegacionales</label>
-    <label><input type="checkbox" id="t-sec"> 🧭 Límites seccionales</label>
+    <label><input type="checkbox" id="t-heat" checked> <i class="ki-filled ki-pulse"></i> Mapa de calor</label>
+    <label><input type="checkbox" id="t-pts"> <i class="ki-filled ki-geolocation"></i> Puntos</label>
+    <label><input type="checkbox" id="t-lim" checked> <i class="ki-filled ki-map"></i> Límites delegacionales</label>
+    <label><input type="checkbox" id="t-sec"> <i class="ki-filled ki-compass"></i> Límites seccionales</label>
     <span class="bl-muted" style="font-size:12px">Con los límites seccionales activos, haz clic en una sección para filtrar la tabla.</span>
   </div>
 
@@ -87,7 +87,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
       <div class="bl-tactions">
         <span id="bl-tfilter" class="bl-chip" style="display:none"></span>
         <button id="bl-clear" class="bl-btn" style="display:none">Ver todos</button>
-        <button id="bl-export" class="bl-btn primary">⬇ Exportar CSV</button>
+        <button id="bl-export" class="bl-btn primary"><i class="ki-filled ki-file-down"></i> Exportar CSV</button>
       </div>
     </div>
     <div class="bl-tablewrap">
