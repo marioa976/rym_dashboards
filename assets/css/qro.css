@@ -16,7 +16,7 @@
 
   --qro-text-primary: #1f2937;
   --qro-text-secondary: #5b667a;
-  --qro-text-muted: #8a94a6;
+  --qro-text-muted: #6b7280;   /* AA en blanco (~4.8:1); antes #8a94a6 fallaba */
 
   --qro-success: #188a5b;
   --qro-warning: #d99000;
@@ -51,6 +51,14 @@ a:hover { text-decoration: underline; }
 
 .text-secondary { color: var(--qro-text-secondary); }
 .text-muted { color: var(--qro-text-muted); }
+
+/* ---------- Accesibilidad: anillo de foco visible por teclado ---------- */
+/* :where() mantiene especificidad baja para no pisar estilos de componentes. */
+:where(a, button, input, select, textarea, summary, [tabindex], [role="button"]):focus-visible {
+  outline: 2px solid var(--qro-blue);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
 
 /* ---------- Layout administrativo ---------- */
 .layout { display: flex; min-height: 100vh; }

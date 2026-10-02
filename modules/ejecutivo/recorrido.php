@@ -180,9 +180,9 @@ require __DIR__ . '/../../views/layout/kt_top.php';
     <div class="rc-panel" style="margin-top:14px">
       <h3>3 · Traza tu recorrido</h3>
       <div class="rc-tools">
-        <button class="rc-btn ghost" id="rc-poly" style="width:auto;flex:1"><i class="ki-filled ki-pencil"></i> Polígono</button>
-        <button class="rc-btn ghost" id="rc-corr" style="width:auto;flex:1"><i class="ki-filled ki-route"></i> Corredor</button>
-        <button class="rc-btn ghost" id="rc-clear" style="width:auto"><i class="ki-filled ki-trash"></i></button>
+        <button class="rc-btn ghost" id="rc-poly" style="width:auto;flex:1"><i class="ki-filled ki-pencil" aria-hidden="true"></i> Polígono</button>
+        <button class="rc-btn ghost" id="rc-corr" style="width:auto;flex:1"><i class="ki-filled ki-route" aria-hidden="true"></i> Corredor</button>
+        <button class="rc-btn ghost" id="rc-clear" style="width:auto" aria-label="Borrar el trazo" title="Borrar el trazo"><i class="ki-filled ki-trash" aria-hidden="true"></i></button>
       </div>
       <div class="rc-tools" id="rc-draw-actions" style="display:none">
         <button class="rc-btn" id="rc-finish" style="flex:1" disabled><i class="ki-filled ki-check"></i> Terminar</button>

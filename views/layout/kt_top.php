@@ -160,5 +160,5 @@ function kt_menu_item(string $href, string $icon, string $label, bool $active): 
   </header>
 
   <!-- Content -->
-  <main class="grow pt-5 pb-10" id="content" role="content">
+  <main class="grow pt-5 pb-10" id="content">
     <div class="<?= $__container ?>">

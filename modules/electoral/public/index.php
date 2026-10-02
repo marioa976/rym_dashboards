@@ -11,7 +11,7 @@ $kpiDefs = [
     'casillas'             => ['Casillas',             'Mesas receptoras',          '#005ab2'],
     'resultados_casilla'   => ['Registros de voto',    'Votos por casilla y código','#2a9eda'],
     'partidos'             => ['Partidos',             'Catálogo de fuerzas',       '#188a5b'],
-    'candidatos'           => ['Candidatos',           'Registrados por elección',  '#d99000'],
+    'candidatos'           => ['Candidatos',           'Registrados por elección',  '#b45309'],
     'import_log_resultados'=> ['Importaciones',        'Cargas de resultados',      '#ce3a2b'],
 ];
 $kpis = [];

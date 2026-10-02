@@ -1398,7 +1398,7 @@ function drawRoutes(){
     if(r.puntos.length<2)return;
     const path=r.puntos.map(p=>({lat:p[0],lng:p[1]}));
     const elec=r.tipo==='Eléctrica';
-    const pl=new google.maps.Polyline({path,strokeColor:elec?'#d99000':'#254185',strokeOpacity:0.55,strokeWeight:2.5,map:mapObj});
+    const pl=new google.maps.Polyline({path,strokeColor:elec?'#b45309':'#254185',strokeOpacity:0.55,strokeWeight:2.5,map:mapObj});
     pl._elec=elec;
     pl.addListener('mouseover',()=>pl.setOptions({strokeWeight:4.5,strokeOpacity:1}));
     pl.addListener('mouseout',()=>pl.setOptions({strokeWeight:2.5,strokeOpacity:0.55}));
@@ -1517,7 +1517,7 @@ function renderCalif(){
     const pct  = k.pct;
     const color = prom === null ? '#6b7a98'
                 : pct >= 80 ? '#188a5b'
-                : pct >= 60 ? '#d99000' : '#ce3a2b';
+                : pct >= 60 ? '#b45309' : '#ce3a2b';
     html += `
       <div class="card kpi">
         <div class="kicker">${dimIcon[d]} ${dimLabel[d]}</div>
@@ -1548,7 +1548,7 @@ function renderCalif(){
           const stars = '★'.repeat(Math.min(escala, Math.round(r.valor)));
           // color graduado: 5/5 verde, 1/5 rojo
           const k = r.valor / escala;
-          const col = k >= .8 ? '#188a5b' : k >= .6 ? '#7fbf3f' : k >= .4 ? '#d99000' : '#ce3a2b';
+          const col = k >= .8 ? '#188a5b' : k >= .6 ? '#7fbf3f' : k >= .4 ? '#b45309' : '#ce3a2b';
           return `
             <div class="bar-row">
               <div class="bar-label" style="min-width:90px">

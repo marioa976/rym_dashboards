@@ -181,7 +181,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
 ?>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-  :root{--bg:#f5f7fb;--surface:#fff;--border:#d9e2f0;--text:#1f2937;--mut:#5b667a;--accent2:#005ab2;--ok:#188a5b;--warn:#d99000;--err:#ce3a2b}
+  :root{--bg:#f5f7fb;--surface:#fff;--border:#d9e2f0;--text:#1f2937;--mut:#5b667a;--accent2:#005ab2;--ok:#188a5b;--warn:#b45309;--err:#ce3a2b}
   *{box-sizing:border-box} html,body{margin:0;background:var(--bg);color:var(--text);font-size:14px}
   .crumb{padding:12px 24px;font-size:13px;color:var(--mut)} .crumb a{color:var(--accent2);text-decoration:none}
   .nav{display:flex;gap:6px;flex-wrap:wrap;padding:0 24px 12px}

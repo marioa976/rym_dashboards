@@ -505,7 +505,7 @@ if ($plan) {
         $rutas_js[] = $coords;
     }
 }
-$colores = ['#254185','#ce3a2b','#188a5b','#d99000','#7c3aed','#2a9eda','#5b667a','#84cc16','#f97316','#0ea5e9'];
+$colores = ['#254185','#ce3a2b','#188a5b','#b45309','#7c3aed','#2a9eda','#5b667a','#84cc16','#f97316','#0ea5e9'];
 
 // Estado del wizard: form (1) · mapa (2-dibujo) · resultado (2-3) · lista (guardados)
 $vista = $vista_planes ? 'lista'
@@ -541,7 +541,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
 <style>
   :root{--bg:#fafafa;--surface:#fff;--border:#ececec;--border-strong:#e0e0e0;
     --text:#1a1a1a;--text-muted:#6b7280;--text-faint:#9ca3af;
-    --positive:#188a5b;--warning:#d99000;--negative:#ce3a2b;--neutral:#005ab2}
+    --positive:#188a5b;--warning:#b45309;--negative:#ce3a2b;--neutral:#005ab2}
   *{box-sizing:border-box;-webkit-font-smoothing:antialiased}
   body{margin:0;font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5}
   .container{max-width:1400px;margin:0 auto;padding:24px 32px 80px}
@@ -1304,7 +1304,7 @@ endif;
 const RUTAS  = <?= json_encode($rutas_js, JSON_UNESCAPED_UNICODE) ?>;
 const COLORS = <?= json_encode($colores) ?>;
 const CENTRO = { lat: <?= $p_lat ?>, lng: <?= $p_lng ?> };
-const COLORES_DIA = ['#1e40af','#005ab2','#8b5cf6','#a855f7','#d946ef','#ec4899','#f43f5e','#ce3a2b','#ea580c','#d99000','#ca8a04','#65a30d','#16a34a','#2a9eda'];
+const COLORES_DIA = ['#1e40af','#005ab2','#8b5cf6','#a855f7','#d946ef','#ec4899','#f43f5e','#ce3a2b','#ea580c','#b45309','#ca8a04','#65a30d','#16a34a','#2a9eda'];
 
 function initMap() {
   const map = new google.maps.Map(document.getElementById('map'), {

@@ -169,7 +169,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
   --cyan:#00d4ff;
   --azul:#3a7cff;
   --verde:#33ffb0;
-  --ambar:#d99000;
+  --ambar:#b45309;
   --rojo:#ce3a2b;
   --rosa:#5b667a;
   --pol:#7fb1ff;
@@ -452,7 +452,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
   background:linear-gradient(90deg, #001f3f, #00d4ff, #ffffff);
 }
 .legend .sw.jam-low { background:#ffd700; }
-.legend .sw.jam-med { background:#d99000; }
+.legend .sw.jam-med { background:#b45309; }
 .legend .sw.jam-high { background:#ce3a2b; }
 .legend .sw.iconmark {
   border-radius:50%; background:#ce3a2b;
@@ -637,11 +637,11 @@ const DARK_STYLE = [
 /* ---- Definición visual de tipos de alerta Waze ---- */
 const ALERT_VISUAL = {
   ACCIDENT:      {icon:'🚨', label:'Accidente',    color:'#ce3a2b'},
-  HAZARD:        {icon:'⚠️', label:'Peligro',       color:'#d99000'},
+  HAZARD:        {icon:'⚠️', label:'Peligro',       color:'#b45309'},
   WEATHERHAZARD: {icon:'🌧️', label:'Clima',         color:'#3a7cff'},
   ROAD_CLOSED:   {icon:'🚧', label:'Vía cerrada',   color:'#ce3a2b'},
-  CONSTRUCTION:  {icon:'🛠️', label:'Construcción',  color:'#d99000'},
-  JAM:           {icon:'🚗', label:'Embotellamiento',color:'#d99000'},
+  CONSTRUCTION:  {icon:'🛠️', label:'Construcción',  color:'#b45309'},
+  JAM:           {icon:'🚗', label:'Embotellamiento',color:'#b45309'},
   POLICE:        {icon:'👮', label:'Policía',       color:'#3a7cff'},
   OTHER:         {icon:'•',  label:'Otro',          color:'#7fb1ff'},
 };
@@ -809,7 +809,7 @@ function clearWazeLayer() {
 
 function colorJam(level) {
   if (level >= 4) return '#ce3a2b';
-  if (level >= 3) return '#d99000';
+  if (level >= 3) return '#b45309';
   if (level >= 1) return '#ffd700';
   return '#d9e2f0';
 }

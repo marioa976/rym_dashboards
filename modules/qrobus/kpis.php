@@ -84,7 +84,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
       <div class="k-card"><span class="acc" style="background:#188a5b"></span><div class="v"><?= number_format($D['geocod']) ?></div><div class="l">Geocodificados</div><div class="s"><?= $pct ?>% del total</div></div>
       <div class="k-card"><span class="acc" style="background:#ce3a2b"></span><div class="v"><?= number_format($D['tipos']) ?></div><div class="l">Tipos de aplicante</div></div>
       <div class="k-card"><span class="acc" style="background:#005ab2"></span><div class="v"><?= number_format($D['municipios']) ?></div><div class="l">Municipios</div></div>
-      <div class="k-card"><span class="acc" style="background:#d99000"></span><div class="v"><?= number_format($D['edad_prom'],1) ?></div><div class="l">Edad promedio</div></div>
+      <div class="k-card"><span class="acc" style="background:#b45309"></span><div class="v"><?= number_format($D['edad_prom'],1) ?></div><div class="l">Edad promedio</div></div>
       <div class="k-card"><span class="acc" style="background:#2a9eda"></span><div class="v"><?= number_format($D['viajes_prom'],1) ?></div><div class="l">Viajes/día (prom.)</div></div>
     </div>
 
@@ -104,7 +104,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
 <?php if ($D): ?>
 <script>
 const D = <?= json_encode($D, JSON_UNESCAPED_UNICODE) ?>;
-const QC = ['#254185','#005ab2','#2a9eda','#188a5b','#d99000','#ce3a2b','#1a2f63','#5b667a','#65a30d','#8b5cf6','#0ea5e9','#b45309','#16a34a','#7f1d1d'];
+const QC = ['#254185','#005ab2','#2a9eda','#188a5b','#b45309','#ce3a2b','#1a2f63','#5b667a','#65a30d','#8b5cf6','#0ea5e9','#b45309','#16a34a','#7f1d1d'];
 Chart.defaults.font.family = "'Montserrat',Arial,sans-serif";
 const donut=(id,rows)=>{ const el=document.getElementById(id); if(!el)return;
   new Chart(el,{type:'doughnut',data:{labels:rows.map(r=>r.k),datasets:[{data:rows.map(r=>+r.n),backgroundColor:QC,borderWidth:1,borderColor:'#fff'}]},

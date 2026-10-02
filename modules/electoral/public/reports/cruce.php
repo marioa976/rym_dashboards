@@ -166,7 +166,7 @@ $apoyosMed = mediana(array_column($rows, 'apoyos'));
 $quadDefs = [
     'prioridad'   => ['t'=>'Prioridad de inversión', 'd'=>'Afín (rentabilidad ≥ mediana) pero con pocos apoyos. Voto afín sin atender.', 'c'=>'#16a34a'],
     'consolidada' => ['t'=>'Consolidada',            'd'=>'Afín y bien atendida. Mantener.', 'c'=>'#0ea5e9'],
-    'fidelizar'   => ['t'=>'Revisar ROI',            'd'=>'Poco afín pero con muchos apoyos. Evaluar retorno.', 'c'=>'#d99000'],
+    'fidelizar'   => ['t'=>'Revisar ROI',            'd'=>'Poco afín pero con muchos apoyos. Evaluar retorno.', 'c'=>'#b45309'],
     'explorar'    => ['t'=>'Explorar',               'd'=>'Poco afín y poco atendida. Bajo costo de oportunidad.', 'c'=>'#94a3b8'],
 ];
 foreach ($rows as $sec => &$r) {
@@ -410,7 +410,7 @@ include __DIR__ . '/../partials/layout_top.php';
   <div class="cx-kpi"><span class="bar-accent" style="background:#b91c1c"></span><div class="v"><?= number_format($totTickets) ?></div><div class="l">Tickets</div><div class="s"><?= number_format($conTickets) ?> secc. con reportes</div></div>
   <div class="cx-kpi"><span class="bar-accent" style="background:#c2410c"></span><div class="v" style="color:#c2410c"><?= number_format($totAbiertos) ?></div><div class="l">Tickets abiertos</div><div class="s"><?= number_format($tasaResol,0) ?>% resueltos</div></div>
   <div class="cx-kpi"><span class="bar-accent" style="background:#16a34a"></span><div class="v" style="color:#16a34a"><?= number_format($afinesSinApoyo) ?></div><div class="l">Afines sin apoyo</div><div class="s">rentabilidad alta, 0 apoyos</div></div>
-  <div class="cx-kpi"><span class="bar-accent" style="background:#d99000"></span><div class="v" style="color:#d99000"><?= number_format($demandaSinCobertura) ?></div><div class="l">Demanda sin cobertura</div><div class="s">tickets abiertos, 0 apoyos</div></div>
+  <div class="cx-kpi"><span class="bar-accent" style="background:#b45309"></span><div class="v" style="color:#b45309"><?= number_format($demandaSinCobertura) ?></div><div class="l">Demanda sin cobertura</div><div class="s">tickets abiertos, 0 apoyos</div></div>
 </div>
 
 <!-- ===== Mapa + detalle ===== -->

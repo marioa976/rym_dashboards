@@ -73,7 +73,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
   --gris-2:#f4f6fb;
   --bd:#e6ecf5;
   --verde:#188a5b;
-  --ambar:#d99000;
+  --ambar:#b45309;
   --rojo:#ce3a2b;
   --rosa:#5b667a;
   --bg:#fbfcfe;
@@ -645,7 +645,7 @@ function renderDonut(elId, data, getKey, getVal, palette){
 function renderComposicion(){
   if (DATA.vacio) return;
   renderDonut('donut-estatus', DATA.por_estatus, d => d.estatus, d => d.bicis,
-    ['#254185','#5b8fd0','#d99000','#ce3a2b','#9bbfe6','#d9e2f0']);
+    ['#254185','#5b8fd0','#b45309','#ce3a2b','#9bbfe6','#d9e2f0']);
   renderDonut('donut-tipo', DATA.por_tipo, d => d.tipo, d => d.bicis,
     ['#254185','#5b667a','#d9e2f0']);
 }
