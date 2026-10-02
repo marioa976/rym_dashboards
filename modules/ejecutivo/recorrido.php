@@ -206,7 +206,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
       </div>
       <button class="rc-btn" id="rc-screen-btn" style="margin-top:12px"><i class="ki-filled ki-maximize"></i> Ver a pantalla completa</button>
       <div class="rc-row" style="margin-top:8px">
-        <button class="rc-btn ghost" id="rc-print-btn" style="flex:1"><i class="ki-filled ki-printer"></i> Imprimir</button>
+        <button class="rc-btn ghost" id="rc-print-btn" style="flex:1"><i class="ki-filled ki-printer" aria-hidden="true"></i> Imprimir<?php if ($verPII): ?> <i class="ki-filled ki-lock" aria-hidden="true"></i><?php endif; ?></button>
         <a class="rc-btn ghost" id="rc-gmaps" target="_blank" rel="noopener" style="flex:1;text-decoration:none"><i class="ki-filled ki-geolocation"></i> Abrir en Maps</a>
       </div>
     </div>
@@ -222,7 +222,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
     <h2 id="sc-title">Recorrido</h2>
     <div class="sc-chips" id="sc-chips"></div>
     <div class="sc-actions">
-      <button class="rc-btn ghost" id="sc-print" style="width:auto"><i class="ki-filled ki-printer"></i> Imprimir</button>
+      <button class="rc-btn ghost" id="sc-print" style="width:auto"><i class="ki-filled ki-printer" aria-hidden="true"></i> Imprimir<?php if ($verPII): ?> <i class="ki-filled ki-lock" aria-hidden="true"></i><?php endif; ?></button>
       <a class="rc-btn" id="sc-gmaps" target="_blank" rel="noopener" style="width:auto;text-decoration:none"><i class="ki-filled ki-geolocation"></i> Maps</a>
       <button class="rc-btn ghost" id="sc-close" style="width:auto">✕ Cerrar</button>
     </div>
@@ -239,6 +239,16 @@ const DIST_SECS = <?= json_encode($distSecs) ?>;
 const HASKEY  = <?= $apiKey ? 'true' : 'false' ?>;
 const VERPII  = <?= $verPII ? 'true' : 'false' ?>;
 const BASE    = <?= json_encode(rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? ''), '/')) ?>;
+const AUDIT_URL = <?= json_encode(url('audit.php')) ?>;
+function auditBeacon(action,detail){ try{ const fd=new FormData(); fd.append('action',action); fd.append('detail',detail||''); if(navigator.sendBeacon){navigator.sendBeacon(AUDIT_URL,fd);} else {fetch(AUDIT_URL,{method:'POST',body:fd,keepalive:true});} }catch(e){} }
+function imprimirFicha(){
+  if(VERPII){
+    const n = lastOrdered ? lastOrdered.length : 0;
+    if(!confirm('La ficha del recorrido incluye nombres de ciudadanos. La impresión queda registrada en auditoría. ¿Continuar? ('+n+' paradas)')) return;
+    auditBeacon('print_recorrido', n+' paradas'+(selSec?' · sec '+selSec:''));
+  }
+  window.print();
+}
 const $ = id => document.getElementById(id);
 function esc(s){ return String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 
@@ -546,7 +556,7 @@ function renderFicha(ordered){
 }
 function box(v,l){ return '<div class="b"><div class="v">'+v+'</div><div class="l">'+l+'</div></div>'; }
 
-$('rc-print-btn').addEventListener('click', ()=>window.print());
+$('rc-print-btn').addEventListener('click', imprimirFicha);
 
 // ---------- segunda pantalla (presentación del recorrido) ----------
 function scStopHtml(o,i){
@@ -581,7 +591,7 @@ function closeScreen(){
 }
 $('rc-screen-btn').addEventListener('click', openScreen);
 $('sc-close').addEventListener('click', closeScreen);
-$('sc-print').addEventListener('click', ()=>window.print());
+$('sc-print').addEventListener('click', imprimirFicha);
 document.addEventListener('keydown', e=>{ if(e.key==='Escape' && $('rc-screen').classList.contains('open')) closeScreen(); });
 
 function clearMarkers(){ if(cluster) cluster.clearMarkers(); for(const k of Object.keys(markers)){ (markers[k]||[]).forEach(m=>m.setMap(null)); markers[k]=[]; } }
