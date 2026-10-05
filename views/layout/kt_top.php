@@ -83,11 +83,13 @@ function kt_menu_item(string $href, string $icon, string $label, bool $active): 
      ganar el cascade: el wrapper es flex y debe poder encogerse (min-width:0),
      y con el sidebar oculto (<lg) no debe reservar su ancho. */
   .kt-wrapper, .kt-container-fixed, .kt-container-fluid, main, .container { min-width: 0; }
+  /* Ningún dashboard debe generar scroll horizontal: lo intrínsecamente ancho
+     (heatmaps, mapas) scrollea DENTRO de su propio contenedor. Esto además evita
+     que un overlay/mapa desborde el viewport (en celular dejaba el "Salir" fuera). */
+  html, body { overflow-x: clip; }
   @media (max-width: 1023px) {
     .kt-wrapper, .kt-header { padding-inline-start: 0 !important; }
-    /* Evita que un contenido ancho (p.ej. el heatmap) expanda el viewport de
-       layout en celular y deje el header/"Salir" fuera de pantalla. */
-    html, body { overflow-x: clip; max-width: 100vw; }
+    html, body { max-width: 100vw; }
   }
 </style>
 <?php if (!empty($ktHead)) echo $ktHead; ?>

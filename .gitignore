@@ -36,3 +36,7 @@ nbproject/
 
 # Datos sueltos
 *.csv
+
+# QA visual local (no versionar)
+_preview/
+scratchpad/

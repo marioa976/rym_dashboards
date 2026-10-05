@@ -548,7 +548,7 @@ footer .meta{font-family:'Montserrat',monospace;text-align:right;line-height:1.7
     <input type="hidden" name="f" value="1">
     <details <?= ($tiene_filtros_get || $preset) ? 'open' : '' ?>>
       <summary>
-        <span class="filters-icon">⚙</span>
+        <span class="filters-icon"><i class="ki-filled ki-filter" aria-hidden="true"></i></span>
         <span class="filters-title">Filtros del análisis</span>
         <?php if ($tot_desc > 0): ?>
           <span class="filters-badge"><?= number_format($tot_desc) ?> viajes descartados · <?= $pct_desc ?>% del total</span>
@@ -724,7 +724,7 @@ footer .meta{font-family:'Montserrat',monospace;text-align:right;line-height:1.7
         </div>
         <div id="map"></div>
         <div class="map-nokey" id="mapnokey" style="display:none">
-          <div class="big">🗺️</div>
+          <div class="big"><i class="ki-filled ki-map" aria-hidden="true"></i></div>
           <h3>No se pudo cargar el mapa</h3>
           <p>Verifica que la <code>google_maps_api_key</code> en <code>config.php</code> sea válida y tenga habilitada la <i>Maps JavaScript API</i>.</p>
         </div>
@@ -741,7 +741,7 @@ footer .meta{font-family:'Montserrat',monospace;text-align:right;line-height:1.7
     </div>
     <div class="grid g-2-1">
       <div class="card reveal"><div class="ctitle">Ranking de estaciones por uso total <span class="tag" id="tag-est"></span></div><div class="cdesc">Salidas + llegadas · ordenado por volumen</div><div style="overflow-x:auto"><table class="tbl" id="tbl-est"></table></div></div>
-      <div class="card reveal"><div class="ctitle">Balance de rebalanceo</div><div class="cdesc">Estaciones que ganan (+) o pierden (−) bicicletas. Útil para planear redistribución.</div><div id="chart-balance"></div><div class="note"><span class="ico">⚙️</span><span>Un balance muy negativo indica que la estación se vacía y requiere reabastecimiento; uno muy positivo, que se satura.</span></div></div>
+      <div class="card reveal"><div class="ctitle">Balance de rebalanceo</div><div class="cdesc">Estaciones que ganan (+) o pierden (−) bicicletas. Útil para planear redistribución.</div><div id="chart-balance"></div><div class="note"><span class="ico"><i class="ki-filled ki-information-2" aria-hidden="true"></i></span><span>Un balance muy negativo indica que la estación se vacía y requiere reabastecimiento; uno muy positivo, que se satura.</span></div></div>
     </div>
     <div class="card reveal" style="margin-top:16px">
       <div class="ctitle">Corredores más transitados <span class="tag">Top 12 pares Origen → Destino</span></div>
@@ -858,6 +858,13 @@ const MAP_ID    = <?= json_encode($GMAP_MAPID) ?>;
 
 /* ------------------ helpers ------------------ */
 const $ = id => document.getElementById(id);
+/* Iconografía: keenicons (del tema) para conceptos genéricos + dos glifos SVG
+   propios para bici/rayo (keenicons no tiene bicicleta, que es el objeto
+   central del tablero). Todo hereda tamaño (1em) y color (currentColor). */
+const KI = n => `<i class="ki-filled ki-${n}" aria-hidden="true"></i>`;
+const _svg = p => `<svg viewBox="0 0 16 16" width="1em" height="1em" fill="currentColor" style="vertical-align:-.125em" aria-hidden="true">${p}</svg>`;
+const BIKE = _svg('<path d="M4 4.5a.5.5 0 0 1 .5-.5H6a.5.5 0 0 1 0 1v.5h4.14l.386-1.158A.5.5 0 0 1 11 4h1a.5.5 0 0 1 0 1h-.64l-.311.935.807 1.29a3 3 0 1 1-.848.53l-.508-.812-2.076 3.322A.5.5 0 0 1 8 10.5H5.959a3 3 0 1 1-1.815-3.274L5 5.856V5h-.5a.5.5 0 0 1-.5-.5m1.5 2.443-.508.814c.5.444.85 1.054.967 1.743h1.139zM8 9.057 9.598 6.5H6.402zM4.937 9.5a2 2 0 0 0-.487-.877l-.548.877zM3.603 8.092A2 2 0 1 0 4.937 10.5H3a.5.5 0 0 1-.424-.765zm7.947.53a2 2 0 1 0 .848-.53l1.054 1.68a.5.5 0 1 1-.848.53z"/>');
+const BOLT = _svg('<path d="M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09z"/>');
 const fmt = n => Number(n).toLocaleString('es-MX');
 const fmt1 = n => Number(n).toLocaleString('es-MX',{minimumFractionDigits:1,maximumFractionDigits:1});
 const BLUES = ['#9bbfe6','#5b8fd0','#2a9eda','#254185','#1a2f63','#13234d','#0d1733'];
@@ -867,19 +874,19 @@ function renderHeader(){
   const k = DATA.kpis;
   $('footmeta').innerHTML = `Periodo · ${k.fecha_min} – ${k.fecha_max}<br>${fmt(k.total_viajes)} viajes · ${fmt(k.usuarios_unicos)} usuarios · ${k.estaciones_activas} estaciones`;
   $('hbadges').innerHTML = `
-    <div class="hbadge">📅 <b>${k.fecha_min} – ${k.fecha_max}</b></div>
-    <div class="hbadge">🚲 <b>${fmt(k.total_viajes)}</b> viajes</div>
-    <div class="hbadge">👥 <b>${fmt(k.usuarios_unicos)}</b> usuarios</div>
-    <div class="hbadge">📍 <b>${k.estaciones_activas}</b> estaciones</div>`;
+    <div class="hbadge">${KI('calendar')} <b>${k.fecha_min} – ${k.fecha_max}</b></div>
+    <div class="hbadge">${BIKE} <b>${fmt(k.total_viajes)}</b> viajes</div>
+    <div class="hbadge">${KI('users')} <b>${fmt(k.usuarios_unicos)}</b> usuarios</div>
+    <div class="hbadge">${KI('geolocation')} <b>${k.estaciones_activas}</b> estaciones</div>`;
   const kpis = [
-    {ico:'🚲',val:fmt(k.total_viajes),u:'',lbl:'Viajes totales',sub:`${k.dias_operacion} días de operación`,accent:true},
-    {ico:'📏',val:fmt1(k.dist_total_km),u:'km',lbl:'Distancia recorrida',sub:`prom. ${fmt(k.dist_prom_m)} m / viaje`},
-    {ico:'⏱️',val:fmt1(k.dur_total_horas),u:'h',lbl:'Tiempo de pedaleo',sub:`prom. ${fmt1(k.dur_prom_min)} min / viaje`},
-    {ico:'👥',val:fmt(k.usuarios_unicos),u:'',lbl:'Usuarios únicos',sub:`${fmt1(k.total_viajes/k.usuarios_unicos)} viajes / usuario`},
-    {ico:'⚡',val:k.vel_prom,u:'km/h',lbl:'Velocidad promedio',sub:`mediana ${k.vel_mediana} · p75 ${k.vel_p75} · efectiva ${k.vel_efectiva} km/h`},
-    {ico:'🔄',val:fmt(k.viajes_circulares),u:'',lbl:'Viajes circulares',sub:`${fmt1(100*k.viajes_circulares/k.total_viajes)}% mismo origen/destino`},
-    {ico:'🌱',val:fmt1(k.co2_kg),u:'kg',lbl:'CO₂ evitado (est.)',sub:`vs. recorrido en automóvil`},
-    {ico:'🎂',val:k.edad_prom,u:'años',lbl:'Edad promedio',sub:`${k.pct_curp}% de viajes con CURP`},
+    {ico:BIKE,val:fmt(k.total_viajes),u:'',lbl:'Viajes totales',sub:`${k.dias_operacion} días de operación`,accent:true},
+    {ico:KI('route'),val:fmt1(k.dist_total_km),u:'km',lbl:'Distancia recorrida',sub:`prom. ${fmt(k.dist_prom_m)} m / viaje`},
+    {ico:KI('timer'),val:fmt1(k.dur_total_horas),u:'h',lbl:'Tiempo de pedaleo',sub:`prom. ${fmt1(k.dur_prom_min)} min / viaje`},
+    {ico:KI('users'),val:fmt(k.usuarios_unicos),u:'',lbl:'Usuarios únicos',sub:`${fmt1(k.total_viajes/k.usuarios_unicos)} viajes / usuario`},
+    {ico:KI('flash-circle'),val:k.vel_prom,u:'km/h',lbl:'Velocidad promedio',sub:`mediana ${k.vel_mediana} · p75 ${k.vel_p75} · efectiva ${k.vel_efectiva} km/h`},
+    {ico:KI('arrows-circle'),val:fmt(k.viajes_circulares),u:'',lbl:'Viajes circulares',sub:`${fmt1(100*k.viajes_circulares/k.total_viajes)}% mismo origen/destino`},
+    {ico:KI('tree'),val:fmt1(k.co2_kg),u:'kg',lbl:'CO₂ evitado (est.)',sub:`vs. recorrido en automóvil`},
+    {ico:KI('gift'),val:k.edad_prom,u:'años',lbl:'Edad promedio',sub:`${k.pct_curp}% de viajes con CURP`},
   ];
   $('kpis').innerHTML = kpis.map(x=>`
     <div class="kpi ${x.accent?'accent':''}">
@@ -1019,7 +1026,7 @@ function renderPulso(){
   const pico=DATA.serie_hora.reduce((a,b)=>b.viajes>a.viajes?b:a);
   const diaMax=DATA.serie_dia.reduce((a,b)=>b.viajes>a.viajes?b:a);
   const k=DATA.kpis;
-  $('insight-pulso').innerHTML=`<span class="ico">💡</span><span class="tx">El sistema registró un promedio de <b>${Math.round(k.total_viajes/k.dias_operacion)} viajes diarios</b>, con su pico a las <b>${pico.hora}:00 h</b> (${pico.viajes} viajes). La flota es predominantemente <b>mecánica (${k.pct_mecanica}%)</b> frente a la eléctrica (${k.pct_electrica}%). El día más activo acumuló <b>${diaMax.viajes} viajes y ${fmt1(diaMax.km)} km</b>.</span>`;
+  $('insight-pulso').innerHTML=`<span class="ico">${KI('information-2')}</span><span class="tx">El sistema registró un promedio de <b>${Math.round(k.total_viajes/k.dias_operacion)} viajes diarios</b>, con su pico a las <b>${pico.hora}:00 h</b> (${pico.viajes} viajes). La flota es predominantemente <b>mecánica (${k.pct_mecanica}%)</b> frente a la eléctrica (${k.pct_electrica}%). El día más activo acumuló <b>${diaMax.viajes} viajes y ${fmt1(diaMax.km)} km</b>.</span>`;
 
   // === Comparativa por tipo (mec vs elec) ===
   const pt = k.por_tipo || {};
@@ -1063,8 +1070,8 @@ function renderPulso(){
 
   let html = `
     <div class="comp-head">
-      <div class="comp-side-h mec">🚲 <b>Mecánica</b></div>
-      <div class="comp-side-h elec">⚡ <b>Eléctrica</b></div>
+      <div class="comp-side-h mec">${BIKE} <b>Mecánica</b></div>
+      <div class="comp-side-h elec">${BOLT} <b>Eléctrica</b></div>
     </div>
     ${rows.map(r => compRow(r.l, r.m, r.e, r.u, r.f)).join('')}
   `;
@@ -1076,7 +1083,7 @@ function renderPulso(){
   if (e.viajes > 0 && m.viajes > 0) {
     const direc = diff_vel >= 0 ? 'más rápida' : 'más lenta';
     const direcD = diff_dist >= 0 ? 'recorren más' : 'recorren menos';
-    nota = `<div class="comp-note">⚡ La flota eléctrica circula <b>${Math.abs(diff_vel).toFixed(1)} km/h ${direc}</b> que la mecánica, y los viajes eléctricos <b>${direcD} ${Math.abs(diff_dist)} m</b> en promedio.</div>`;
+    nota = `<div class="comp-note">${BOLT} La flota eléctrica circula <b>${Math.abs(diff_vel).toFixed(1)} km/h ${direc}</b> que la mecánica, y los viajes eléctricos <b>${direcD} ${Math.abs(diff_dist)} m</b> en promedio.</div>`;
   }
 
   $('tipo-compare').innerHTML = html + nota;
@@ -1132,7 +1139,7 @@ function renderPatrones(){
   const k=DATA.kpis;
   const durMode=DATA.dur_dist.filter((d,i)=>i>0).reduce((a,b)=>b.cantidad>a.cantidad?b:a);
   const heatPico=DATA.heat.reduce((a,b)=>b.viajes>a.viajes?b:a);
-  $('insight-patrones').innerHTML=`<span class="ico">📊</span><span class="tx">La mayoría de los viajes dura <b>${durMode.rango}</b>. La ventana de máxima intensidad fue <b>${heatPico.dia} a las ${heatPico.hora}:00 h</b>. Hay <b>${fmt(k.viajes_sin_distancia)} viajes con distancia 0</b> — probablemente desbloqueos sin uso real, conviene auditarlos.</span>`;
+  $('insight-patrones').innerHTML=`<span class="ico">${KI('chart-line')}</span><span class="tx">La mayoría de los viajes dura <b>${durMode.rango}</b>. La ventana de máxima intensidad fue <b>${heatPico.dia} a las ${heatPico.hora}:00 h</b>. Hay <b>${fmt(k.viajes_sin_distancia)} viajes con distancia 0</b> — probablemente desbloqueos sin uso real, conviene auditarlos.</span>`;
 }
 
 function renderHeatmap(){
@@ -1201,7 +1208,7 @@ function renderImpacto(){
       <div class="bar-track">
         <div class="bar-fill" style="width:${c.v}%;background:${c.v>85?'linear-gradient(90deg,#00d28e,#188a5b)':c.v>60?'linear-gradient(90deg,var(--cielo),var(--azul))':'linear-gradient(90deg,#ffb84d,var(--ambar))'}">${c.v}%</div>
       </div></div>`).join('');
-  $('notas-tecnicas').innerHTML=`<span class="ico">📋</span><span><b>Notas técnicas:</b> El reporte cubre ${fmt(total)} viajes entre el ${k.fecha_min} y el ${k.fecha_max}. Edad y sexo derivados de la CURP (${k.pct_curp}% de cobertura). ${DATA.rutas.length} viajes tienen recorrido GPS detallado. Las estimaciones de CO₂ y calorías usan factores de referencia configurables en <code>config.php</code>. Se detectaron ${fmt(k.viajes_sin_distancia)} viajes con duración y distancia en 0 que conviene auditar.</span>`;
+  $('notas-tecnicas').innerHTML=`<span class="ico">${KI('clipboard')}</span><span><b>Notas técnicas:</b> El reporte cubre ${fmt(total)} viajes entre el ${k.fecha_min} y el ${k.fecha_max}. Edad y sexo derivados de la CURP (${k.pct_curp}% de cobertura). ${DATA.rutas.length} viajes tienen recorrido GPS detallado. Las estimaciones de CO₂ y calorías usan factores de referencia configurables en <code>config.php</code>. Se detectaron ${fmt(k.viajes_sin_distancia)} viajes con duración y distancia en 0 que conviene auditar.</span>`;
 }
 
 function renderRutasDestacadas(){
@@ -1219,12 +1226,12 @@ function renderRutasDestacadas(){
     const kmh = r.dur > 0 ? (r.dist/1000) / (r.dur/3600) : 0;
     return `<div class="card" style="padding:18px" title="dist=${r.dist} m · dur=${r.dur} s">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-        <span class="pill ${r.tipo==='Eléctrica'?'elec':'meca'}">${r.tipo==='Eléctrica'?'⚡':'🚲'} ${r.tipo}</span>
+        <span class="pill ${r.tipo==='Eléctrica'?'elec':'meca'}">${r.tipo==='Eléctrica'?BOLT:BIKE} ${r.tipo}</span>
         <span style="font-family:'Montserrat';font-size:11px;color:var(--gris-l)">${r.folio}</span>
       </div>
       <div style="font-family:'Montserrat';font-weight:800;font-size:21px;color:var(--azul-d)">${kmStr} km</div>
       <div style="font-size:12.5px;color:var(--gris);margin-top:3px">${r.origen} → ${r.destino}</div>
-      <div style="font-size:11.5px;color:var(--gris-l);margin-top:8px;font-family:'Montserrat'">⏱ ${durStr} min · ${kmh.toFixed(2)} km/h prom.</div>
+      <div style="font-size:11.5px;color:var(--gris-l);margin-top:8px;font-family:'Montserrat'">${KI('timer')} ${durStr} min · ${kmh.toFixed(2)} km/h prom.</div>
     </div>`;
   }).join('');
 }
@@ -1238,10 +1245,10 @@ function renderPlanes(){
   const kp=DATA.kpis_planes;
   // 4 KPIs principales
   const kpis=[
-    {ico:'🎫',val:fmt(kp.total_planes),u:'',lbl:'Planes registrados',sub:`${fmt(kp.usuarios_con_plan)} usuarios distintos`,accent:true},
-    {ico:'✅',val:fmt(kp.planes_vigentes),u:'',lbl:'Planes vigentes hoy',sub:`${kp.tasa_vigencia}% del total`},
-    {ico:'💳',val:`${kp.tasa_pago}`,u:'%',lbl:'Tasa de pago',sub:`${fmt(kp.planes_pagados)} planes pagados`},
-    {ico:'🔁',val:`${kp.pct_renovacion}`,u:'%',lbl:'Tasa de renovación',sub:`${fmt(kp.renovaciones)} usuarios con > 1 plan`},
+    {ico:KI('price-tag'),val:fmt(kp.total_planes),u:'',lbl:'Planes registrados',sub:`${fmt(kp.usuarios_con_plan)} usuarios distintos`,accent:true},
+    {ico:KI('check-circle'),val:fmt(kp.planes_vigentes),u:'',lbl:'Planes vigentes hoy',sub:`${kp.tasa_vigencia}% del total`},
+    {ico:KI('credit-cart'),val:`${kp.tasa_pago}`,u:'%',lbl:'Tasa de pago',sub:`${fmt(kp.planes_pagados)} planes pagados`},
+    {ico:KI('arrows-loop'),val:`${kp.pct_renovacion}`,u:'%',lbl:'Tasa de renovación',sub:`${fmt(kp.renovaciones)} usuarios con > 1 plan`},
   ];
   $('kpis-planes').innerHTML=kpis.map(x=>`
     <div class="kpi ${x.accent?'accent':''}">
@@ -1369,7 +1376,7 @@ function renderPlanes(){
 
   // Insight
   const topPlan=pt[0];
-  $('insight-planes').innerHTML=`<span class="ico">💎</span><span class="tx">Hay <b>${fmt(kp.planes_vigentes)} planes vigentes</b> al día de hoy (${kp.tasa_vigencia}%). El plan más popular es <b>${topPlan.plan}</b> con ${topPlan.total} altas y tasa de pago del ${topPlan.tasa_pago}%. El <b>${kp.pct_renovacion}%</b> de los usuarios ha contratado más de un plan en el periodo. Duración promedio del plan: <b>${kp.duracion_prom_dias} días</b>.</span>`;
+  $('insight-planes').innerHTML=`<span class="ico">${KI('diamonds')}</span><span class="tx">Hay <b>${fmt(kp.planes_vigentes)} planes vigentes</b> al día de hoy (${kp.tasa_vigencia}%). El plan más popular es <b>${topPlan.plan}</b> con ${topPlan.total} altas y tasa de pago del ${topPlan.tasa_pago}%. El <b>${kp.pct_renovacion}%</b> de los usuarios ha contratado más de un plan en el periodo. Duración promedio del plan: <b>${kp.duracion_prom_dias} días</b>.</span>`;
 }
 
 /* ------------------ GOOGLE MAPS ------------------ */
@@ -1497,7 +1504,7 @@ function renderCalif(){
   const fmt = n => (n === null || n === undefined) ? '—' : Number(n).toLocaleString('es-MX');
   const fmtAvg = n => (n === null || n === undefined) ? '—' : Number(n).toFixed(2);
   const dimLabel = {bicicleta:'Bicicleta', estacion:'Estación', app:'App'};
-  const dimIcon  = {bicicleta:'🚲', estacion:'📍', app:'📱'};
+  const dimIcon  = {bicicleta:BIKE, estacion:KI('geolocation'), app:KI('phone')};
   const escala = c.escala || 5;
 
   // === FILA 1: tasa de respuesta + 3 promedios ===
