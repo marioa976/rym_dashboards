@@ -100,6 +100,9 @@ return [
                 'token'       => env_str('ZENDESK_TOKEN'),
                 'tag_default' => env_str('ZENDESK_TAG_DEFAULT', 'servicio_recoleccion_tiliches'),
             ],
+            // Secretos para endpoints máquina-a-máquina (sync nocturno y webhook).
+            'cron_key'       => env_str('ZENDESK_CRON_KEY'),        // Cloud Scheduler
+            'webhook_secret' => env_str('ZENDESK_WEBHOOK_SECRET'),  // firma/verificación del webhook de Zendesk
         ],
 
         // ---------------- Qrobici (Movilidad) -------------------

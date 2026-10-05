@@ -6,7 +6,9 @@
  */
 declare(strict_types=1);
 
-if (PHP_SAPI !== 'cli') {
+// Los endpoints máquina-a-máquina (sync_cron.php, webhook.php) definen ZD_NO_GUARD
+// y validan su propio secreto antes de incluir este config, así que no exigen login.
+if (PHP_SAPI !== 'cli' && !defined('ZD_NO_GUARD')) {
     require_once __DIR__ . '/../../core/guard.php';
     require_module('zendesk');
 }
@@ -31,5 +33,7 @@ return [
     'mapa_centro_lng' => -100.3899,
     'mapa_zoom'       => 11,
 
-    'zendesk_api' => $__m['zendesk_api'] ?? [],
+    'zendesk_api'    => $__m['zendesk_api'] ?? [],
+    'cron_key'       => $__m['cron_key'] ?? '',
+    'webhook_secret' => $__m['webhook_secret'] ?? '',
 ];
