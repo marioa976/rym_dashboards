@@ -613,6 +613,43 @@ function zd_importar(PDO $pdo, array $api, array $tickets, array $mapeo): array 
     return [$ok, $err];
 }
 
+/**
+ * Importación incremental de un rango [$desde, $hasta] por cursor (sin tope de
+ * 1000). Reutilizable desde el cron CLI y desde el endpoint HTTP del scheduler.
+ * Como usa la Incremental Export API (por updated_at), re-trae los tickets que
+ * cambiaron en la ventana -> actualiza estatus de los que se movieron.
+ * Devuelve un resumen asociativo (o ['error'=>...] si no puede arrancar).
+ */
+function zd_importar_rango(PDO $pdo, array $api, string $desde, string $hasta, string $origen = 'cron'): array {
+    if (empty($api['subdomain']) || empty($api['user']) || empty($api['token'])) return ['error' => 'Faltan credenciales de la API de Zendesk.'];
+    $mapeo = zd_cargar_mapeo($pdo);
+    if (!$mapeo) return ['error' => 'No hay mapeo de campos (importa sql/zendesk_mapeo.sql).'];
+    zd_sincronizar_estructura($pdo, $mapeo);
+
+    $ts = strtotime($desde . ' 00:00:00');
+    $cursor = ''; $pagina = 0; $totOk = 0; $totFetch = 0; $totErr = 0; $rate = 0;
+    while (true) {
+        $r = zd_incremental($api, $cursor, $ts);
+        if (!empty($r['rate_limited'])) { if (++$rate > 30) break; sleep(20); continue; }
+        $rate = 0;
+        if (!empty($r['error'])) { $totErr++; break; }
+        $pagina++;
+        $tickets = $r['tickets'];
+        [$ok, $errs] = zd_importar($pdo, $api, $tickets, $mapeo);
+        zd_log($pdo, ['desde'=>$desde,'hasta'=>$hasta,'tag'=>'','traidos'=>count($tickets),
+            'guardados'=>$ok,'errores'=>count($errs),'tope'=>0,'origen'=>$origen,'usuario_id'=>null]);
+        zd_log_errores($pdo, $errs, $origen);
+        $totOk += $ok; $totFetch += count($tickets); $totErr += count($errs);
+        if (!empty($r['fin']) || empty($r['next'])) break;
+        if ($pagina >= 5000) break;
+        $cursor = (string)$r['next'];
+        sleep(2);
+    }
+    @set_time_limit(0);
+    zd_asignar_secciones($pdo);
+    return ['desde'=>$desde,'hasta'=>$hasta,'guardados'=>$totOk,'traidos'=>$totFetch,'errores'=>$totErr,'paginas'=>$pagina];
+}
+
 /** Crea (si no existe) la tabla de bitácora y registra una ejecución de import. */
 function zd_log(PDO $pdo, array $d): void {
     try {
