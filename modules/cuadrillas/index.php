@@ -53,14 +53,14 @@ $kpis = [
       <div class="t"><i class="ki-filled ki-people"></i> Padrón</div>
       <div class="d">Administra cuadrillas y operadores (con su acceso a la app).</div>
     </a>
-    <div class="ac soon">
-      <div class="t"><i class="ki-filled ki-geolocation"></i> Asignar y despachar <span class="badge-soon">Próximo</span></div>
+    <a class="ac" href="<?= e(url('modules/cuadrillas/asignar.php')) ?>">
+      <div class="t"><i class="ki-filled ki-geolocation"></i> Asignar y despachar</div>
       <div class="d">Toma un plan de rutas, ligalo a una cuadrilla y despáchalo a campo.</div>
-    </div>
-    <div class="ac soon">
-      <div class="t"><i class="ki-filled ki-chart-line"></i> Seguimiento <span class="badge-soon">Próximo</span></div>
-      <div class="d">Avance en vivo, estatus de paradas y evidencias de campo.</div>
-    </div>
+    </a>
+    <a class="ac" href="<?= e(url('modules/cuadrillas/seguimiento.php')) ?>">
+      <div class="t"><i class="ki-filled ki-chart-line"></i> Seguimiento</div>
+      <div class="d">Avance de órdenes y estatus de paradas. Evidencias en la app (Fase 2).</div>
+    </a>
   </div>
 </div>
 

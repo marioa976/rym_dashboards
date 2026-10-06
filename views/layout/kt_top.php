@@ -40,7 +40,7 @@ $__subpages = [
                     ['Performance bicis','reporte_bicis.php'],['Flujo de la ciudad','mapa_animado.php'],
                     ['La ciudad en movimiento','cinema.php'],
                     ['Mapa de riesgos','mapa_riesgos.php']],
-    'cuadrillas'=> [['Tablero','index.php'],['Padrón','padron.php']],
+    'cuadrillas'=> [['Tablero','index.php'],['Asignar / despachar','asignar.php'],['Seguimiento','seguimiento.php'],['Padrón','padron.php']],
 ];
 $__page = basename((string)($_SERVER['SCRIPT_NAME'] ?? ''));
 

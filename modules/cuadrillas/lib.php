@@ -219,6 +219,130 @@ function cuad_operador_guardar(PDO $pdo, array $d): int
     return (int)$pdo->lastInsertId();
 }
 
+/* ============================================================
+   PLANES (origen del trazo) · ASIGNAR / DESPACHAR
+   ============================================================ */
+
+/** Planes guardados por el planificador (tabla cuadrillas_planes). */
+function cuad_planes(PDO $pdo): array
+{
+    try {
+        return $pdo->query(
+            "SELECT id, nombre, n_cuadrillas, n_tickets, km, creado_en
+               FROM cuadrillas_planes ORDER BY creado_en DESC"
+        )->fetchAll(PDO::FETCH_ASSOC);
+    } catch (Throwable $e) { return []; }   // la tabla puede no existir aún
+}
+
+/** Un plan decodificado: ['id','nombre','pl'=>[...]]. null si no existe. */
+function cuad_plan(PDO $pdo, int $id): ?array
+{
+    try {
+        $st = $pdo->prepare("SELECT id, nombre, payload FROM cuadrillas_planes WHERE id=?");
+        $st->execute([$id]);
+    } catch (Throwable $e) { return null; }
+    $r = $st->fetch(PDO::FETCH_ASSOC);
+    if (!$r) return null;
+    $pl = json_decode((string)$r['payload'], true);
+    if (!is_array($pl) || empty($pl['plan'])) return null;
+    return ['id' => (int)$r['id'], 'nombre' => (string)$r['nombre'], 'pl' => $pl];
+}
+
+/**
+ * Despacha un plan: por cada ruta del plan ASIGNADA a una cuadrilla real crea
+ * una `orden` por día (fecha = base + (día-1)) con sus `orden_parada` (una por
+ * ticket, en orden de visita) y registra el evento de despacho. Transaccional.
+ *
+ * $asig = [ indiceRutaDelPlan(0-based) => ['cuadrilla_id'=>int, 'fecha'=>'Y-m-d'] ]
+ * Devuelve ['ordenes'=>N, 'paradas'=>M, 'ids'=>[...]].
+ */
+function cuad_despachar(PDO $pdo, array $plan, array $asig, ?int $creado_por): array
+{
+    $rutas = $plan['pl']['plan'] ?? [];
+    $nOrd = 0; $nPar = 0; $ids = [];
+
+    $pdo->beginTransaction();
+    try {
+        $insOrden = $pdo->prepare(
+            "INSERT INTO orden (plan_id,cuadrilla_id,fecha,titulo,estatus,n_paradas,km,creado_por,despachada_en)
+             VALUES (?,?,?,?,'despachada',?,?,?,NOW())");
+        $insParada = $pdo->prepare(
+            "INSERT INTO orden_parada (orden_id,idx,ticket_id,titulo,direccion,lat,lng,estatus)
+             VALUES (?,?,?,?,?,?,?,'pendiente')");
+        $insEvento = $pdo->prepare(
+            "INSERT INTO orden_evento (orden_id,tipo,detalle) VALUES (?,'despacho',?)");
+
+        foreach ($rutas as $i => $cu) {
+            $cuadId = (int)($asig[$i]['cuadrilla_id'] ?? 0);
+            $fechaB = (string)($asig[$i]['fecha'] ?? '');
+            if ($cuadId <= 0 || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $fechaB)) continue;
+
+            foreach (($cu['dias'] ?? []) as $dia) {
+                $tickets = $dia['tickets'] ?? [];
+                if (!$tickets) continue;
+                $dnum  = (int)($dia['dia'] ?? 1);
+                $fecha = date('Y-m-d', strtotime($fechaB . ' +' . ($dnum - 1) . ' days'));
+                $titulo = trim(($plan['nombre'] ?: 'Plan') . ' · Cuadrilla ' . ($cu['cuadrilla'] ?? ($i + 1))
+                          . ($dnum > 1 ? " · Día $dnum" : ''));
+
+                $insOrden->execute([$plan['id'], $cuadId, $fecha, mb_substr($titulo, 0, 160),
+                                    count($tickets), round((float)($dia['km'] ?? 0), 1), $creado_por]);
+                $ordenId = (int)$pdo->lastInsertId();
+                $ids[] = $ordenId; $nOrd++;
+
+                $idx = 0;
+                foreach ($tickets as $t) {
+                    $tit = trim(($t['servicio'] ?? 'Ticket') . (!empty($t['colonia']) ? ' — ' . $t['colonia'] : ''));
+                    $insParada->execute([
+                        $ordenId, $idx++,
+                        (int)($t['id'] ?? 0) ?: null,
+                        mb_substr($tit, 0, 255),
+                        ($t['direccion'] ?? '') !== '' ? mb_substr((string)$t['direccion'], 0, 255) : null,
+                        isset($t['lat']) ? (float)$t['lat'] : null,
+                        isset($t['lng']) ? (float)$t['lng'] : null,
+                    ]);
+                    $nPar++;
+                }
+                $insEvento->execute([$ordenId, json_encode(['n_paradas' => count($tickets), 'plan_id' => $plan['id']])]);
+            }
+        }
+        $pdo->commit();
+    } catch (Throwable $e) {
+        $pdo->rollBack();
+        throw $e;
+    }
+    return ['ordenes' => $nOrd, 'paradas' => $nPar, 'ids' => $ids];
+}
+
+/** Lista de órdenes para seguimiento. */
+function cuad_ordenes(PDO $pdo, int $limite = 200): array
+{
+    $limite = max(1, min(500, $limite));
+    return $pdo->query(
+        "SELECT o.*, c.nombre AS cuadrilla, c.color,
+                (SELECT COUNT(*) FROM orden_parada p WHERE p.orden_id=o.id AND p.estatus='resuelta') AS resueltas
+           FROM orden o
+           LEFT JOIN cuadrilla c ON c.id = o.cuadrilla_id
+          ORDER BY o.fecha DESC, o.id DESC
+          LIMIT $limite"
+    )->fetchAll(PDO::FETCH_ASSOC);
+}
+
+/** Paradas de un conjunto de órdenes, agrupadas por orden_id. */
+function cuad_paradas_por_orden(PDO $pdo, array $ordenIds): array
+{
+    $ids = array_values(array_filter(array_map('intval', $ordenIds)));
+    if (!$ids) return [];
+    $in = implode(',', $ids);
+    $rows = $pdo->query(
+        "SELECT id, orden_id, idx, ticket_id, titulo, direccion, estatus, motivo_no
+           FROM orden_parada WHERE orden_id IN ($in) ORDER BY orden_id, idx"
+    )->fetchAll(PDO::FETCH_ASSOC);
+    $out = [];
+    foreach ($rows as $r) { $out[(int)$r['orden_id']][] = $r; }
+    return $out;
+}
+
 /** KPIs ligeros para el tablero. */
 function cuad_kpis(PDO $pdo): array
 {
