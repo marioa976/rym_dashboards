@@ -126,7 +126,10 @@ $ktActive = 'qrobici';
 $ktFluid = true;
 require __DIR__ . '/../../views/layout/kt_top.php';
 ?><style>
-:root{
+/* TODO el CSS del reporte vive bajo #qr para NO filtrarse al shell del portal
+   (sidebar/topbar/menú). Antes `*`, `body` y `header` reseteaban el shell y lo
+   hacían verse "embebido" / distinto al resto de los módulos. */
+#qr{
   /* Homologado: las variables del reporte se mapean a los tokens Metronic
      del portal, así toda la página hereda el tema unificado. */
   --azul:var(--primary); --azul-d:#254185; --azul-l:#e8f1fb; --azul-ll:transparent;
@@ -136,14 +139,13 @@ require __DIR__ . '/../../views/layout/kt_top.php';
   --sombra:0 1px 3px rgba(10,27,61,.04),0 8px 24px rgba(10,27,61,.06);
   --sombra-h:0 4px 12px rgba(10,27,61,.08),0 16px 40px rgba(10,27,61,.10);
 }
-*{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--tinta);line-height:1.5;-webkit-font-smoothing:antialiased}
-.wrap{max-width:none;margin:0;padding:0}
+#qr *{margin:0;padding:0;box-sizing:border-box}
+#qr{font-family:'Montserrat',sans-serif;color:var(--tinta);line-height:1.5;-webkit-font-smoothing:antialiased}
+#qr .wrap{max-width:none;margin:0;padding:0}
 
-header{background:transparent;color:var(--foreground);padding:4px 0 0;position:relative;overflow:visible}
-header::before{display:none}
-header .wrap{position:relative;z-index:2}
+#qr header{background:transparent;color:var(--foreground);padding:4px 0 0;position:relative;overflow:visible}
+#qr header::before{display:none}
+#qr header .wrap{position:relative;z-index:2}
 .brand{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
 .brand .name{display:flex;align-items:center;gap:11px;font-family:'Montserrat',sans-serif;font-weight:700;font-size:16px;letter-spacing:-.01em;color:var(--foreground)}
 .brand .name .dot{width:30px;height:30px;border-radius:9px;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px}
@@ -170,7 +172,7 @@ header .wrap{position:relative;z-index:2}
 .kpi.accent .val,.kpi.accent .lbl{color:#fff}
 .kpi.accent .sub{color:rgba(255,255,255,.7)}
 
-section{padding:54px 0 0}
+#qr section{padding:54px 0 0}
 
 /* ===== PANEL DE FILTROS ===== */
 .filters{margin:18px 0 0;position:relative;z-index:6}
@@ -494,10 +496,10 @@ svg .vlbl{font-size:11px;fill:var(--tinta);font-weight:700;font-family:'Montserr
 .mini .v{font-family:'Montserrat',sans-serif;font-size:26px;font-weight:800;letter-spacing:-.03em;color:var(--azul-d)}
 .mini .l{font-size:12px;color:var(--gris);margin-top:3px}
 
-footer{margin-top:64px;padding:38px 0;border-top:1px solid var(--linea);display:flex;align-items:center;justify-content:space-between;color:var(--gris-l);font-size:12.5px}
-footer .name{display:flex;align-items:center;gap:9px;font-family:'Montserrat',sans-serif;font-weight:800;color:var(--tinta);font-size:15px}
-footer .name .dot{width:26px;height:26px;border-radius:7px;background:var(--azul);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px}
-footer .meta{font-family:'Montserrat',monospace;text-align:right;line-height:1.7}
+#qr footer{margin-top:64px;padding:38px 0;border-top:1px solid var(--linea);display:flex;align-items:center;justify-content:space-between;color:var(--gris-l);font-size:12.5px}
+#qr footer .name{display:flex;align-items:center;gap:9px;font-family:'Montserrat',sans-serif;font-weight:800;color:var(--tinta);font-size:15px}
+#qr footer .name .dot{width:26px;height:26px;border-radius:7px;background:var(--azul);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px}
+#qr footer .meta{font-family:'Montserrat',monospace;text-align:right;line-height:1.7}
 
 .reveal{opacity:0;transform:translateY(16px);transition:opacity .6s,transform .6s}
 .reveal.in{opacity:1;transform:none}
@@ -514,16 +516,16 @@ footer .meta{font-family:'Montserrat',monospace;text-align:right;line-height:1.7
 }
 </style>
 
+<div id="qr">
 <header>
   <div class="wrap">
     <div class="brand">
-      <div class="name"><span class="dot">◉</span> QroBici</div>
+      <div class="skicker" style="color:var(--muted-foreground);font-size:12px;text-transform:uppercase;letter-spacing:.05em;font-weight:600">Inteligencia de movilidad · Sistema de bicicleta pública</div>
       <div class="meta">
         <span class="live-dot" style="display:inline-block;margin-right:6px"></span>DATOS EN VIVO<br>
         <span id="genfecha"><?= date('d M Y · H:i') ?></span>
       </div>
     </div>
-    <div class="skicker" style="color:var(--muted-foreground);margin-bottom:10px;font-size:12px;text-transform:uppercase;letter-spacing:.05em;font-weight:600">Inteligencia de movilidad · Sistema de bicicleta pública</div>
     <h1 class="htitle"><?= $TITULO ?></h1>
     <p class="hsub"><?= $SUBTITULO ?></p>
     <div class="hbadges" id="hbadges"></div>
@@ -1643,4 +1645,5 @@ if(GMAPS_KEY && GMAPS_KEY.length>10 && GMAPS_KEY!=='AIzaSy...PEGAR_AQUI...'){
   $('mapnokey').style.display='flex';
 }
 </script>
+</div><!-- /#qr -->
 <?php require __DIR__ . '/../../views/layout/kt_bottom.php'; ?>
