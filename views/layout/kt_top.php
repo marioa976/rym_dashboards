@@ -19,6 +19,7 @@ $__icons = [
     'ejecutivo' => 'chart-line-star', 'dif' => 'heart', 'zendesk' => 'abstract-14',
     'qrobici' => 'route', 'electoral' => 'map', 'qrobus' => 'bus',
     'bloque' => 'technology-4', 'areasverdes' => 'tree', 'obras' => 'abstract-26',
+    'cuadrillas' => 'delivery',
 ];
 
 /**
@@ -39,6 +40,7 @@ $__subpages = [
                     ['Performance bicis','reporte_bicis.php'],['Flujo de la ciudad','mapa_animado.php'],
                     ['La ciudad en movimiento','cinema.php'],
                     ['Mapa de riesgos','mapa_riesgos.php']],
+    'cuadrillas'=> [['Tablero','index.php'],['Padrón','padron.php']],
 ];
 $__page = basename((string)($_SERVER['SCRIPT_NAME'] ?? ''));
 
