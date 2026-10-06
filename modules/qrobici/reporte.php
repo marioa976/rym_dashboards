@@ -139,13 +139,16 @@ require __DIR__ . '/../../views/layout/kt_top.php';
   --sombra:0 1px 3px rgba(10,27,61,.04),0 8px 24px rgba(10,27,61,.06);
   --sombra-h:0 4px 12px rgba(10,27,61,.08),0 16px 40px rgba(10,27,61,.10);
 }
-#qr *{margin:0;padding:0;box-sizing:border-box}
+/* `:where(#qr)` scopea al reporte SIN subir especificidad (vale 0), así el reset
+   sigue perdiendo contra las reglas de clase como en el diseño original. Usar
+   `#qr *` lo subía a (1,0,1) y pisaba todos los padding/margin -> todo encimado. */
+:where(#qr) *{margin:0;padding:0;box-sizing:border-box}
 #qr{font-family:'Montserrat',sans-serif;color:var(--tinta);line-height:1.5;-webkit-font-smoothing:antialiased}
-#qr .wrap{max-width:none;margin:0;padding:0}
+:where(#qr) .wrap{max-width:none;margin:0;padding:0}
 
-#qr header{background:transparent;color:var(--foreground);padding:4px 0 0;position:relative;overflow:visible}
-#qr header::before{display:none}
-#qr header .wrap{position:relative;z-index:2}
+:where(#qr) header{background:transparent;color:var(--foreground);padding:4px 0 0;position:relative;overflow:visible}
+:where(#qr) header::before{display:none}
+:where(#qr) header .wrap{position:relative;z-index:2}
 .brand{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
 .brand .name{display:flex;align-items:center;gap:11px;font-family:'Montserrat',sans-serif;font-weight:700;font-size:16px;letter-spacing:-.01em;color:var(--foreground)}
 .brand .name .dot{width:30px;height:30px;border-radius:9px;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px}
@@ -172,7 +175,7 @@ require __DIR__ . '/../../views/layout/kt_top.php';
 .kpi.accent .val,.kpi.accent .lbl{color:#fff}
 .kpi.accent .sub{color:rgba(255,255,255,.7)}
 
-#qr section{padding:54px 0 0}
+:where(#qr) section{padding:54px 0 0}
 
 /* ===== PANEL DE FILTROS ===== */
 .filters{margin:18px 0 0;position:relative;z-index:6}
@@ -496,10 +499,10 @@ svg .vlbl{font-size:11px;fill:var(--tinta);font-weight:700;font-family:'Montserr
 .mini .v{font-family:'Montserrat',sans-serif;font-size:26px;font-weight:800;letter-spacing:-.03em;color:var(--azul-d)}
 .mini .l{font-size:12px;color:var(--gris);margin-top:3px}
 
-#qr footer{margin-top:64px;padding:38px 0;border-top:1px solid var(--linea);display:flex;align-items:center;justify-content:space-between;color:var(--gris-l);font-size:12.5px}
-#qr footer .name{display:flex;align-items:center;gap:9px;font-family:'Montserrat',sans-serif;font-weight:800;color:var(--tinta);font-size:15px}
-#qr footer .name .dot{width:26px;height:26px;border-radius:7px;background:var(--azul);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px}
-#qr footer .meta{font-family:'Montserrat',monospace;text-align:right;line-height:1.7}
+:where(#qr) footer{margin-top:64px;padding:38px 0;border-top:1px solid var(--linea);display:flex;align-items:center;justify-content:space-between;color:var(--gris-l);font-size:12.5px}
+:where(#qr) footer .name{display:flex;align-items:center;gap:9px;font-family:'Montserrat',sans-serif;font-weight:800;color:var(--tinta);font-size:15px}
+:where(#qr) footer .name .dot{width:26px;height:26px;border-radius:7px;background:var(--azul);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px}
+:where(#qr) footer .meta{font-family:'Montserrat',monospace;text-align:right;line-height:1.7}
 
 .reveal{opacity:0;transform:translateY(16px);transition:opacity .6s,transform .6s}
 .reveal.in{opacity:1;transform:none}
@@ -513,6 +516,9 @@ svg .vlbl{font-size:11px;fill:var(--tinta);font-weight:700;font-family:'Montserr
 @media(max-width:560px){
   .wrap{padding:0 16px} .kpis{grid-template-columns:1fr}
   .donut-wrap{flex-direction:column} .bar-label{width:88px}
+  /* En móvil el eyebrow y el "DATOS EN VIVO" no caben lado a lado: apílalos. */
+  .brand{flex-direction:column;align-items:flex-start;gap:8px}
+  .brand .meta{text-align:left}
 }
 </style>
 
