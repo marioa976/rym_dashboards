@@ -328,6 +328,42 @@ function cuad_ordenes(PDO $pdo, int $limite = 200): array
     )->fetchAll(PDO::FETCH_ASSOC);
 }
 
+/**
+ * Recalcula contadores y estatus de una orden a partir de sus paradas:
+ *  - todas cerradas (resuelta|no_resuelta)  -> 'cerrada' (+ cerrada_en)
+ *  - alguna tocada (no todas pendientes)    -> 'en_proceso'
+ *  - todas pendientes                       -> 'despachada'
+ * (No reabre una orden ya 'cancelada'.) Devuelve el nuevo estado.
+ */
+function cuad_recalc_orden(PDO $pdo, int $ordenId): array
+{
+    $actual = $pdo->prepare("SELECT estatus FROM orden WHERE id=?");
+    $actual->execute([$ordenId]);
+    $est0 = (string)$actual->fetchColumn();
+    if ($est0 === 'cancelada' || $est0 === '') {
+        return ['estatus' => $est0, 'n_resueltas' => 0, 'total' => 0];
+    }
+    $st = $pdo->prepare("SELECT estatus, COUNT(*) n FROM orden_parada WHERE orden_id=? GROUP BY estatus");
+    $st->execute([$ordenId]);
+    $by = []; $total = 0;
+    foreach ($st as $r) { $by[$r['estatus']] = (int)$r['n']; $total += (int)$r['n']; }
+    $res   = $by['resuelta'] ?? 0;
+    $nores = $by['no_resuelta'] ?? 0;
+    $pend  = $by['pendiente'] ?? 0;
+    $cerradas = $res + $nores;
+
+    if ($total > 0 && $cerradas >= $total) {
+        $pdo->prepare("UPDATE orden SET estatus='cerrada', n_resueltas=?, cerrada_en=COALESCE(cerrada_en,NOW()) WHERE id=?")
+            ->execute([$res, $ordenId]);
+        $nuevo = 'cerrada';
+    } else {
+        $nuevo = ($pend < $total) ? 'en_proceso' : 'despachada';
+        $pdo->prepare("UPDATE orden SET estatus=?, n_resueltas=?, cerrada_en=NULL WHERE id=?")
+            ->execute([$nuevo, $res, $ordenId]);
+    }
+    return ['estatus' => $nuevo, 'n_resueltas' => $res, 'total' => $total];
+}
+
 /** Paradas de un conjunto de órdenes, agrupadas por orden_id. */
 function cuad_paradas_por_orden(PDO $pdo, array $ordenIds): array
 {

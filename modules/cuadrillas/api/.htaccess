@@ -1,0 +1,7 @@
+# Asegura que el header Authorization: Bearer llegue a PHP (Apache suele quitarlo).
+CGIPassAuth On
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{HTTP:Authorization} .
+  RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+</IfModule>
