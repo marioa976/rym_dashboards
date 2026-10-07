@@ -4,8 +4,9 @@ App para que las cuadrillas atiendan sus rutas: ver las órdenes del día,
 navegar a cada parada y actualizar el estatus. Consume la API del portal
 (`modules/cuadrillas/api/`).
 
-> **MVP (Fase 2):** login, mis rutas, detalle de paradas, navegar y cambiar
-> estatus (online). Evidencias con cámara + offline llegan en la Fase 3.
+> **Hoy (F2–F3, online):** login, mis rutas, detalle de paradas, navegar,
+> cambiar estatus y **evidencias con cámara** (→ Google Cloud Storage).
+> Pendiente: offline-first y push (FCM).
 
 ## Requisitos
 - Flutter 3.19+ (Dart 3.3+). `flutter doctor` en verde para Android.
@@ -64,8 +65,11 @@ lib/
 - `GET  mis_ordenes.php` (Bearer) → órdenes abiertas + paradas
 - `POST estatus.php` (Bearer) → actualiza una parada
 
-## Pendiente (Fase 3)
-- Evidencias (cámara → Google Cloud Storage).
+## Pendiente
 - Offline-first (cola local + sync).
 - Push (FCM) de "nueva ruta asignada".
 - Mapa embebido de la ruta (hoy se navega con la app de mapas del teléfono).
+
+> **Cámara (Android):** `image_picker` usa la app de cámara del sistema por
+> intent, así que no requiere declarar el permiso `CAMERA`. Si en algún momento
+> lo declaras en el manifest, tendrás que pedir el permiso en runtime.

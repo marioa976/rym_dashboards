@@ -8,6 +8,7 @@ class Parada {
   final double? lng;
   String estatus;
   String? motivoNo;
+  final List<int> evidencias;
 
   Parada({
     required this.id,
@@ -19,7 +20,8 @@ class Parada {
     this.lng,
     this.estatus = 'pendiente',
     this.motivoNo,
-  });
+    List<int>? evidencias,
+  }) : evidencias = evidencias ?? [];
 
   bool get cerrada => estatus == 'resuelta' || estatus == 'no_resuelta';
 
@@ -33,5 +35,8 @@ class Parada {
         lng: j['lng'] == null ? null : (j['lng'] as num).toDouble(),
         estatus: (j['estatus'] ?? 'pendiente').toString(),
         motivoNo: j['motivo_no']?.toString(),
+        evidencias: ((j['evidencias'] as List?) ?? [])
+            .map((e) => (e['id'] as num).toInt())
+            .toList(),
       );
 }

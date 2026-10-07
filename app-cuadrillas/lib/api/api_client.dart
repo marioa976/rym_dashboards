@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -53,6 +54,11 @@ class ApiClient {
 
   Map<String, String> get _headers => {
         'Content-Type': 'application/json',
+        ...authHeaders,
+      };
+
+  /// Headers de autenticación (p.ej. para cargar imágenes protegidas).
+  Map<String, String> get authHeaders => {
         if (_token != null) 'Authorization': 'Bearer $_token',
         if (_token != null) 'X-Auth-Token': _token!,
       };
@@ -139,6 +145,34 @@ class ApiClient {
           .timeout(const Duration(seconds: 20));
     } catch (e) {
       throw ApiException('No hay conexión con el servidor.');
+    }
+    return _decode(r);
+  }
+
+  /// Sube una evidencia (foto) de una parada. Devuelve { evidencia:{id,tipo,...} }.
+  Future<Map<String, dynamic>> subirEvidencia(
+    int paradaId,
+    Uint8List bytes, {
+    String tipo = 'despues',
+    String? nota,
+    double? lat,
+    double? lng,
+    String filename = 'foto.jpg',
+  }) async {
+    final req = http.MultipartRequest('POST', _u('evidencia.php'));
+    req.headers.addAll(authHeaders);
+    req.fields['parada_id'] = paradaId.toString();
+    req.fields['tipo'] = tipo;
+    if (nota != null && nota.isNotEmpty) req.fields['nota'] = nota;
+    if (lat != null) req.fields['lat'] = lat.toString();
+    if (lng != null) req.fields['lng'] = lng.toString();
+    req.files.add(http.MultipartFile.fromBytes('foto', bytes, filename: filename));
+    late http.Response r;
+    try {
+      final streamed = await req.send().timeout(const Duration(seconds: 45));
+      r = await http.Response.fromStream(streamed);
+    } catch (e) {
+      throw ApiException('No se pudo subir la foto. Revisa tu conexión.');
     }
     return _decode(r);
   }

@@ -379,6 +379,39 @@ function cuad_paradas_por_orden(PDO $pdo, array $ordenIds): array
     return $out;
 }
 
+/** Operador válido a partir de un token (o null). Reutilizable fuera de la API. */
+function cuad_operador_por_token(PDO $pdo, string $token): ?array
+{
+    if ($token === '') return null;
+    $st = $pdo->prepare(
+        "SELECT o.id, o.nombre, o.usuario, o.rol, o.activo, o.cuadrilla_id,
+                c.nombre AS cuadrilla, c.color, s.id AS sesion_id, s.expira_en
+           FROM operador_sesion s
+           JOIN cuadrilla_operador o ON o.id = s.operador_id
+           LEFT JOIN cuadrilla c ON c.id = o.cuadrilla_id
+          WHERE s.token_hash = ? LIMIT 1");
+    $st->execute([hash('sha256', $token)]);
+    $r = $st->fetch(PDO::FETCH_ASSOC);
+    if (!$r || !(int)$r['activo']) return null;
+    if ($r['expira_en'] && strtotime((string)$r['expira_en']) < time()) return null;
+    return $r;
+}
+
+/** Evidencias de un conjunto de paradas, agrupadas por parada_id. */
+function cuad_evidencias_por_parada(PDO $pdo, array $paradaIds): array
+{
+    $ids = array_values(array_filter(array_map('intval', $paradaIds)));
+    if (!$ids) return [];
+    $in = implode(',', $ids);
+    $rows = $pdo->query(
+        "SELECT id, parada_id, tipo, nota, creado_en FROM parada_evidencia
+          WHERE parada_id IN ($in) ORDER BY parada_id, id"
+    )->fetchAll(PDO::FETCH_ASSOC);
+    $out = [];
+    foreach ($rows as $r) { $out[(int)$r['parada_id']][] = $r; }
+    return $out;
+}
+
 /** KPIs ligeros para el tablero. */
 function cuad_kpis(PDO $pdo): array
 {

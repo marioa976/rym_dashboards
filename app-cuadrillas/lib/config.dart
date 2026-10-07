@@ -8,6 +8,10 @@ class Config {
   /// Para pruebas contra tu máquina (emulador Android usa 10.0.2.2):
   // static const String baseUrl = 'http://10.0.2.2:8888/portal/modules/cuadrillas/api';
 
+  /// URL del visor privado de una evidencia (requiere el token en el header).
+  static String evidenciaUrl(int id) =>
+      '${baseUrl.replaceFirst('/api', '')}/evidencia_ver.php?id=$id';
+
   /// Colores de marca.
   static const int brand = 0xFF005AB2; // azul QRO
   static const int accent = 0xFF0F766E; // verde cuadrillas

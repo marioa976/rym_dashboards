@@ -14,6 +14,10 @@ cuad_ensure_schema($pdo);
 
 $ordenes = cuad_ordenes($pdo);
 $paradas = cuad_paradas_por_orden($pdo, array_column($ordenes, 'id'));
+// evidencias por parada (para las miniaturas)
+$todasParadas = [];
+foreach ($paradas as $ps) foreach ($ps as $p) $todasParadas[] = (int)$p['id'];
+$evidencias = cuad_evidencias_por_parada($pdo, $todasParadas);
 
 $flash = $_SESSION['cuad_flash'] ?? null; unset($_SESSION['cuad_flash']);
 
@@ -98,18 +102,28 @@ require __DIR__ . '/../../views/layout/kt_top.php';
         </summary>
         <div class="paradas">
           <table class="ptbl">
-            <thead><tr><th>#</th><th>Parada</th><th>Dirección</th><th>Ticket</th><th>Estatus</th></tr></thead>
+            <thead><tr><th>#</th><th>Parada</th><th>Dirección</th><th>Ticket</th><th>Estatus</th><th>Evidencia</th></tr></thead>
             <tbody>
-              <?php foreach ($ps as $p): $pe = $PEST[$p['estatus']] ?? $PEST['pendiente']; ?>
+              <?php foreach ($ps as $p): $pe = $PEST[$p['estatus']] ?? $PEST['pendiente']; $evs = $evidencias[(int)$p['id']] ?? []; ?>
                 <tr>
                   <td style="color:var(--muted-foreground)"><?= (int)$p['idx']+1 ?></td>
                   <td><?= e($p['titulo'] ?? '—') ?></td>
                   <td style="color:var(--muted-foreground)"><?= e($p['direccion'] ?? '—') ?></td>
                   <td><?php if($p['ticket_id']):?><code style="font-size:12px">#<?= (int)$p['ticket_id'] ?></code><?php else:?>—<?php endif;?></td>
                   <td><span class="pst" style="color:<?= $pe[1] ?>"><?= $pe[0] ?></span><?php if($p['estatus']==='no_resuelta' && $p['motivo_no']):?> <span style="color:var(--muted-foreground);font-weight:400">(<?= e($p['motivo_no']) ?>)</span><?php endif;?></td>
+                  <td>
+                    <?php if(!$evs):?><span style="color:var(--muted-foreground)">—</span>
+                    <?php else: ?><div style="display:flex;gap:5px;flex-wrap:wrap">
+                      <?php foreach($evs as $ev): ?>
+                        <a href="<?= e(url('modules/cuadrillas/evidencia_ver.php?id='.(int)$ev['id'])) ?>" target="_blank" title="<?= e($ev['tipo'].($ev['nota']?' · '.$ev['nota']:'')) ?>">
+                          <img src="<?= e(url('modules/cuadrillas/evidencia_ver.php?id='.(int)$ev['id'])) ?>" alt="evidencia" loading="lazy" style="width:40px;height:40px;object-fit:cover;border-radius:6px;border:1px solid var(--border)">
+                        </a>
+                      <?php endforeach; ?>
+                    </div><?php endif; ?>
+                  </td>
                 </tr>
               <?php endforeach; ?>
-              <?php if(!$ps):?><tr><td colspan="5" style="color:var(--muted-foreground)">Sin paradas.</td></tr><?php endif;?>
+              <?php if(!$ps):?><tr><td colspan="6" style="color:var(--muted-foreground)">Sin paradas.</td></tr><?php endif;?>
             </tbody>
           </table>
         </div>

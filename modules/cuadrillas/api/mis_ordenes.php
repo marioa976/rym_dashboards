@@ -45,10 +45,12 @@ if ($ordenes) {
         "SELECT id, orden_id, idx, ticket_id, titulo, direccion, lat, lng, estatus, motivo_no, resuelta_en
            FROM orden_parada WHERE orden_id IN ($ids) ORDER BY orden_id, idx"
     )->fetchAll(PDO::FETCH_ASSOC);
+    $evid = cuad_evidencias_por_parada($pdo, array_column($pr, 'id'));
     $porOrden = [];
     foreach ($pr as $p) {
+        $pid = (int)$p['id'];
         $porOrden[(int)$p['orden_id']][] = [
-            'id'        => (int)$p['id'],
+            'id'        => $pid,
             'idx'       => (int)$p['idx'],
             'ticket_id' => $p['ticket_id'] !== null ? (int)$p['ticket_id'] : null,
             'titulo'    => $p['titulo'],
@@ -58,6 +60,9 @@ if ($ordenes) {
             'estatus'   => $p['estatus'],
             'motivo_no' => $p['motivo_no'],
             'resuelta_en' => $p['resuelta_en'],
+            'evidencias' => array_map(fn($e) => [
+                'id' => (int)$e['id'], 'tipo' => $e['tipo'],
+            ], $evid[$pid] ?? []),
         ];
     }
     foreach ($ordenes as $o) {
