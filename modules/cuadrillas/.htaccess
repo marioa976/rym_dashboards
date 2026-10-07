@@ -1,0 +1,8 @@
+# Pasa el header Authorization: Bearer a PHP (lo usa evidencia_ver.php con token
+# de operador). Apache suele quitarlo si no se declara esto.
+CGIPassAuth On
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{HTTP:Authorization} .
+  RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+</IfModule>
