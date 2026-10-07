@@ -11,6 +11,7 @@
  */
 declare(strict_types=1);
 require __DIR__ . '/_api.php';
+require_once __DIR__ . '/../lib_zendesk.php';
 api_metodo('POST');
 
 $pdo = cuad_pdo();
@@ -69,6 +70,12 @@ try {
     $pdo->rollBack();
     error_log('[portal][cuadrillas-api] estatus: ' . $e->getMessage());
     api_error('No se pudo guardar el cambio. Intenta de nuevo.', 500);
+}
+
+// Reflejo a Zendesk (best-effort) al CERRAR una parada que viene de un ticket.
+// Solo si cambió a un estado terminal distinto del anterior.
+if (in_array($nuevo, ['resuelta', 'no_resuelta'], true) && $par['estatus'] !== $nuevo) {
+    cz_reflejar_parada($pdo, $paradaId, $nuevo, $op, $nuevo === 'no_resuelta' ? $motivo : null);
 }
 
 $o = $pdo->prepare("SELECT n_paradas FROM orden WHERE id=?");
