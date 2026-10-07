@@ -5,6 +5,31 @@
  */
 declare(strict_types=1);
 
+/**
+ * Normaliza un nombre de delegación a una de las 7 OFICIALES de Querétaro
+ * (devuelve el nombre canónico tal como está en cat_delegacion). Cualquier otro
+ * valor (ULID suelto, "X", nombre de colonia…) devuelve null, para NO crear
+ * delegaciones basura en el catálogo.
+ */
+function zd_deleg_canon(?string $s): ?string {
+    $s = trim((string)$s);
+    if ($s === '') return null;
+    $k = mb_strtoupper($s, 'UTF-8');
+    $k = strtr($k, ['Á'=>'A','É'=>'E','Í'=>'I','Ó'=>'O','Ú'=>'U','Ü'=>'U','Ñ'=>'N']);
+    $k = preg_replace('/\s+/', ' ', trim($k));
+    static $map = [
+        'CAYETANO RUBIO'             => 'CAYETANO RUBIO',
+        'VILLA CAYETANO RUBIO'       => 'CAYETANO RUBIO',
+        'CENTRO HISTORICO'           => 'CENTRO HISTORICO',
+        'EPIGMENIO GONZALEZ'         => 'EPIGMENIO GONZÁLEZ',
+        'FELIPE CARRILLO PUERTO'     => 'FELIPE CARRILLO PUERTO',
+        'FELIX OSORES SOTOMAYOR'     => 'FELIX OSORES SOTOMAYOR',
+        'JOSEFA VERGARA Y HERNANDEZ' => 'JOSEFA VERGARA Y HERNÁNDEZ',
+        'SANTA ROSA JAUREGUI'        => 'SANTA ROSA JÁUREGUI',
+    ];
+    return $map[$k] ?? null;
+}
+
 /** GET autenticado a Zendesk (Basic: email/token : api_token). */
 function zd_get(string $url, string $user, string $token): array {
     $ch = curl_init($url);
@@ -432,6 +457,10 @@ function zd_ticket_a_fila(PDO $pdo, array $ticket, array $mapeo, array $meta = [
         $col = $label('30954716982683', $cUlid);   // respaldo: etiqueta del campo o crudo
     }
 
+    // Normaliza a las 7 delegaciones OFICIALES de Querétaro. Si no coincide
+    // (ULID suelto, "X", una colonia, etc.) se deja sin delegación en vez de
+    // crear basura en cat_delegacion.
+    $deleg = zd_deleg_canon($deleg);
     if ($deleg) $row['delegacion_id'] = zd_get_or_create($pdo, 'cat_delegacion', $deleg);
     if (is_string($col) && $col !== '') $row['colonia'] = $col;
 
