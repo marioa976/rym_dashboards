@@ -47,6 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($_POST['accion'] ?? '', ['
             // Cruce espacial en una sola pasada al terminar el sync (no por página).
             @set_time_limit(300);
             zd_asignar_secciones($pdo);
+            zd_asignar_delegaciones($pdo);
             echo json_encode(['ok' => true]); exit;
         }
 

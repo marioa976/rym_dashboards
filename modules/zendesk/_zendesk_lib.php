@@ -624,6 +624,47 @@ function zd_asignar_secciones(PDO $pdo): void {
     } catch (Throwable $e) { /* no rompemos el import */ }
 }
 
+/**
+ * Deriva la delegación por GEOMETRÍA para tickets con coordenadas pero sin
+ * delegación (point-in-polygon contra delegaciones_geo, los 7 límites oficiales
+ * del KMZ). Mapea el nombre del KMZ al del catálogo con zd_deleg_canon. Corre
+ * bajo READ COMMITTED; son solo 7 polígonos, así que no necesita prefiltro.
+ * Best-effort: no rompe el import. Pensada para correr UNA vez al final del sync.
+ */
+function zd_asignar_delegaciones(PDO $pdo): void {
+    static $ready = null;   // null=sin revisar · false=no aplica · true=listo
+    static $pares = [];     // geo_id => cat_delegacion_id
+    try {
+        if ($ready === null) {
+            $ready = false;
+            $hay = (int)$pdo->query("SELECT COUNT(*) FROM information_schema.tables
+                      WHERE table_schema=DATABASE() AND table_name='delegaciones_geo'")->fetchColumn();
+            if (!$hay) return;
+            $cat = [];
+            foreach ($pdo->query("SELECT id,nombre FROM cat_delegacion") as $r) { $cat[$r['nombre']] = (int)$r['id']; }
+            foreach ($pdo->query("SELECT id,nombre FROM delegaciones_geo") as $g) {
+                $canon = zd_deleg_canon($g['nombre']);
+                if ($canon && isset($cat[$canon])) $pares[(int)$g['id']] = $cat[$canon];
+            }
+            if (!$pares) return;
+            $pdo->exec("SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED");
+            $ready = true;
+        }
+        if (!$ready) return;
+
+        $upd = $pdo->prepare("
+            UPDATE tickets t JOIN delegaciones_geo g ON g.id = :gid
+               SET t.delegacion_id = :cid
+             WHERE t.delegacion_id IS NULL AND t.latitud IS NOT NULL AND t.longitud IS NOT NULL
+               AND ST_Contains(ST_GeomFromWKB(ST_AsWKB(g.geom),0),
+                               ST_GeomFromText(CONCAT('POINT(',t.longitud,' ',t.latitud,')'),0))
+        ");
+        foreach ($pares as $gid => $cid) {
+            try { $upd->execute([':gid' => $gid, ':cid' => $cid]); } catch (Throwable $e) { /* sigue */ }
+        }
+    } catch (Throwable $e) { /* no rompemos el import */ }
+}
+
 function zd_importar(PDO $pdo, array $api, array $tickets, array $mapeo): array {
     zd_asegurar_form_id($pdo);      // columna del formulario de Zendesk
     $meta = zd_meta($api);
@@ -676,6 +717,7 @@ function zd_importar_rango(PDO $pdo, array $api, string $desde, string $hasta, s
     }
     @set_time_limit(0);
     zd_asignar_secciones($pdo);
+    zd_asignar_delegaciones($pdo);
     return ['desde'=>$desde,'hasta'=>$hasta,'guardados'=>$totOk,'traidos'=>$totFetch,'errores'=>$totErr,'paginas'=>$pagina];
 }
 

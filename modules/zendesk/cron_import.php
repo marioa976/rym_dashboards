@@ -84,7 +84,8 @@ while (true) {
 out("Asignando secciones a tickets nuevos (cruce espacial, una pasada)…");
 @set_time_limit(0);
 zd_asignar_secciones($pdo);
-out("Secciones asignadas.");
+zd_asignar_delegaciones($pdo);
+out("Secciones y delegaciones asignadas.");
 
 out("Listo. Guardados/actualizados: $totOk · Traídos: $totFetch · Errores: $totErr · Páginas: $pagina");
 exit($totErr > 0 ? 2 : 0);
