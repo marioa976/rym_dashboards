@@ -423,3 +423,101 @@ function cuad_kpis(PDO $pdo): array
         'paradas_pend' => $one("SELECT COUNT(*) FROM orden_parada p JOIN orden o ON o.id=p.orden_id WHERE o.estatus IN ('despachada','en_proceso') AND p.estatus IN ('pendiente','en_camino','en_sitio')"),
     ];
 }
+
+/**
+ * Payload del tablero EN VIVO: KPIs + paradas (con coords/estatus) de las órdenes
+ * abiertas + última posición conocida de cada cuadrilla (bitácora con GPS) +
+ * feed de actividad reciente. Pensado para refrescar por polling.
+ */
+function cuad_vivo_payload(PDO $pdo): array
+{
+    // Órdenes abiertas (con su cuadrilla).
+    $ordenes = $pdo->query(
+        "SELECT o.id, o.titulo, o.estatus, o.n_paradas, o.n_resueltas, o.cuadrilla_id,
+                c.nombre AS cuadrilla, c.color
+           FROM orden o LEFT JOIN cuadrilla c ON c.id = o.cuadrilla_id
+          WHERE o.estatus IN ('despachada','en_proceso')
+          ORDER BY o.id"
+    )->fetchAll(PDO::FETCH_ASSOC);
+
+    $ids = array_map('intval', array_column($ordenes, 'id'));
+    $meta = [];
+    foreach ($ordenes as $o) $meta[(int)$o['id']] = $o;
+
+    $paradas = [];
+    $posiciones = [];
+    if ($ids) {
+        $in = implode(',', $ids);
+
+        // Paradas con coordenadas.
+        $rows = $pdo->query(
+            "SELECT id, orden_id, idx, titulo, estatus, lat, lng
+               FROM orden_parada WHERE orden_id IN ($in)
+                AND lat IS NOT NULL AND lng IS NOT NULL
+              ORDER BY orden_id, idx"
+        )->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($rows as $r) {
+            $o = $meta[(int)$r['orden_id']] ?? [];
+            $paradas[] = [
+                'id'        => (int)$r['id'],
+                'orden_id'  => (int)$r['orden_id'],
+                'idx'       => (int)$r['idx'],
+                'titulo'    => $r['titulo'],
+                'estatus'   => $r['estatus'],
+                'lat'       => (float)$r['lat'],
+                'lng'       => (float)$r['lng'],
+                'cuadrilla' => $o['cuadrilla'] ?? null,
+                'color'     => $o['color'] ?? '#0f766e',
+            ];
+        }
+
+        // Última posición conocida por orden (último evento con GPS).
+        $rows = $pdo->query(
+            "SELECT e.orden_id, e.lat, e.lng, e.tipo, e.creado_en, op.nombre AS operador
+               FROM orden_evento e
+               JOIN (SELECT orden_id, MAX(id) AS mid FROM orden_evento
+                      WHERE lat IS NOT NULL AND orden_id IN ($in) GROUP BY orden_id) u ON u.mid = e.id
+               LEFT JOIN cuadrilla_operador op ON op.id = e.operador_id"
+        )->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($rows as $r) {
+            $o = $meta[(int)$r['orden_id']] ?? [];
+            $posiciones[] = [
+                'orden_id'  => (int)$r['orden_id'],
+                'lat'       => (float)$r['lat'],
+                'lng'       => (float)$r['lng'],
+                'tipo'      => $r['tipo'],
+                'cuando'    => $r['creado_en'],
+                'operador'  => $r['operador'],
+                'cuadrilla' => $o['cuadrilla'] ?? null,
+                'color'     => $o['color'] ?? '#0f766e',
+            ];
+        }
+    }
+
+    // Actividad reciente (últimos eventos de campo).
+    $actividad = $pdo->query(
+        "SELECT e.tipo, e.creado_en, e.detalle, op.nombre AS operador,
+                c.nombre AS cuadrilla, p.titulo AS parada
+           FROM orden_evento e
+           JOIN orden o ON o.id = e.orden_id
+           LEFT JOIN cuadrilla c ON c.id = o.cuadrilla_id
+           LEFT JOIN cuadrilla_operador op ON op.id = e.operador_id
+           LEFT JOIN orden_parada p ON p.id = e.parada_id
+          WHERE e.tipo <> 'despacho'
+          ORDER BY e.id DESC LIMIT 25"
+    )->fetchAll(PDO::FETCH_ASSOC);
+
+    return [
+        'ok'         => true,
+        'ts'         => date('H:i:s'),
+        'kpis'       => cuad_kpis($pdo),
+        'ordenes'    => array_map(fn($o) => [
+            'id' => (int)$o['id'], 'titulo' => $o['titulo'], 'estatus' => $o['estatus'],
+            'n_paradas' => (int)$o['n_paradas'], 'n_resueltas' => (int)$o['n_resueltas'],
+            'cuadrilla' => $o['cuadrilla'], 'color' => $o['color'] ?? '#0f766e',
+        ], $ordenes),
+        'paradas'    => $paradas,
+        'posiciones' => $posiciones,
+        'actividad'  => $actividad,
+    ];
+}

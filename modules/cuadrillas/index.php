@@ -49,6 +49,10 @@ $kpis = [
   </div>
 
   <div class="acts">
+    <a class="ac" href="<?= e(url('modules/cuadrillas/vivo.php')) ?>">
+      <div class="t"><i class="ki-filled ki-geolocation"></i> Tablero en vivo</div>
+      <div class="d">Mapa en tiempo real: paradas por estatus, posición de cuadrillas y actividad.</div>
+    </a>
     <a class="ac" href="<?= e(url('modules/cuadrillas/padron.php')) ?>">
       <div class="t"><i class="ki-filled ki-people"></i> Padrón</div>
       <div class="d">Administra cuadrillas y operadores (con su acceso a la app).</div>
