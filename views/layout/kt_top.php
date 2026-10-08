@@ -38,7 +38,7 @@ $__subpages = [
                     ['Descargar de Zendesk','descargar_zendesk.php',true]],
     'qrobici'   => [['Inicio','index.php'],['Informe ejecutivo','informe.php'],['Reporte de movilidad','reporte.php'],
                     ['Performance bicis','reporte_bicis.php'],['Flujo de la ciudad','mapa_animado.php'],
-                    ['La ciudad en movimiento','cinema.php'],['Dashboard (Claude)','dashboard_cloud.php'],
+                    ['La ciudad en movimiento','cinema.php'],
                     ['Mapa de riesgos','mapa_riesgos.php']],
     'cuadrillas'=> [['Tablero','index.php'],['En vivo','vivo.php'],['Asignar / despachar','asignar.php'],['Seguimiento','seguimiento.php'],['Padrón','padron.php']],
 ];
