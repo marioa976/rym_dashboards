@@ -1,9 +1,11 @@
 # ============================================================
-#  Imagen para Cloud Run — PHP 8.2 + Apache
+#  Imagen para Cloud Run — PHP 8.3 + Apache
 #  El portal se sirve en la raíz del contenedor (/var/www/html).
 #  Cloud Run inyecta el puerto en $PORT (8080 por defecto).
+#  El tag 8.3-apache resuelve al último parche de la línea 8.3
+#  (>= 8.3.36) y recibe parches de seguridad en cada build.
 # ============================================================
-FROM php:8.2-apache
+FROM php:8.3-apache
 
 # Librerías del sistema que necesitan algunas extensiones de PHP
 RUN apt-get update \
