@@ -73,10 +73,10 @@ try {
     if (!$ticket) throw new RuntimeException('Respuesta sin ticket.');
 
     [$okN, $errs] = zd_importar($pdo, $api, [$ticket], $mapeo);
-    // Cruce espacial ACOTADO a este ticket (punto, instantáneo). NUNCA un barrido
-    // completo: el webhook corre por cada ticket y eso abría muchas conexiones pesadas.
-    try { zd_asignar_secciones($pdo, $tid); } catch (Throwable $e) {}
-    try { zd_asignar_delegaciones($pdo, $tid); } catch (Throwable $e) {}
+    // El cruce espacial (sección/delegación) NO corre en el webhook: disparado por
+    // cada evento de Zendesk abría decenas de consultas pesadas en paralelo y
+    // congelaba la BD. La sección/delegación la asigna un cron geográfico aparte
+    // (cron_geo.php) cada X minutos.
 
     error_log("[portal][zendesk-webhook] ticket=$tid status=" . ($ticket['status'] ?? '?') . " guardado=$okN");
     echo json_encode(['ok'=>true, 'ticket'=>$tid, 'status'=>$ticket['status'] ?? null, 'guardado'=>$okN, 'errores'=>$errs], JSON_UNESCAPED_UNICODE);

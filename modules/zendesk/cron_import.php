@@ -80,12 +80,9 @@ while (true) {
 }
 
 // Cruce espacial UNA sola vez al final (no por página): asigna seccion_id a los
-// tickets nuevos con coordenadas. En CLI no hay límite de tiempo.
-out("Asignando secciones a tickets nuevos (cruce espacial, una pasada)…");
+// El cruce espacial (sección/delegación) lo hace el cron geográfico aparte
+// (cron_geo.php), para no mezclar una operación pesada con la importación.
 @set_time_limit(0);
-zd_asignar_secciones($pdo);
-zd_asignar_delegaciones($pdo);
-out("Secciones y delegaciones asignadas.");
 
 out("Listo. Guardados/actualizados: $totOk · Traídos: $totFetch · Errores: $totErr · Páginas: $pagina");
 exit($totErr > 0 ? 2 : 0);

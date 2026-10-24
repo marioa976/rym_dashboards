@@ -616,15 +616,11 @@ function zd_asignar_secciones(PDO $pdo, ?int $ticketId = null): void {
             } catch (Throwable $e) { /* cae al método directo */ }
         }
 
-        // FALLBACK directo (sin prefiltro): PLANO SRID 0 y punto (lng lat), válido en MySQL 8 y MariaDB.
-        $pdo->exec("
-            UPDATE tickets t
-              JOIN secciones_geo sg
-                ON ST_Contains(ST_GeomFromWKB(ST_AsWKB(sg.geom),0),
-                               ST_GeomFromText(CONCAT('POINT(',t.longitud,' ',t.latitud,')'),0))
-              SET t.seccion_id = sg.seccion_id
-              WHERE t.seccion_id IS NULL AND t.latitud IS NOT NULL AND t.longitud IS NOT NULL{$scope}
-        ");
+        // SIN bbox NO hacemos el cruce directo: el `JOIN secciones_geo ON ST_Contains`
+        // es un producto cartesiano contra MILES de polígonos y congela la BD
+        // (lo vimos tardar >60 min). Se omite y lo reintenta el cron geográfico
+        // cuando el bbox esté disponible.
+        error_log('[portal][zendesk] secciones: bbox no disponible, se omite el cruce (evita cartesiano)');
     } catch (Throwable $e) { /* no rompemos el import */ }
 }
 
@@ -732,8 +728,8 @@ function zd_importar_rango(PDO $pdo, array $api, string $desde, string $hasta, s
         sleep(2);
     }
     @set_time_limit(0);
-    zd_asignar_secciones($pdo);
-    zd_asignar_delegaciones($pdo);
+    // El cruce espacial (sección/delegación) ya NO corre aquí: es pesado y
+    // bloqueaba la BD. Lo hace un cron geográfico aparte (cron_geo.php), cada X.
     return ['desde'=>$desde,'hasta'=>$hasta,'guardados'=>$totOk,'traidos'=>$totFetch,'errores'=>$totErr,'paginas'=>$pagina];
 }
 
