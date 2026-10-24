@@ -572,8 +572,12 @@ function zd_asegurar_form_id(PDO $pdo): void {
     } catch (Throwable $e) { /* si no hay permiso, el importador simplemente no la llena */ }
 }
 
-function zd_asignar_secciones(PDO $pdo): void {
+function zd_asignar_secciones(PDO $pdo, ?int $ticketId = null): void {
+    // $ticketId: si se pasa, SOLO cruza ese ticket (punto, barato) — para el
+    // webhook, que corre por ticket. Sin él, barre todos los seccion_id NULL:
+    // solo para el cierre de un sync grande, nunca por webhook.
     static $listo = null;     // null=sin revisar · false=no aplica · true=listo
+    $scope = $ticketId !== null ? ' AND t.ticket_id = ' . (int)$ticketId : '';
     try {
         if ($listo === null) {
             $listo = false;
@@ -604,7 +608,7 @@ function zd_asignar_secciones(PDO $pdo): void {
                        AND t.latitud  BETWEEN b.minlat AND b.maxlat
                       JOIN secciones_geo sg ON sg.seccion_id = b.seccion_id
                       SET t.seccion_id = b.seccion_id
-                     WHERE t.seccion_id IS NULL AND t.latitud IS NOT NULL AND t.longitud IS NOT NULL
+                     WHERE t.seccion_id IS NULL AND t.latitud IS NOT NULL AND t.longitud IS NOT NULL{$scope}
                        AND ST_Contains(ST_GeomFromWKB(ST_AsWKB(sg.geom),0),
                                        ST_GeomFromText(CONCAT('POINT(',t.longitud,' ',t.latitud,')'),0))
                 ");
@@ -619,7 +623,7 @@ function zd_asignar_secciones(PDO $pdo): void {
                 ON ST_Contains(ST_GeomFromWKB(ST_AsWKB(sg.geom),0),
                                ST_GeomFromText(CONCAT('POINT(',t.longitud,' ',t.latitud,')'),0))
               SET t.seccion_id = sg.seccion_id
-              WHERE t.seccion_id IS NULL AND t.latitud IS NOT NULL AND t.longitud IS NOT NULL
+              WHERE t.seccion_id IS NULL AND t.latitud IS NOT NULL AND t.longitud IS NOT NULL{$scope}
         ");
     } catch (Throwable $e) { /* no rompemos el import */ }
 }
@@ -631,7 +635,16 @@ function zd_asignar_secciones(PDO $pdo): void {
  * bajo READ COMMITTED; son solo 7 polígonos, así que no necesita prefiltro.
  * Best-effort: no rompe el import. Pensada para correr UNA vez al final del sync.
  */
-function zd_asignar_delegaciones(PDO $pdo): void {
+/**
+ * Deriva la delegación por geometría para tickets con coords pero sin delegación.
+ *
+ * $ticketId: si se pasa, SOLO evalúa ese ticket (búsqueda puntual por ticket_id,
+ * instantánea) — úsalo en el webhook, que corre por cada ticket. Sin él, barre
+ * TODOS los tickets sin delegación: solo para el cierre de un sync grande
+ * (cron/descarga/rango), nunca por ticket, porque el ST_Contains sin prefiltro
+ * sobre toda la tabla y en cada webhook abría muchísimas conexiones pesadas.
+ */
+function zd_asignar_delegaciones(PDO $pdo, ?int $ticketId = null): void {
     static $ready = null;   // null=sin revisar · false=no aplica · true=listo
     static $pares = [];     // geo_id => cat_delegacion_id
     try {
@@ -652,15 +665,18 @@ function zd_asignar_delegaciones(PDO $pdo): void {
         }
         if (!$ready) return;
 
+        $scope = $ticketId !== null ? ' AND t.ticket_id = :tid' : '';
         $upd = $pdo->prepare("
             UPDATE tickets t JOIN delegaciones_geo g ON g.id = :gid
                SET t.delegacion_id = :cid
-             WHERE t.delegacion_id IS NULL AND t.latitud IS NOT NULL AND t.longitud IS NOT NULL
+             WHERE t.delegacion_id IS NULL AND t.latitud IS NOT NULL AND t.longitud IS NOT NULL{$scope}
                AND ST_Contains(ST_GeomFromWKB(ST_AsWKB(g.geom),0),
                                ST_GeomFromText(CONCAT('POINT(',t.longitud,' ',t.latitud,')'),0))
         ");
         foreach ($pares as $gid => $cid) {
-            try { $upd->execute([':gid' => $gid, ':cid' => $cid]); } catch (Throwable $e) { /* sigue */ }
+            $args = [':gid' => $gid, ':cid' => $cid];
+            if ($ticketId !== null) $args[':tid'] = $ticketId;
+            try { $upd->execute($args); } catch (Throwable $e) { /* sigue */ }
         }
     } catch (Throwable $e) { /* no rompemos el import */ }
 }
