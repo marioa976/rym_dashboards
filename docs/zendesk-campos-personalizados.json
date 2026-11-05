@@ -1,0 +1,521 @@
+{
+  "fuente": "tabla zendesk_mapeo (portal_qro) · zd_cargar_mapeo()",
+  "generado": "2026-11-05",
+  "total": 64,
+  "estandar": 8,
+  "personalizados": 56,
+  "campos": [
+    {
+      "campo_id": "std_id",
+      "nombre": "Ticket ID",
+      "columna": "ticket_id",
+      "tipo": "texto",
+      "estandar": true,
+      "guardar": true
+    },
+    {
+      "campo_id": "std_created_at",
+      "nombre": "Creado",
+      "columna": "fecha_creacion",
+      "tipo": "fecha",
+      "estandar": true,
+      "guardar": true
+    },
+    {
+      "campo_id": "std_subject",
+      "nombre": "Asunto",
+      "columna": "zd_asunto",
+      "tipo": "texto",
+      "estandar": true,
+      "guardar": true
+    },
+    {
+      "campo_id": "std_description",
+      "nombre": "Descripción",
+      "columna": "zd_descripcion",
+      "tipo": "textolargo",
+      "estandar": true,
+      "guardar": true
+    },
+    {
+      "campo_id": "std_status",
+      "nombre": "Estado (Zendesk)",
+      "columna": "zd_estado",
+      "tipo": "texto",
+      "estandar": true,
+      "guardar": true
+    },
+    {
+      "campo_id": "std_priority",
+      "nombre": "Prioridad (Zendesk)",
+      "columna": "zd_prioridad",
+      "tipo": "texto",
+      "estandar": true,
+      "guardar": true
+    },
+    {
+      "campo_id": "std_updated_at",
+      "nombre": "Actualizado",
+      "columna": "zd_actualizado",
+      "tipo": "fecha",
+      "estandar": true,
+      "guardar": true
+    },
+    {
+      "campo_id": "std_tags",
+      "nombre": "Tags",
+      "columna": "zd_tags",
+      "tipo": "textolargo",
+      "estandar": true,
+      "guardar": true
+    },
+    {
+      "campo_id": "ID del campo",
+      "nombre": "Nombre conocido",
+      "columna": "zd_nombre_conocido",
+      "tipo": "texto",
+      "estandar": false,
+      "guardar": true
+    },
+    {
+      "campo_id": "30277746014619",
+      "nombre": "External ID Trámite (Uso Interno)",
+      "columna": "zd_external_id_tramite_uso_interno",
+      "tipo": "texto",
+      "estandar": false,
+      "guardar": true
+    },
+    {
+      "campo_id": "30278458271131",
+      "nombre": "Fecha estimada resolución",
+      "columna": "zd_fecha_estimada_resolucion",
+      "tipo": "fecha",
+      "estandar": false,
+      "guardar": true
+    },
+    {
+      "campo_id": "30283185089563",
+      "nombre": "Language",
+      "columna": "zd_language",
+      "tipo": "texto",
+      "estandar": false,
+      "guardar": true
+    },
+    {
+      "campo_id": "30283185103259",
+      "nombre": "Language confidence",
+      "columna": "zd_language_confidence",
+      "tipo": "texto",
+      "estandar": false,
+      "guardar": true
+    },
+    {
+      "campo_id": "30283185109147",
+      "nombre": "Sentiment",
+      "columna": "zd_sentiment",
+      "tipo": "texto",
+      "estandar": false,
+      "guardar": true
+    },
+    {
+      "campo_id": "30283202402587",
+      "nombre": "Sentiment confidence",
+      "columna": "zd_sentiment_confidence",
+      "tipo": "texto",
+      "estandar": false,
+      "guardar": true
+    },
+    {
+      "campo_id": "30289064739483",
+      "nombre": "Calle",
+      "columna": "zd_calle",
+      "tipo": "texto",
+      "estandar": false,
+      "guardar": true
+    },
+    {
+      "campo_id": "30310204899355",
+      "nombre": "Geolocalizacion",
+      "columna": "latitud",
+      "tipo": "geo",
+      "estandar": false,
+      "guardar": true
+    },
+    {
+      "campo_id": "30774801051675",
+      "nombre": "Nombre",
+      "columna": "zd_nombre",
+      "tipo": "texto",
+      "estandar": false,
+      "guardar": true
+    },
+    {
+      "campo_id": "30774806575643",
+      "nombre": "Apellido paterno",
+      "columna": "zd_apellido_paterno",
+      "tipo": "texto",
+      "estandar": false,
+      "guardar": true
+    },
+    {
+      "campo_id": "30774844883355",
+      "nombre": "Apellido materno",
+      "columna": "zd_apellido_materno",
+      "tipo": "texto",
+      "estandar": false,
+      "guardar": true
+    },
+    {
+      "campo_id": "30774870688027",
+      "nombre": "Teléfono",
+      "columna": "zd_telefono",
+      "tipo": "texto",
+      "estandar": false,
+      "guardar": true
+    },
+    {
+      "campo_id": "30774968022939",
+      "nombre": "Dirección",
+      "columna": "zd_direccion",
+      "tipo": "textolargo",
+      "estandar": false,
+      "guardar": true
+    },
+    {
+      "campo_id": "30874463523099",
+      "nombre": "Servicio",
+      "columna": "zd_servicio",
+      "tipo": "texto",
+      "estandar": false,
+      "guardar": true
+    },
+    {
+      "campo_id": "30930277484955",
+      "nombre": "Dependencia",
+      "columna": "zd_dependencia",
+      "tipo": "texto",
+      "estandar": false,
+      "guardar": true
+    },
+    {
+      "campo_id": "30954708072347",
+      "nombre": "Delegación",
+      "columna": "zd_delegacion",
+      "tipo": "texto",
+      "estandar": false,
+      "guardar": true
+    },
+    {
+      "campo_id": "30954716982683",
+      "nombre": "Colonia",
+      "columna": "zd_colonia",
+      "tipo": "texto",
+      "estandar": false,
+      "guardar": true
+    },
+    {
+      "campo_id": "31056030284059",
+      "nombre": "Imagen Evidencia (URL)",
+      "columna": "zd_imagen_evidencia_url",
+      "tipo": "textolargo",
+      "estandar": false,
+      "guardar": true
+    },
+    {
+      "campo_id": "31398369804827",
+      "nombre": "ID Siebel (Histórico Siebel)",
+      "columna": "zd_id_siebel_historico_siebel",
+      "tipo": "textolargo",
+      "estandar": false,
+      "guardar": true
+    },
+    {
+      "campo_id": "31398433135131",
+      "nombre": "Trámite / Servicio (Histórico Siebel)",
+      "columna": "zd_tramite_servicio_historico_siebel",
+      "tipo": "textolargo",
+      "estandar": false,
+      "guardar": true
+    },
+    {
+      "campo_id": "31657758911387",
+      "nombre": "Trámite",
+      "columna": "zd_tramite",
+      "tipo": "texto",
+      "estandar": false,
+      "guardar": true
+    },
+    {
+      "campo_id": "31658502069787",
+      "nombre": "CURP",
+      "columna": "zd_curp",
+      "tipo": "texto",
+      "estandar": false,
+      "guardar": true
+    },
+    {
+      "campo_id": "31658508667291",
+      "nombre": "Clave Catastral",
+      "columna": "zd_clave_catastral",
+      "tipo": "texto",
+      "estandar": false,
+      "guardar": true
+    },
+    {
+      "campo_id": "31758914331419",
+      "nombre": "Texto Notificación - Estado trámite",
+      "columna": "zd_texto_notificacion_estado_tramite",
+      "tipo": "textolargo",
+      "estandar": false,
+      "guardar": true
+    },
+    {
+      "campo_id": "31758940040475",
+      "nombre": "Texto Notificación - Detalle trámite",
+      "columna": "zd_texto_notificacion_detalle_tramite",
+      "tipo": "textolargo",
+      "estandar": false,
+      "guardar": true
+    },
+    {
+      "campo_id": "31758941273115",
+      "nombre": "Texto Notificación - Next steps trámite",
+      "columna": "zd_texto_notificacion_next_steps_tramite",
+      "tipo": "textolargo",
+      "estandar": false,
+      "guardar": true
+    },
+    {
+      "campo_id": "32061554573851",
+      "nombre": "Origen",
+      "columna": "zd_origen",
+      "tipo": "texto",
+      "estandar": false,
+      "guardar": true
+    },
+    {
+      "campo_id": "32633428068507",
+      "nombre": "Foto",
+      "columna": "zd_foto",
+      "tipo": "textolargo",
+      "estandar": false,
+      "guardar": true
+    },
+    {
+      "campo_id": "34447263331099",
+      "nombre": "Waiting Time",
+      "columna": "zd_waiting_time",
+      "tipo": "texto",
+      "estandar": false,
+      "guardar": true
+    },
+    {
+      "campo_id": "34447268839195",
+      "nombre": "Aircall SMS ID",
+      "columna": "zd_aircall_sms_id",
+      "tipo": "texto",
+      "estandar": false,
+      "guardar": true
+    },
+    {
+      "campo_id": "34447282840603",
+      "nombre": "Talk Time",
+      "columna": "zd_talk_time",
+      "tipo": "texto",
+      "estandar": false,
+      "guardar": true
+    },
+    {
+      "campo_id": "34447299021467",
+      "nombre": "Aircall Call ID",
+      "columna": "zd_aircall_call_id",
+      "tipo": "texto",
+      "estandar": false,
+      "guardar": true
+    },
+    {
+      "campo_id": "34447299077275",
+      "nombre": "Duration",
+      "columna": "zd_duration",
+      "tipo": "texto",
+      "estandar": false,
+      "guardar": true
+    },
+    {
+      "campo_id": "34656252740251",
+      "nombre": "Histórico Estados",
+      "columna": "zd_historico_estados",
+      "tipo": "textolargo",
+      "estandar": false,
+      "guardar": true
+    },
+    {
+      "campo_id": "38364924412059",
+      "nombre": "Primer mensaje",
+      "columna": "zd_primer_mensaje",
+      "tipo": "textolargo",
+      "estandar": false,
+      "guardar": true
+    },
+    {
+      "campo_id": "39003466062875",
+      "nombre": "Ticket actualizado",
+      "columna": "zd_ticket_actualizado",
+      "tipo": "texto",
+      "estandar": false,
+      "guardar": true
+    },
+    {
+      "campo_id": "39065662480411",
+      "nombre": "Estado de aprobación",
+      "columna": "zd_estado_de_aprobacion",
+      "tipo": "texto",
+      "estandar": false,
+      "guardar": true
+    },
+    {
+      "campo_id": "39077160152475",
+      "nombre": "Motivo de no resolución exitosa",
+      "columna": "zd_motivo_de_no_resolucion_exitosa",
+      "tipo": "textolargo",
+      "estandar": false,
+      "guardar": true
+    },
+    {
+      "campo_id": "39077332704411",
+      "nombre": "Tipo de resolución",
+      "columna": "zd_tipo_de_resolucion",
+      "tipo": "texto",
+      "estandar": false,
+      "guardar": true
+    },
+    {
+      "campo_id": "39102788352155",
+      "nombre": "Llamada de cierre 070",
+      "columna": "zd_llamada_de_cierre_070",
+      "tipo": "texto",
+      "estandar": false,
+      "guardar": true
+    },
+    {
+      "campo_id": "39103356425499",
+      "nombre": "Observación ciudadano",
+      "columna": "zd_observacion_ciudadano",
+      "tipo": "textolargo",
+      "estandar": false,
+      "guardar": true
+    },
+    {
+      "campo_id": "39433926299419",
+      "nombre": "Días hasta entrega",
+      "columna": "zd_dias_hasta_entrega",
+      "tipo": "texto",
+      "estandar": false,
+      "guardar": true
+    },
+    {
+      "campo_id": "39476158463515",
+      "nombre": "Tiempo estimado de resolución",
+      "columna": "zd_tiempo_estimado_de_resolucion",
+      "tipo": "texto",
+      "estandar": false,
+      "guardar": true
+    },
+    {
+      "campo_id": "39593888123675",
+      "nombre": "Open",
+      "columna": "zd_open",
+      "tipo": "texto",
+      "estandar": false,
+      "guardar": true
+    },
+    {
+      "campo_id": "40264807997723",
+      "nombre": "Motivo de no resolución",
+      "columna": "zd_motivo_de_no_resolucion",
+      "tipo": "textolargo",
+      "estandar": false,
+      "guardar": true
+    },
+    {
+      "campo_id": "41208139785115",
+      "nombre": "Satisfaction rating url",
+      "columna": "zd_satisfaction_rating_url",
+      "tipo": "texto",
+      "estandar": false,
+      "guardar": true
+    },
+    {
+      "campo_id": "42697341168795",
+      "nombre": "Promotor",
+      "columna": "zd_promotor",
+      "tipo": "texto",
+      "estandar": false,
+      "guardar": true
+    },
+    {
+      "campo_id": "42958319160475",
+      "nombre": "Equivalencia Zuper",
+      "columna": "zd_equivalencia_zuper",
+      "tipo": "texto",
+      "estandar": false,
+      "guardar": true
+    },
+    {
+      "campo_id": "43004553297179",
+      "nombre": "Tipo de resolución",
+      "columna": "zd_tipo_de_resolucion_2",
+      "tipo": "texto",
+      "estandar": false,
+      "guardar": true
+    },
+    {
+      "campo_id": "44200813400603",
+      "nombre": "Folio SIPUM",
+      "columna": "zd_folio_sipum",
+      "tipo": "texto",
+      "estandar": false,
+      "guardar": true
+    },
+    {
+      "campo_id": "47924465416219",
+      "nombre": "ID SIEBEL",
+      "columna": "zd_id_siebel",
+      "tipo": "texto",
+      "estandar": false,
+      "guardar": true
+    },
+    {
+      "campo_id": "49468096117275",
+      "nombre": "Tareas necesarias",
+      "columna": "zd_tareas_necesarias",
+      "tipo": "textolargo",
+      "estandar": false,
+      "guardar": true
+    },
+    {
+      "campo_id": "50340639690139",
+      "nombre": "Nivel de resolución",
+      "columna": "zd_nivel_de_resolucion",
+      "tipo": "texto",
+      "estandar": false,
+      "guardar": true
+    },
+    {
+      "campo_id": "50340653684507",
+      "nombre": "Grupo de canales",
+      "columna": "zd_grupo_de_canales",
+      "tipo": "texto",
+      "estandar": false,
+      "guardar": true
+    },
+    {
+      "campo_id": "51306711778331",
+      "nombre": "Colonia Geolocalizada",
+      "columna": "latitud",
+      "tipo": "geo",
+      "estandar": false,
+      "guardar": true
+    }
+  ]
+}
