@@ -30,6 +30,27 @@ function zd_deleg_canon(?string $s): ?string {
     return $map[$k] ?? null;
 }
 
+/**
+ * Extrae un teléfono MX (10 dígitos) del texto dado. Zendesk no llena el campo
+ * "Teléfono"; el ciudadano lo escribe en el mensaje/descripción. Maneja prefijo
+ * de país (+52 / +521) y descarta ladas inválidas (0/1). Devuelve 10 dígitos o
+ * null. Heurístico: toma la primera corrida de 10–13 dígitos que normalice bien.
+ */
+function zd_extraer_telefono(string ...$textos): ?string {
+    foreach ($textos as $t) {
+        if ($t === '') continue;
+        if (!preg_match_all('/\d{10,13}/', $t, $m)) continue;
+        foreach ($m[0] as $dig) {
+            $n = $dig;
+            if (strlen($n) === 13 && str_starts_with($n, '521'))      $n = substr($n, 3); // +521 (histórico)
+            elseif (strlen($n) === 12 && str_starts_with($n, '52'))   $n = substr($n, 2); // +52
+            elseif (strlen($n) === 11 && $n[0] === '1')               $n = substr($n, 1); // 1 + 10
+            if (strlen($n) === 10 && $n[0] !== '0' && $n[0] !== '1') return $n;
+        }
+    }
+    return null;
+}
+
 /** GET autenticado a Zendesk (Basic: email/token : api_token). */
 function zd_get(string $url, string $user, string $token): array {
     $ch = curl_init($url);
@@ -474,6 +495,16 @@ function zd_ticket_a_fila(PDO $pdo, array $ticket, array $mapeo, array $meta = [
     $row['fuente_archivo']  = 'zendesk-api';
     $row['zd_raw']          = json_encode($ticket, JSON_UNESCAPED_UNICODE);
     $row['zd_importado_en'] = date('Y-m-d H:i:s');
+
+    // Teléfono: Zendesk NO llena el campo "Teléfono"; el ciudadano lo escribe en
+    // el mensaje/descripción. Si viene vacío, intenta extraerlo del texto (barato).
+    if (empty($row['zd_telefono'])) {
+        $tel = zd_extraer_telefono(
+            (string)($row['zd_primer_mensaje'] ?? ''),
+            (string)($row['zd_descripcion'] ?? '')
+        );
+        if ($tel !== null) $row['zd_telefono'] = $tel;
+    }
     return $row;
 }
 
